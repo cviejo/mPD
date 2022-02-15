@@ -14,15 +14,15 @@ Scale = 1
 UpdateNeeded = true
 
 -- local ss = pipe(keys, filter(s.includes("Color")))
-local touchable = true
 local editmode = 0
 local canvasId
 
 local trace = fifo(30)
+local touchCount = 0
 
 function setup()
 	of.setVerticalSync(false) -- false for fps > 60 (desktop only, apparently)
-	of.setFrameRate(25)
+	of.setFrameRate(90)
 	of.enableSmoothing()
 	of.enableAntiAliasing()
 
@@ -41,9 +41,8 @@ function draw()
 	of.setColor(0, 0, 0, 100)
 	text.draw(math.floor(of.getFrameRate()), 50, 60)
 	text.draw("items:" .. #canvas.items(), 150, 60)
+	text.draw("touches:" .. touchCount, 250, 60)
 	text.draw(s.joinLines(trace.items()), 50, 120)
-
-	touchable = true
 end
 
 function touchEvent(touch)
@@ -69,12 +68,19 @@ end
 function keyPressed(key)
 	if (s.keyEq('e', key)) then
 		pd.queue(canvasId, 'editmode 0') --
+	elseif (s.keyEq('a', key)) then
+		pd.queue(canvasId, 'selectall') --
 	elseif (s.keyEq('w', key)) then
 		pd.queue(canvasId, 'editmode 1') --
+	elseif (s.keyEq('x', key)) then
+		pd.delete(canvasId) --
+	elseif (s.keyEq('u', key)) then
+		pd.queue(canvasId, 'undo') --
 	end
 end
 
 function gotMessage(msg)
+	-- console.log("msg", msg);
 	local parsed = parse(msg)
 
 	if parsed == nil then
@@ -95,13 +101,13 @@ function exit()
 	pd.closePatch()
 end
 
--- on android there's hundreds of touch events, which freezes the gui
--- this is a hack to match move events to the framerate
-touchMoved = function(touch)
-	if (touch.type ~= of.TouchEventArgs_move) then
-		touchEvent(touch)
-	elseif touchable then
-		touchEvent(touch)
-		touchable = false
-	end
-end
+touchMoved = touchEvent
+-- function(touch)
+-- 	touchCount = touchCount + 1
+--
+-- 		touchEvent(touch)
+-- 	elseif touchable then
+-- 		touchEvent(touch)
+-- 		touchable = false
+-- 	end
+-- end

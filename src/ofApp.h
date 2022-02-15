@@ -27,19 +27,20 @@ class ofApp : public ofBaseApp, ofxLuaListener {
 		void errorReceived(std::string &msg) {}
 
 		void keyPressed(ofKeyEventArgs &args);
-		void mousePressed(int x, int y, int button);
-		void mouseReleased(int x, int y, int button);
-		void mouseDragged(int x, int y, int button);
-		void mouseScrolled(ofMouseEventArgs & mouse);
+#if defined(TARGET_ANDROID)
 		void touchDown(ofTouchEventArgs& args);
 		void touchMoved(ofTouchEventArgs& args);
 		void touchUp(ofTouchEventArgs& args);
 		void touchDoubleTap(ofTouchEventArgs& args);
 		void touchCancelled(ofTouchEventArgs& args);
-#if defined(TARGET_ANDROID)
 		bool scaleBegin(ofxAndroidScaleEventArgs& aArgs);
 		bool scale(ofxAndroidScaleEventArgs& aArgs);
 		bool scaleEnd(ofxAndroidScaleEventArgs& aArgs);
 		void swipe(ofxAndroidSwipeDir swipeDir, int id);
+#else
+		void mousePressed(int x, int y, int button);
+		void mouseReleased(int x, int y, int button);
+		void mouseDragged(int x, int y, int button);
+		void mouseScrolled(ofMouseEventArgs & mouse);
 #endif
 };

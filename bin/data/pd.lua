@@ -11,14 +11,18 @@ M.queue = function(...)
 end
 
 M.flush = function()
-	if (queue ~= '') then
-		mpd.pdsend(queue)
-		queue = ''
-	end
+	if (queue == '') then return end
+
+	mpd.pdsend(queue)
+	queue = ''
 end
 
 M.send = function(...)
 	mpd.pdsend(joinWords({...}))
+end
+
+M.delete = function(canvasId)
+	M.queue(canvasId, 'key 1 8 0 1 0;', canvasId, 'key 0 8 0 1 0')
 end
 
 return M

@@ -23,12 +23,17 @@ ofSoundStreamSettings audioSettings;
 float* inputBuffer = NULL;
 int ticks = 8;
 bool computing = true;
+bool touchable = true;
+bool scaling = false;
+ofTouchEventArgs lastTouch;
 queue<ofMessage> pdMessages;
 
 //--------------------------------------------------------------------
 void gui_hook(char* buffer){
-	auto message = ofMessage(buffer);
-	pdMessages.push(message);
+	if (!ofIsStringInString(buffer, "pdtk_canvas_getscroll")){
+		auto message = ofMessage(buffer);
+		pdMessages.push(message);
+	}
 }
 
 //--------------------------------------------------------------
@@ -77,7 +82,7 @@ bool initAudio(){
 }
 
 //--------------------------------------------------------------------
- bool mpd::init() {
+bool mpd::init() {
 	if (!initAudio()){
 		clear();
 		return false;
@@ -94,11 +99,19 @@ bool initAudio(){
 	return true;
 }
 
+// - touchMoved: same fn for all events, since type is passed anyway
+// - touchable: limit rate to framerate
 //--------------------------------------------------------------------
 void mpd::touch(ofTouchEventArgs &touch) {
+	if (touch.id != 0 || scaling) {
+		return;
+	}
 	mtx.lock();
-	// touchMoved for all events, less clutter since type is passed anyway
-	lua.scriptTouchMoved(touch); 
+	if (touch.type != ofTouchEventArgs::move || touchable) {
+		touchable = false;
+		lastTouch = touch;
+		lua.scriptTouchMoved(touch);
+	}
 	mtx.unlock();
 }
 
@@ -142,6 +155,7 @@ void mpd::draw() {
 	mtx.lock();
 	lua.scriptDraw();
 	mtx.unlock();
+	touchable = true;
 }
 
 //--------------------------------------------------------------------
@@ -193,20 +207,30 @@ void mpd::audioOut(float *output, int size, int channelCount) {
 
 //--------------------------------------------------------------------
 bool mpd::scale(const string& type, float value, int x, int y) {
-	mtx.lock();
-	float scale = (float)lua.getNumber("Scale", 1);
-	if (type == "scroll") {
-		scale +=  value * 0.1f;
-	} else if (type == "scale") {
-		scale *=  value;
+	if (type == "scaleBegin") {
+		scaling = true;
 	}
-	// handle scalingEnd / begin
-	lua.setNumber("Scale", scale);
-	lua.setBool("UpdateNeeded", true);
+	if (type == "scaleEnd") {
+		scaling = false;
+	}
+	mtx.lock();
+	if (type == "scale") {
+		float scale = (float)lua.getNumber("Scale", 1);
+		if (type == "scroll") {
+			scale +=  value * 0.1f;
+		} else if (type == "scale") {
+			scale *=  value;
+		}
+		lua.setNumber("Scale", scale);
+		lua.setBool("UpdateNeeded", true);
+	}
+	else if (type == "scaleBegin") {
+		lastTouch.type = ofTouchEventArgs::up;
+		lua.scriptTouchMoved(lastTouch); // finalize touch
+	}
 	mtx.unlock();
 	return true;
 }
-
 
 //--------------------------------------------------------------------
 // Patch mpd::openPatch(const string& file, const string& folder) {
