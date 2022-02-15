@@ -1,75 +1,45 @@
 #pragma once
 
 #include "ofMain.h"
-#include "pd.h"
 #include "ofxLua.h"
 #if defined(TARGET_ANDROID)
 #include "ofxAndroid.h"
-#elif defined(TARGET_OF_IOS)
-#include "ofxiOS.h"
-#include "ofPinchGestureRecognizer.h"
 #endif
-
-using namespace pd;
+#include "./utils/PathWatcher.h"
 
 #if defined(TARGET_ANDROID)
 class ofApp : public ofxAndroidApp, ofxLuaListener {
-#elif defined(TARGET_OF_IOS)
-class ofApp : public ofxiOSApp, ofxLuaListener {
 #else
 class ofApp : public ofBaseApp, ofxLuaListener {
 #endif
 
 	public:
-		float scale = 1.0f;
-		bool updateNeeded = false;
-		bool lock = false;
-		ofxLua lua;
-		// ofxPd pd;
+		PathWatcher watcher;
 
 		void setup();
+		void update();
 		void draw();
-
-		void audioReceived(float * input,  int bufferSize, int channelCount);
-		void audioRequested(float * output, int bufferSize, int channelCount);
-
-		void keyPressed(int key);
-		
-		void touchDown(ofTouchEventArgs &touch);
-		void touchMoved(ofTouchEventArgs &touch);
-		void touchUp(ofTouchEventArgs &touch);
-		void touchDoubleTap(ofTouchEventArgs &touch);
-		// void touchCancelled(ofTouchEventArgs &touch);
-
-		void reset();
 		void exit();
+		void audioReceived(float * buffer, int size, int channelCount);
+		void audioRequested(float * buffer, int size, int channelCount);
 
-		void errorReceived(std::string &msg);
+		void gotMessage(ofMessage msg) {}
+		void errorReceived(std::string &msg) {}
 
+		void keyPressed(ofKeyEventArgs &args);
+		void mousePressed(int x, int y, int button);
+		void mouseReleased(int x, int y, int button);
+		void mouseDragged(int x, int y, int button);
+		void mouseScrolled(ofMouseEventArgs & mouse);
+		void touchDown(ofTouchEventArgs& args);
+		void touchMoved(ofTouchEventArgs& args);
+		void touchUp(ofTouchEventArgs& args);
+		void touchDoubleTap(ofTouchEventArgs& args);
+		void touchCancelled(ofTouchEventArgs& args);
 #if defined(TARGET_ANDROID)
-		bool onScaleBegin(ofxAndroidScaleEventArgs& aArgs);
-		bool onScale(ofxAndroidScaleEventArgs& aArgs);
-		bool onScaleEnd(ofxAndroidScaleEventArgs& aArgs);
-		// void swipe(ofxAndroidSwipeDir swipeDir, int id);
-#elif defined(TARGET_OF_IOS)
-		ofPinchGestureRecognizer* _pinch;
-#else
-		void mouseScrolled(ofMouseEventArgs & mouse) {
-			updateNeeded = true;
-			scale += mouse.scrollY * 0.1f;
-		}
-		void mouseDragged(int x, int y, int id) {
-			auto args = new ofTouchEventArgs(ofTouchEventArgs::move, x, y, id);
-			touchMoved(*args);
-		}
-		void mousePressed(int x, int y, int id) {
-			auto args = new ofTouchEventArgs(ofTouchEventArgs::down, x, y, id);
-			touchDown(*args);
-		}
-		void mouseReleased(int x, int y, int id) {
-			auto args = new ofTouchEventArgs(ofTouchEventArgs::up, x, y, id);
-			touchUp(*args);
-		}
-		// void mouseScrolled(ofMouseEventArgs & mouse);
+		bool scaleBegin(ofxAndroidScaleEventArgs& aArgs);
+		bool scale(ofxAndroidScaleEventArgs& aArgs);
+		bool scaleEnd(ofxAndroidScaleEventArgs& aArgs);
+		void swipe(ofxAndroidSwipeDir swipeDir, int id);
 #endif
 };

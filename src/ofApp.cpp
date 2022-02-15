@@ -1,144 +1,78 @@
 #include "ofApp.h"
+#include "mpd.h"
+#include "utils/events.h"
 
 void ofApp::setup() {
-#if defined(TARGET_ANDROID)
-	ofAddListener(ofxAndroidEvents().scaleBegin, this, &ofApp::onScaleBegin);
-	ofAddListener(ofxAndroidEvents().scale, this, &ofApp::onScale);
-	ofAddListener(ofxAndroidEvents().scaleEnd, this, &ofApp::onScaleEnd);
-#elif !defined(TARGET_OF_IOS)
-	ofAddListener(ofEvents().mouseScrolled, this, &ofApp::mouseScrolled);
-#endif
+	watcher.addPath(ofToDataPath("main.lua", true));
+	watcher.addPath(ofToDataPath("canvas.lua", true));
+	watcher.start();
 
-	lua.addListener(this);
+	mpd::init();
+}
 
-	#ifdef TARGET_LINUX_ARM
-		// longer latency for Raspberry PI
-		int ticksPerBuffer = 32; // 32 * 64 = buffer len of 2048
-		int numInputs = 0; // no built in mic
-	#else
-		int ticksPerBuffer = 8; // 8 * 64 = buffer len of 512
-		int numInputs = 1;
-	#endif
-
-	ofSoundStreamSettings settings;
-
-	settings.numInputChannels = 1;
-	settings.numOutputChannels = 2;
-	settings.sampleRate = 44100;
-	settings.bufferSize = pd::base.blockSize() * ticksPerBuffer;
-	settings.setInListener(this);
-	settings.setOutListener(this);
-
-	ofSoundStreamSetup(settings);
-
-	if(!pd::init(settings)) {
-		OF_EXIT_APP(1);
+void ofApp::update() {
+	while(watcher.waitingEvents()) {
+		watcher.stop();
+		watcher.nextEvent();
+		mpd::reload();
+		watcher.start();
 	}
-
-	pd::base.computeAudio(true);
-	Patch patch = pd::openPatch("test.pd");
-
-	this->reset();
 }
 
 void ofApp::draw() {
-	lua.setNumber("Scale", scale);
-	if(updateNeeded){
-		lua.setBool("UpdateNeeded", updateNeeded);
-		updateNeeded = false;
-	}
-	lua.scriptDraw();
+	mpd::draw();
 }
 
-void ofApp::reset() {
-	lua.scriptExit();
-	lua.init(true);
-	lua.doScript("main.lua", true);
-	lua.scriptSetup();
+void ofApp::keyPressed(ofKeyEventArgs &args) {
+	mpd::key(args);
 }
 
-void ofApp::keyPressed(int key) {
-	if (key == 114){
-		this->reset();
-	}
+void ofApp::mousePressed(int x, int y, int button) {
+	mpd::touch(*new ofTouchEventArgs(ofTouchEventArgs::down, x, y, button));
 }
 
-void ofApp::touchDown(ofTouchEventArgs &touch) {}
-
-void ofApp::touchUp(ofTouchEventArgs &touch) {}
-
-void ofApp::touchMoved(ofTouchEventArgs &touch) {
-	lua.scriptTouchMoved(touch);
+void ofApp::mouseReleased(int x, int y, int button) {
+	mpd::touch(*new ofTouchEventArgs(ofTouchEventArgs::up, x, y, button));
 }
 
-void ofApp::touchDoubleTap(ofTouchEventArgs &touch) {
-	this->reset();
+void ofApp::mouseDragged(int x, int y, int button) {
+	mpd::touch(*new ofTouchEventArgs(ofTouchEventArgs::move, x, y, button));
 }
 
+void ofApp::mouseScrolled(ofMouseEventArgs& args) {
+	// scale += mouse.scrollY * 0.1f;
+	ofLogVerbose() << args.scrollY;
+}
 
-void ofApp::audioReceived(float * input, int bufferSize, int nChannels) {
-	pd::audioIn(input, bufferSize, nChannels);
-	// if (!_computing){ return; }
-   //
-	// // TODO: if computing
-	// PdGui::instance().audioIn(input, bufferSize, nChannels);
+void ofApp::audioReceived(float * buffer, int size, int channelCount) {
+	mpd::audioIn(buffer, size, channelCount);
+}
+
+void ofApp::audioRequested(float * buffer, int size, int channelCount) {
+	mpd::audioOut(buffer, size, channelCount);
 }
 
 
-void ofApp::audioRequested(float * output, int bufferSize, int nChannels) {
-	pd::audioOut(output, bufferSize, nChannels);
-	// if (!_computing){ return; }
-   //
-	// // TODO: if computing
-	// PdGui::instance().audioOut(output, bufferSize, nChannels);
-}
+void ofApp::touchDown(ofTouchEventArgs& args) { mpd::touch(args); }
 
+void ofApp::touchMoved(ofTouchEventArgs& args) { mpd::touch(args); }
 
+void ofApp::touchUp(ofTouchEventArgs& args) { mpd::touch(args); }
 
-void ofApp::errorReceived(std::string& msg) {
-	ofDrawBitmapString(msg, 200, 200);
-	ofLogVerbose() << "lua error: " << msg;
-}
+void ofApp::touchDoubleTap(ofTouchEventArgs& args) { mpd::touch(args); }
+
+void ofApp::touchCancelled(ofTouchEventArgs& args) { mpd::touch(args); }
+
+#if defined(TARGET_ANDROID)
+bool ofApp::scaleBegin(ofxAndroidScaleEventArgs& aArgs) { return true; }
+
+bool ofApp::scale(ofxAndroidScaleEventArgs& aArgs) { return true; }
+
+bool ofApp::scaleEnd(ofxAndroidScaleEventArgs& aArgs) { return true; }
+
+void ofApp::swipe(ofxAndroidSwipeDir swipeDir, int id) {}
+#endif
 
 void ofApp::exit() {
 	ofSoundStreamStop();
 }
-
-
-#if defined(TARGET_ANDROID)
-bool ofApp::onScaleBegin(ofxAndroidScaleEventArgs& aArgs) {
-	// lua.setBool("Scaling", true);
-	//
-	// _scaling = true;
-	// AppEvent event(AppEvent::TYPE_SCALE_BEGIN);
-	// ofNotifyEvent(AppEvent::events, event);
-
-	return true;
-}
-
-
-//--------------------------------------------------------------
-bool ofApp::onScale(ofxAndroidScaleEventArgs& aArgs) {
-	scale *= aArgs.getScaleFactor();
-
-	//
-	// AppEvent event(AppEvent::TYPE_SCALE, "", aArgs.getFocusX(), aArgs.getFocusY());
-	// event.value = aArgs.getScaleFactor();
-	// ofNotifyEvent(AppEvent::events, event);
-	return true;
-}
-
-
-//--------------------------------------------------------------
-bool ofApp::onScaleEnd(ofxAndroidScaleEventArgs& aArgs) {
-	// lua.setBool("Scaling", false);
-
-	// _scaling = false;
-   //
-	// AppEvent event(AppEvent::TYPE_SCALE_END);
-   //
-	// ofNotifyEvent(AppEvent::events, event);
-   //
-	return true;
-}
-#endif

@@ -9,10 +9,9 @@ int main() {
 }
 
 #ifdef TARGET_ANDROID
-void ofAndroidApplicationInit() {
-}
-
 void ofAndroidActivityInit() {
 	main();
 }
+
+void ofAndroidApplicationInit() {}
 #endif

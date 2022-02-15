@@ -1,6 +1,14 @@
 #include "pd.h"
 #include "m_pd.h"
 
+extern "C" {
+	void canvas_map(t_canvas *x, t_floatarg f);
+}
+
+void gui_hook(char* msg){
+	ofLogVerbose("gui_hook") << msg;
+}
+
 namespace pd {
 
 	PdBase base;
@@ -45,10 +53,9 @@ namespace pd {
 			ofLogError("Pd") << "opening patch \"" + file + "\" failed";
 		}
 
-		t_canvas* a = (t_canvas*)p.handle();
+		// set canvas visible to 1
+		canvas_map((t_canvas*)p.handle(), 1);
 		
-		// t_pd* a = (t_pd*)p.handle();
-
 		return p;
 	}
 
