@@ -12,7 +12,7 @@
 #ifndef __Z_PRINT_UTIL_H__
 #define __Z_PRINT_UTIL_H__
 
-#include "z_libpd.h"
+#include "../z_libpd.h"
 
 #ifdef __cplusplus
 extern "C"

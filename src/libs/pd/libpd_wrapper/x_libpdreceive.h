@@ -12,7 +12,7 @@
 #ifndef __X_LIBPDREC_H__
 #define __X_LIBPDREC_H__
 
-#include "m_pd.h"
+#include "../pure-data/src/m_pd.h"
 
 // internal "virtual" libpd receive object which forwards events to hooks
 // do *not* include this file in a user-facing header

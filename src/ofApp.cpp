@@ -7,6 +7,13 @@ void ofApp::setup() {
 	watcher.addPath(ofToDataPath("canvas.lua", true));
 	watcher.start();
 
+#if defined(TARGET_ANDROID)
+	ofAddListener(ofxAndroidEvents().scaleBegin, this, &ofApp::scaleBegin);
+	ofAddListener(ofxAndroidEvents().scale, this, &ofApp::scale);
+	ofAddListener(ofxAndroidEvents().scaleEnd, this, &ofApp::scaleEnd);
+#endif
+
+
 	mpd::init();
 }
 
@@ -17,6 +24,7 @@ void ofApp::update() {
 		mpd::reload();
 		watcher.start();
 	}
+	mpd::update();
 }
 
 void ofApp::draw() {
@@ -40,8 +48,7 @@ void ofApp::mouseDragged(int x, int y, int button) {
 }
 
 void ofApp::mouseScrolled(ofMouseEventArgs& args) {
-	// scale += mouse.scrollY * 0.1f;
-	ofLogVerbose() << args.scrollY;
+	mpd::scale("scroll", args.scrollY, mouseX, mouseY);
 }
 
 void ofApp::audioReceived(float * buffer, int size, int channelCount) {
@@ -52,6 +59,21 @@ void ofApp::audioRequested(float * buffer, int size, int channelCount) {
 	mpd::audioOut(buffer, size, channelCount);
 }
 
+#if defined(TARGET_ANDROID)
+bool ofApp::scaleBegin(ofxAndroidScaleEventArgs& x) {
+	return mpd::scale("scaleBegin", x.getScaleFactor(), x.getFocusX(), x.getFocusY());
+}
+
+bool ofApp::scale(ofxAndroidScaleEventArgs& x) {
+	return mpd::scale("scale", x.getScaleFactor(), x.getFocusX(), x.getFocusY());
+}
+
+bool ofApp::scaleEnd(ofxAndroidScaleEventArgs& x) {
+	return mpd::scale("scaleEnd", x.getScaleFactor(), x.getFocusX(), x.getFocusY());
+}
+
+void ofApp::swipe(ofxAndroidSwipeDir swipeDir, int id) {}
+#endif
 
 void ofApp::touchDown(ofTouchEventArgs& args) { mpd::touch(args); }
 
@@ -62,16 +84,6 @@ void ofApp::touchUp(ofTouchEventArgs& args) { mpd::touch(args); }
 void ofApp::touchDoubleTap(ofTouchEventArgs& args) { mpd::touch(args); }
 
 void ofApp::touchCancelled(ofTouchEventArgs& args) { mpd::touch(args); }
-
-#if defined(TARGET_ANDROID)
-bool ofApp::scaleBegin(ofxAndroidScaleEventArgs& aArgs) { return true; }
-
-bool ofApp::scale(ofxAndroidScaleEventArgs& aArgs) { return true; }
-
-bool ofApp::scaleEnd(ofxAndroidScaleEventArgs& aArgs) { return true; }
-
-void ofApp::swipe(ofxAndroidSwipeDir swipeDir, int id) {}
-#endif
 
 void ofApp::exit() {
 	ofSoundStreamStop();

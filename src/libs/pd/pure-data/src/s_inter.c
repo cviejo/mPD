@@ -729,8 +729,10 @@ void sys_vgui(const char *fmt, ...)
     int msglen, bytesleft, headwas, nwrote;
     va_list ap;
 
-    if (!sys_havegui())
-        return;
+    // mPD
+    /* if (!sys_havegui()) */
+    /*     return; */
+
     if (!pd_this->pd_inter->i_guibuf)
     {
         if (!(pd_this->pd_inter->i_guibuf = malloc(GUI_ALLOCCHUNK)))
@@ -745,12 +747,14 @@ void sys_vgui(const char *fmt, ...)
         (GUI_ALLOCCHUNK/2))
             sys_trytogetmoreguibuf(pd_this->pd_inter->i_guisize +
                 GUI_ALLOCCHUNK);
+
+    // mPD
     va_start(ap, fmt);
-    msglen = vsnprintf(pd_this->pd_inter->i_guibuf +
-        pd_this->pd_inter->i_guihead,
-            pd_this->pd_inter->i_guisize - pd_this->pd_inter->i_guihead,
-                fmt, ap);
+    msglen = vsnprintf(pd_this->pd_inter->i_guibuf, pd_this->pd_inter->i_guisize, fmt, ap);
     va_end(ap);
+    gui_hook(pd_this->pd_inter->i_guibuf);
+    return;
+
     if(msglen < 0)
     {
         fprintf(stderr,
@@ -913,6 +917,9 @@ void sys_queuegui(void *client, t_glist *glist, t_guicallbackfn f)
     gq->gq_fn = f;
     gq->gq_next = 0;
     *gqnextptr = gq;
+
+    // mPD
+    sys_flushqueue();
 }
 
 void sys_unqueuegui(void *client)

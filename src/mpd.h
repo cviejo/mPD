@@ -15,6 +15,7 @@ namespace mpd {
 	void reload();
 	bool init();
 	void draw();
+	void update();
 
 	void key(ofKeyEventArgs &args);
 	void touch(ofTouchEventArgs &touch);
@@ -23,11 +24,13 @@ namespace mpd {
 	void audioIn(float *input, int size, int channelCount);
 	void audioOut(float *output, int size, int channelCount);
 
-	Patch openPatch(const string& file, const string& folder);
-	void closePatch(Patch& patch);
 	bool scale(const string& type, float value, int x, int y);
 
 #if defined(TARGET_ANDROID)
 	void swipe(ofxAndroidSwipeEventArgs& args);
 #endif
+
+	void pdsend(const string& cmd);
 }
+	// Patch openPatch(const string& file, const string& folder);
+	// void closePatch(Patch& patch);

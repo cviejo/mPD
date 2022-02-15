@@ -8,6 +8,9 @@
 extern "C" {
 #endif
 
+// mPD
+extern void gui_hook(char* msg);
+
 #define PD_MAJOR_VERSION 0
 #define PD_MINOR_VERSION 51
 #define PD_BUGFIX_VERSION 4

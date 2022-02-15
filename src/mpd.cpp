@@ -2,16 +2,14 @@
 
 #include "mpd.h"
 #include "ofxLua.h"
+#include <queue>
 #if defined(TARGET_ANDROID)
 #include "ofxAndroid.h"
 #endif
 
+using std::queue;
+
 extern "C" {
-	void canvas_map(t_canvas *x, t_floatarg f);
-	void canvas_mouse(t_canvas *x, t_floatarg xpos,  t_floatarg ypos,  t_floatarg which, t_floatarg mod);
-	void canvas_motion(t_canvas *x, t_floatarg xpos,  t_floatarg ypos,  t_floatarg fmod);
-	void canvas_mouseup(t_canvas *x, t_floatarg fxpos, t_floatarg fypos, t_floatarg fwhich);
-	void canvas_editmode(t_canvas *x, t_floatarg state);
 	int luaopen_mpd(lua_State* L);
 }
 
@@ -25,13 +23,21 @@ ofSoundStreamSettings audioSettings;
 float* inputBuffer = NULL;
 int ticks = 8;
 bool computing = true;
+queue<ofMessage> pdMessages;
 
 //--------------------------------------------------------------------
 void gui_hook(char* buffer){
 	auto message = ofMessage(buffer);
-	mtx.lock();
-	lua.scriptGotMessage(message);
-	mtx.unlock();
+	pdMessages.push(message);
+}
+
+//--------------------------------------------------------------
+void mpd::pdsend(const string& cmd){
+	t_binbuf* buffer = binbuf_new();
+
+	binbuf_text(buffer, (char*)cmd.c_str(), cmd.length());
+	binbuf_eval(buffer, 0, 0, 0);
+	binbuf_free(buffer);
 }
 
 //--------------------------------------------------------------------
@@ -53,9 +59,9 @@ bool initAudio(){
 	audioSettings.setOutListener(app);
 
 	// auto devices = soundStream.getDeviceList();
-	// audioSettings.setInDevice(devices[2]);
-	// audioSettings.setOutDevice(devices[1]);
-	// audioSettings.sampleRate = 48000;
+	// audioSettings.setInDevice(devices[3]);
+	// audioSettings.setOutDevice(devices[4]);
+	// // audioSettings.sampleRate = 48000;
 	
 
 	inputBuffer = new float[audioSettings.numInputChannels * audioSettings.bufferSize];
@@ -89,24 +95,9 @@ bool initAudio(){
 }
 
 //--------------------------------------------------------------------
-Patch mpd::openPatch(const string& file, const string& folder) {
-	Patch patch = base.openPatch(file, folder);
-
-	if(!patch.isValid()) {
-		ofLogError("Pd") << "opening patch \"" + file + "\" failed";
-	}
-	else {
-		// ofLogVerbose("Pd") << "opened patch: "+ file + " path: " + folder;
-		canvas_map((t_canvas*)patch.handle(), 1);
-	}
-
-	return patch;
-}
-
-//--------------------------------------------------------------------
 void mpd::touch(ofTouchEventArgs &touch) {
 	mtx.lock();
-	// We use touchMoved for all touch events, less clutter since is passed anyway
+	// touchMoved for all events, less clutter since type is passed anyway
 	lua.scriptTouchMoved(touch); 
 	mtx.unlock();
 }
@@ -116,11 +107,6 @@ void mpd::key(ofKeyEventArgs &args) {
 	mtx.lock();
 	lua.scriptKeyPressed(args.key);
 	mtx.unlock();
-}
-
-//--------------------------------------------------------------------
-void mpd::closePatch(Patch& patch) {
-	base.closePatch(patch);
 }
 
 //--------------------------------------------------------------------
@@ -139,6 +125,16 @@ void mpd::reload() {
 	luaopen_mpd(lua);
 	lua.doScript("main.lua", true);
 	lua.scriptSetup();
+}
+
+//--------------------------------------------------------------------
+void mpd::update() {
+	mtx.lock();
+	while (!pdMessages.empty()) {
+		lua.scriptGotMessage(pdMessages.front());
+		pdMessages.pop();
+	}
+	mtx.unlock();
 }
 
 //--------------------------------------------------------------------
@@ -212,12 +208,19 @@ bool mpd::scale(const string& type, float value, int x, int y) {
 }
 
 
+//--------------------------------------------------------------------
+// Patch mpd::openPatch(const string& file, const string& folder) {
+// 	Patch patch = base.openPatch(file, folder);
+	// if(!patch.isValid()) {
+	// 	ofLogError("Pd") << "opening patch \"" + file + "\" failed";
+	// }
+	// else {
+	// 	canvas_map((t_canvas*)patch.handle(), 1);
+	// }
+// 	return patch;
+// }
 // //--------------------------------------------------------------------
-//  void mpd::keyPressed(ofKeyEventArgs &args) {
-// 	//  ofLogVerbose() << args.key;
-// 	// if (args.key == 114){
-// 	// 	reload();
-// 	// }
-// 	lua.scriptKeyPressed(args.key);
+// void mpd::closePatch(Patch& patch) {
+// 	base.closePatch(patch);
 // }
 

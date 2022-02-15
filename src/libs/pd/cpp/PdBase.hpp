@@ -13,9 +13,9 @@
  */
 #pragma once
 
-#include "z_libpd.h"
-#include "z_queued.h"
-#include "z_print_util.h"
+#include "../libpd_wrapper/z_libpd.h"
+#include "../libpd_wrapper/util/z_queued.h"
+#include "../libpd_wrapper/util/z_print_util.h"
 
 #include <map>  
 

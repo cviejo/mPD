@@ -11,7 +11,7 @@
 #ifndef __Z_QUEUED_H__
 #define __Z_QUEUED_H__
 
-#include "z_libpd.h"
+#include "../z_libpd.h"
 
 #ifdef __cplusplus
 extern "C"
