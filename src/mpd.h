@@ -13,7 +13,8 @@ using std::string;
 namespace mpd {
 	void clear();
 	void reload();
-	bool init();
+	void init();
+	bool initAudio(int inIndex, int outIndex, float sampleRate);
 	void draw();
 	void update();
 

@@ -46,57 +46,41 @@ void mpd::pdsend(const string& cmd){
 }
 
 //--------------------------------------------------------------------
-bool initAudio(){
+bool mpd::initAudio(int inIndex, int outIndex, float sampleRate) {
 	auto app = ofGetAppPtr();
 
-	// by name
-	// auto devices = soundStream.getMatchingDevices("ffff");
-	// if (!devices.empty()) {
-	// 	ofLogVerbose() << "setting out device";
-	// 	audioSettings.setOutDevice(devices[1]);
-	// }
+	auto inDevice = soundStream.getDeviceList()[inIndex];
+	auto outDevice = soundStream.getDeviceList()[outIndex];
 
-	audioSettings.numInputChannels = 1;
-	audioSettings.numOutputChannels = 2;
-	audioSettings.sampleRate = 44100;
+	audioSettings.numInputChannels = inDevice.inputChannels;
+	audioSettings.numOutputChannels = outDevice.outputChannels;
+	audioSettings.sampleRate = sampleRate;
 	audioSettings.bufferSize = base.blockSize() * ticks;
 	audioSettings.setInListener(app);
 	audioSettings.setOutListener(app);
-
-	// auto devices = soundStream.getDeviceList();
-	// audioSettings.setInDevice(devices[3]);
-	// audioSettings.setOutDevice(devices[4]);
-	// // audioSettings.sampleRate = 48000;
+	audioSettings.setInDevice(inDevice);
+	audioSettings.setOutDevice(outDevice);
 	
-
-	inputBuffer = new float[audioSettings.numInputChannels * audioSettings.bufferSize];
+	inputBuffer = new float[inDevice.inputChannels * audioSettings.bufferSize];
 
 	soundStream.setup(audioSettings);
 
-	return base.init(
-		audioSettings.numInputChannels,
-		audioSettings.numOutputChannels,
-		audioSettings.sampleRate,
-		false
-	);
+	bool result = base.init(inDevice.inputChannels, outDevice.outputChannels, sampleRate, false);
+
+	if (result) {
+		base.computeAudio(true);
+	}
+
+	return result;
 }
 
 //--------------------------------------------------------------------
-bool mpd::init() {
-	if (!initAudio()){
-		clear();
-		return false;
-	}
-
-	base.computeAudio(true);
-
+void mpd::init() {
 	lua.setErrorCallback([](string& message) {
 		ofLogWarning() << "Lua script error: " << message;
 	});
 
 	reload();
-
-	return true;
 }
 
 // - touchMoved: same fn for all events, since type is passed anyway
@@ -132,11 +116,38 @@ void mpd::clear() {
 }
 
 //--------------------------------------------------------------------
+void pushAudioDevices() {
+	auto devices = soundStream.getDeviceList();
+	lua.newTable("devices");
+	lua.pushTable("devices");
+	for(size_t i = 0; i < devices.size(); i++) {
+		auto device = devices[i];
+		lua.newTable(i + 1);
+		lua.pushTable(i + 1);
+		lua.setString("name", device.name);
+		lua.setNumber("id", device.deviceID);
+		lua.setNumber("inputChannels", device.inputChannels);
+		lua.setNumber("outputChannels", device.outputChannels);
+		lua.setBool("isDefaultInput", device.isDefaultInput);
+		lua.setBool("isDefaultOutput", device.isDefaultOutput);
+		lua.newTable("sampleRates");
+		lua.pushTable("sampleRates");
+		for(size_t j = 0; j < device.sampleRates.size(); j++) {
+			lua.setNumber(j + 1, device.sampleRates[j]);
+		}
+		lua.popTable();
+		lua.popTable();
+	}
+	lua.popTable();
+}
+
+//--------------------------------------------------------------------
 void mpd::reload() {
 	lua.scriptExit();
 	lua.init(true);
 	luaopen_mpd(lua);
 	lua.doScript("main.lua", true);
+	pushAudioDevices();
 	lua.scriptSetup();
 }
 

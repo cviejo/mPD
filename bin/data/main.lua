@@ -13,7 +13,8 @@ Scaling = false
 Scale = 2
 UpdateNeeded = true
 
--- local ss = pipe(keys, filter(s.includes("Color")))
+local ss = pipe(keys, filter(s.includes("Sound")))
+
 local editmode = 0
 local canvasId
 
@@ -26,7 +27,11 @@ function setup()
 	of.enableSmoothing()
 	of.enableAntiAliasing()
 
+	mpd.initAudio(2, 1, 48000)
+
 	pd.queue('pd open test.pd', file.getPath('.'))
+
+	console.log("devices", devices);
 end
 
 function draw()
