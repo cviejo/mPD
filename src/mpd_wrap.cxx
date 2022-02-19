@@ -4327,9 +4327,14 @@ static int _wrap_clear(lua_State* L) { int SWIG_arg = 0; SWIG_check_num_args("mp
   if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
 static int _wrap_reload(lua_State* L) { int SWIG_arg = 0; SWIG_check_num_args("mpd::reload",0,0) mpd::reload(); return SWIG_arg;
   if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_init(lua_State* L) { int SWIG_arg = 0; bool result; SWIG_check_num_args("mpd::init",0,0)
-  result = (bool)mpd::init(); lua_pushboolean(L,(int)(result!=0)); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail; fail:
-  lua_error(L); return SWIG_arg; }
+static int _wrap_init(lua_State* L) { int SWIG_arg = 0; SWIG_check_num_args("mpd::init",0,0) mpd::init(); return SWIG_arg;
+  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
+static int _wrap_initAudio(lua_State* L) { int SWIG_arg = 0; int arg1 ; int arg2 ; float arg3 ; bool result;
+  SWIG_check_num_args("mpd::initAudio",3,3) if(!lua_isnumber(L,1)) SWIG_fail_arg("mpd::initAudio",1,"int");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("mpd::initAudio",2,"int");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("mpd::initAudio",3,"float"); arg1 = (int)lua_tonumber(L, 1);
+  arg2 = (int)lua_tonumber(L, 2); arg3 = (float)lua_tonumber(L, 3); result = (bool)mpd::initAudio(arg1,arg2,arg3);
+  lua_pushboolean(L,(int)(result!=0)); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
 static int _wrap_draw(lua_State* L) { int SWIG_arg = 0; SWIG_check_num_args("mpd::draw",0,0) mpd::draw(); return SWIG_arg;
   if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
 static int _wrap_update(lua_State* L) { int SWIG_arg = 0; SWIG_check_num_args("mpd::update",0,0) mpd::update(); return SWIG_arg;
@@ -4380,6 +4385,7 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "clear", _wrap_clear},
     { "reload", _wrap_reload},
     { "init", _wrap_init},
+    { "initAudio", _wrap_initAudio},
     { "draw", _wrap_draw},
     { "update", _wrap_update},
     { "key", _wrap_key},

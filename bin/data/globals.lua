@@ -28,6 +28,7 @@ _G.identity = R.identity
 _G.includes = R.includes
 _G.isString = R.isString
 _G.join = R.join
+_G.keys = R.keys
 _G.map = R.map
 _G.pipe = R.pipe
 _G.propEq = R.propEq
