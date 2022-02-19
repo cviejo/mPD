@@ -48,18 +48,18 @@ local canvas = "(%.%w-%.c)"
 
 local raiseCord = gmatch(canvas .. ' (raise) cord')
 
-local coords = gmatch(canvas .. ' coords ([^%s]-) ([%d%s%.]*)')
+local coords = gmatch(canvas .. ' coords ([^%s]-) ([-%d%s%.]*)')
 
-local move = gmatch(canvas .. ' move ([^%s]-) ([%d%s%.]*)')
+local move = gmatch(canvas .. ' move ([^%s]-) ([-%d%s%.]*)')
 
 local configure = gmatch(canvas .. ' itemconfigure ([^%s]-) (.*)')
 
-local create = gmatch(canvas .. ' create (%w+) ([%d%s%.]*) (%-.*)')
+local create = gmatch(canvas .. ' create (%w+) ([-%d%s%.]*) (%-.*)')
 
 local setText = gmatch('pdtk_text_set ' .. canvas .. ' ([^%s]-) {(.*)}')
 
 -- LuaFormatter off
-local newText = gmatch('pdtk_text_new ' .. canvas .. ' {(.-)} ([%d%s%.]*) {(.-)} (.*) (.*)')
+local newText = gmatch('pdtk_text_new ' .. canvas .. ' {(.-)} ([-%d%s%.]*) {(.-)} (.*) (.*)')
 
 local newCanvas = gmatch('pdtk_canvas_new (%.%w-) (%d-) (%d-) ')
 

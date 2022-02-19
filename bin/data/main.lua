@@ -85,7 +85,6 @@ function keyPressed(key)
 end
 
 function gotMessage(msg)
-	-- console.log("msg", msg);
 	local parsed = parse(msg)
 
 	if parsed == nil then

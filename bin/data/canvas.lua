@@ -34,7 +34,6 @@ local function drawLine(item)
 end
 
 local function drawRectangle(item)
-	-- if not points or #points < 2 then return end
 	local x, y = item.points[1].x, item.points[1].y
 	local w, h = item.points[2].x - x, item.points[2].y - y
 	if (item.fill) then
