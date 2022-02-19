@@ -20,3 +20,7 @@
 ignore.*
 obj
 .DS_Store
+
+*.xcodeproj
+*.plist
+*.xcconfig
