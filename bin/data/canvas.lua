@@ -6,7 +6,7 @@ local items = {}
 local back = 255
 local front = 0
 
-grid.init(20)
+grid.init(8)
 
 local setHex = safe(pipe(of.hexToInt, of.setHexColor))
 
@@ -81,7 +81,7 @@ local function message(msg)
 	end
 end
 
-local resetItem = function()
+local resetStyles = function()
 	of.noFill()
 	of.setColor(front)
 	of.setLineWidth(Scale)
@@ -89,21 +89,23 @@ end
 
 -- LuaFormatter off
 local drawItem = pipe(
-	tap(resetItem),
+	tap(resetStyles),
 	cond({
 		{shapeEq('line'), drawLine},
-		{shapeEq('rectangle'), drawRectangle},
 		{shapeEq('oval'), drawOval},
+		{shapeEq('rectangle'), drawRectangle},
 	})
 )
 -- LuaFormatter on
 
 local function draw()
-	of.background(back)
 	of.pushMatrix()
+	of.background(back)
 	of.scale(Scale, Scale)
-	of.enableAlphaBlending()
 	of.enableAntiAliasing()
+	of.enableAlphaBlending()
+
+	if Scale > 1 then grid.draw(0, 0) end
 
 	forEach(drawItem, items)
 
@@ -123,4 +125,3 @@ return {
 -- local color = g.hex(item.fill)
 -- -- if (g.isGrey(color)) then color:invert() end
 -- of.setColor(color)
-

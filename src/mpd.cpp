@@ -13,18 +13,18 @@ extern "C" {
 	int luaopen_mpd(lua_State* L);
 }
 
-// mutex.lock fixes luajit crashes when accessed from different threads (like scale events on android)
+// mtx.lock fixes luajit crashes when accessed from different threads (scale events on android)
 pd::PdBase base;
 ofxLua lua;
 ofMutex mtx;
 ofSoundStream soundStream;
 ofSoundStreamSettings audioSettings;
 
-float* inputBuffer = NULL;
 int ticks = 8;
 bool computing = true;
 bool touchable = true;
 bool scaling = false;
+float* inputBuffer = NULL;
 ofTouchEventArgs lastTouch;
 queue<ofMessage> pdMessages;
 
@@ -169,7 +169,7 @@ void updateSettings(int size, int inChannels, int outChannels){
 		audioSettings.bufferSize = size;
 		audioSettings.numInputChannels = inChannels;
 		audioSettings.numOutputChannels = outChannels;
-		// @TODO
+		// TODO
 		// init(audioSettings);
 		base.computeAudio(computing);
 	}
@@ -214,7 +214,7 @@ bool mpd::scale(const string& type, float value, int x, int y) {
 		scaling = false;
 	}
 	mtx.lock();
-	if (type == "scale") {
+	if (type == "scale" || type == "scroll") {
 		float scale = (float)lua.getNumber("Scale", 1);
 		if (type == "scroll") {
 			scale +=  value * 0.1f;

@@ -36,6 +36,7 @@ _G.setup = R.setup
 _G.split = R.split
 _G.splitEvery = R.splitEvery
 _G.tap = R.tap
+_G.times = R.times
 _G.touchMoved = R.touchMoved
 _G.unary = R.unary
 _G.when = R.when

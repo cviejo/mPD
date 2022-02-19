@@ -10,7 +10,7 @@ local canvas = require('canvas')
 local parse = require('parse')
 
 Scaling = false
-Scale = 1
+Scale = 2
 UpdateNeeded = true
 
 -- local ss = pipe(keys, filter(s.includes("Color")))
