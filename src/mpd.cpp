@@ -18,7 +18,7 @@ pd::PdBase base;
 ofxLua lua;
 ofMutex mtx;
 ofSoundStream soundStream;
-ofSoundStreamSettings audioSettings;
+ofSoundStreamSettings settings;
 
 int ticks = 8;
 bool computing = true;
@@ -46,32 +46,36 @@ void mpd::pdsend(const string& cmd){
 }
 
 //--------------------------------------------------------------------
-bool mpd::initAudio(int inIndex, int outIndex, float sampleRate) {
-	auto app = ofGetAppPtr();
-
-	auto inDevice = soundStream.getDeviceList()[inIndex];
-	auto outDevice = soundStream.getDeviceList()[outIndex];
-
-	audioSettings.numInputChannels = inDevice.inputChannels;
-	audioSettings.numOutputChannels = outDevice.outputChannels;
-	audioSettings.sampleRate = sampleRate;
-	audioSettings.bufferSize = base.blockSize() * ticks;
-	audioSettings.setInListener(app);
-	audioSettings.setOutListener(app);
-	audioSettings.setInDevice(inDevice);
-	audioSettings.setOutDevice(outDevice);
+bool mpd::initAudio(int inputChannels, int outputChannels, float sampleRate) {
+	settings.numInputChannels = inputChannels;
+	settings.numOutputChannels = outputChannels;
+	settings.sampleRate = sampleRate;
+	settings.bufferSize = base.blockSize() * ticks;
+	settings.setInListener(ofGetAppPtr());
+	settings.setOutListener(ofGetAppPtr());
 	
-	inputBuffer = new float[inDevice.inputChannels * audioSettings.bufferSize];
+	inputBuffer = new float[inputChannels * settings.bufferSize];
 
-	soundStream.setup(audioSettings);
+	soundStream.setup(settings);
 
-	bool result = base.init(inDevice.inputChannels, outDevice.outputChannels, sampleRate, false);
+	bool result = base.init(inputChannels, outputChannels, sampleRate, false);
 
 	if (result) {
 		base.computeAudio(true);
 	}
 
 	return result;
+}
+
+//--------------------------------------------------------------------
+bool mpd::initAudio(const string& input, const string& output, float sampleRate) {
+	auto inDevice = soundStream.getMatchingDevices(input)[0];
+	auto outDevice = soundStream.getMatchingDevices(output)[0];
+
+	settings.setInDevice(inDevice);
+	settings.setOutDevice(outDevice);
+
+	return initAudio(inDevice.inputChannels, outDevice.outputChannels, sampleRate);
 }
 
 //--------------------------------------------------------------------
@@ -116,7 +120,10 @@ void mpd::clear() {
 }
 
 //--------------------------------------------------------------------
-void pushAudioDevices() {
+void pushGlobals() {
+#if defined(TARGET_ANDROID)
+	lua.setString("Target", "android");
+#endif
 	auto devices = soundStream.getDeviceList();
 	lua.newTable("devices");
 	lua.pushTable("devices");
@@ -147,7 +154,7 @@ void mpd::reload() {
 	lua.init(true);
 	luaopen_mpd(lua);
 	lua.doScript("main.lua", true);
-	pushAudioDevices();
+	pushGlobals();
 	lua.scriptSetup();
 }
 
@@ -172,16 +179,16 @@ void mpd::draw() {
 //--------------------------------------------------------------------
 void updateSettings(int size, int inChannels, int outChannels){
 	auto changed = 
-		size != audioSettings.bufferSize ||
-		inChannels != audioSettings.numInputChannels ||
-		outChannels != audioSettings.numOutputChannels;
+		size != settings.bufferSize ||
+		inChannels != settings.numInputChannels ||
+		outChannels != settings.numOutputChannels;
 	if(changed) {
 		ticks = size / base.blockSize();
-		audioSettings.bufferSize = size;
-		audioSettings.numInputChannels = inChannels;
-		audioSettings.numOutputChannels = outChannels;
+		settings.bufferSize = size;
+		settings.numInputChannels = inChannels;
+		settings.numOutputChannels = outChannels;
 		// TODO
-		// init(audioSettings);
+		// init(settings);
 		base.computeAudio(computing);
 	}
 }
@@ -197,7 +204,7 @@ void mpd::audioIn(float *input, int size, int channelCount) {
 		return;
 	}
 	try {
-		updateSettings(size, channelCount, audioSettings.numOutputChannels);
+		updateSettings(size, channelCount, settings.numOutputChannels);
 		memcpy(inputBuffer, input, size * channelCount * sizeof(float));
 	}
 	catch (...) {
@@ -210,7 +217,7 @@ void mpd::audioOut(float *output, int size, int channelCount) {
 	if(!computing || inputBuffer == NULL) {
 		return;
 	}
-	updateSettings(size, audioSettings.numInputChannels, channelCount);
+	updateSettings(size, settings.numInputChannels, channelCount);
 	if (!base.processFloat(ticks, inputBuffer, output)){
 		ofLogError("Pd") << "could not process output buffer";
 	}

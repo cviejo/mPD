@@ -18,7 +18,7 @@ M.init = function(step)
 	of.scale(scale, scale)
 
 	local setColor = function(value)
-		if (value % (step * 5) == 0) then
+		if (value % (step * 10) == 0) then
 			of.setColor(100, 100, 100, 200);
 		else
 			of.setColor(100, 100, 100, 100);

@@ -9,17 +9,14 @@ local frame = require('ui/frame')
 local canvas = require('canvas')
 local parse = require('parse')
 
+Target = 'desktop'
 Scaling = false
 Scale = 2
 UpdateNeeded = true
 
-local ss = pipe(keys, filter(s.includes("Sound")))
-
 local editmode = 0
-local canvasId
-
 local trace = fifo(30)
-local touchCount = 0
+local canvasId
 
 function setup()
 	of.setVerticalSync(false) -- false for fps > 60 (desktop only, apparently)
@@ -27,11 +24,18 @@ function setup()
 	of.enableSmoothing()
 	of.enableAntiAliasing()
 
-	mpd.initAudio(2, 1, 48000)
+	local success = false
 
-	pd.queue('pd open test.pd', file.getPath('.'))
+	if Target == 'android' then
+		success = mpd.initAudio(1, 2, 44100)
+	else
+		success = mpd.initAudio("Apple Inc.: MacBook Pro Microphone",
+		                        "Apple Inc.: MacBook Pro Speakers", 48000)
+	end
 
-	console.log("devices", devices);
+	if (success) then
+		pd.queue('pd open test.pd', file.getPath('.')) --
+	end
 end
 
 function draw()
@@ -44,9 +48,7 @@ function draw()
 	frame.draw(0, 0)
 
 	of.setColor(0, 0, 0, 100)
-	text.draw(math.floor(of.getFrameRate()), 50, 60)
-	text.draw("items:" .. #canvas.items(), 150, 60)
-	text.draw("touches:" .. touchCount, 250, 60)
+	text.draw(math.floor(of.getFrameRate()) .. " items:" .. #canvas.items(), 50, 60)
 	text.draw(s.joinLines(trace.items()), 50, 120)
 end
 
@@ -102,7 +104,6 @@ function gotMessage(msg)
 end
 
 function exit()
-	pd.closePatch()
 end
 
 touchMoved = touchEvent

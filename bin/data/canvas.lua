@@ -23,14 +23,20 @@ end
 local shapeEq = propEq('shape')
 
 local function drawLine(item)
+	local line = of.Polyline()
+	of.setColor(255)
+	of.fill()
+	of.beginShape()
+	for _, p in ipairs(item.points) do
+		line:addVertex(p.x, p.y)
+		of.vertex(p.x, p.y)
+	end
+	of.endShape()
+	of.setColor(front)
 	setHex(item.fill)
 	of.setLineWidth(tonumber(item.width) * Scale)
-	local polyline = of.Polyline()
-	for _, p in ipairs(item.points) do
-		polyline:addVertex(p.x, p.y) --
-	end
 	of.disableSmoothing()
-	polyline:draw()
+	line:draw()
 end
 
 local function drawRectangle(item)
@@ -104,7 +110,7 @@ local function draw()
 	of.enableAntiAliasing()
 	of.enableAlphaBlending()
 
-	if Scale > 1 then grid.draw(0, 0) end
+	if Scale > 1 then grid.draw(-1, -1) end
 
 	forEach(drawItem, items)
 

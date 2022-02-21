@@ -14,7 +14,8 @@ namespace mpd {
 	void clear();
 	void reload();
 	void init();
-	bool initAudio(int inIndex, int outIndex, float sampleRate);
+	bool initAudio(int inputChannels, int outputChannels, float sampleRate);
+	bool initAudio(const string& input, const string& output, float sampleRate);
 	void draw();
 	void update();
 
