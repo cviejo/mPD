@@ -9,17 +9,16 @@ local frame = require('ui/frame')
 local canvas = require('canvas')
 local parse = require('parse')
 
+Target = 'desktop'
 Scaling = false
-Scale = 2
+Scale = 1
 UpdateNeeded = true
 
-local ss = pipe(keys, filter(s.includes("Sound")))
-
 local editmode = 0
+local trace = fifo(30)
 local canvasId
 
-local trace = fifo(30)
-local touchCount = 0
+local clampScale = clamp(0.5, 4)
 
 function setup()
 	of.setVerticalSync(false) -- false for fps > 60 (desktop only, apparently)
@@ -27,14 +26,22 @@ function setup()
 	of.enableSmoothing()
 	of.enableAntiAliasing()
 
-	mpd.initAudio(2, 1, 48000)
+	local success = false
 
-	pd.queue('pd open test.pd', file.getPath('.'))
+	if Target == 'android' then
+		success = mpd.initAudio(1, 2, 44100)
+	else
+		success = mpd.initAudio("Apple Inc.: MacBook Pro Microphone",
+		                        "Apple Inc.: MacBook Pro Speakers", 48000)
+	end
 
-	console.log("devices", devices);
+	if (success) then
+		pd.queue('pd open test.pd', file.getPath('.')) --
+	end
 end
 
 function draw()
+	Scale = clampScale(Scale)
 	pd.flush()
 
 	if UpdateNeeded then
@@ -44,9 +51,13 @@ function draw()
 	frame.draw(0, 0)
 
 	of.setColor(0, 0, 0, 100)
-	text.draw(math.floor(of.getFrameRate()), 50, 60)
-	text.draw("items:" .. #canvas.items(), 150, 60)
-	text.draw("touches:" .. touchCount, 250, 60)
+	-- LuaFormatter off
+	text.draw(
+		math.floor(of.getFrameRate()) ..
+		' items:' .. #canvas.items() ..
+		' scale:' .. Scale, 50, 60
+	)
+	-- LuaFormatter on
 	text.draw(s.joinLines(trace.items()), 50, 120)
 end
 
@@ -85,10 +96,11 @@ function keyPressed(key)
 end
 
 function gotMessage(msg)
+	-- console.log("msg", msg);
 	local parsed = parse(msg)
 
 	if parsed == nil then
-		log('not parsed', msg)
+		-- log('not parsed', msg)
 	elseif parsed.cmd == 'new-canvas' then
 		canvasId = parsed.canvasId
 		pd.queue(canvasId, 'map 1')
@@ -102,7 +114,6 @@ function gotMessage(msg)
 end
 
 function exit()
-	pd.closePatch()
 end
 
 touchMoved = touchEvent

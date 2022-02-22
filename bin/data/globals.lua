@@ -16,6 +16,7 @@ _G.swig_type = swig_type
 -- than then dynamic approach below
 _G.T = R.T
 _G.always = R.always
+_G.clamp = R.clamp
 _G.cond = R.cond
 _G.draw = R.draw
 _G.either = R.either
@@ -31,6 +32,7 @@ _G.join = R.join
 _G.keys = R.keys
 _G.map = R.map
 _G.pipe = R.pipe
+_G.prop = R.prop
 _G.propEq = R.propEq
 _G.reject = R.reject
 _G.setup = R.setup
@@ -40,6 +42,7 @@ _G.tap = R.tap
 _G.times = R.times
 _G.touchMoved = R.touchMoved
 _G.unary = R.unary
+_G.unapply = R.unapply
 _G.when = R.when
 
 -- local function makeGlobal(x, name)

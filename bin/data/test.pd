@@ -1,4 +1,4 @@
-#N canvas -1290 463 698 506 12;
+#N canvas 429 233 698 506 12;
 #X obj 27 237 dac~;
 #X obj 28 107 osc~ 200;
 #X obj 94 164 tgl 15 0 empty empty empty 17 7 0 10 #00fc04 #fc0400
@@ -28,22 +28,20 @@
 #X restore 92 224 graph;
 #X obj 124 118 metro 2000;
 #X obj 124 153 hradio 15 1 0 8 empty empty empty 0 -8 0 10 #fcfcfc
-#000000 #000000 2;
+#000000 #000000 0;
 #X msg 131 49 some msg;
 #X obj 193 88 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000
 #000000 0 1;
 #X obj 27 133 *~ 0.02;
 #X obj 127 178 hradio 15 1 0 8 empty empty empty 0 -8 0 10 #fcfcfc
-#000000 #000000 2;
+#000000 #000000 0;
 #X obj 260 30 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 #fcfcfc
-#000000 #000000 5200 1;
+#000000 #000000 0 1;
 #X obj 260 180 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 #fcfcfc
-#000000 #000000 5200 1;
+#000000 #000000 0 1;
 #X connect 1 0 12 0;
 #X connect 3 0 1 0;
 #X connect 4 0 8 0;
 #X connect 6 0 8 0;
 #X connect 9 0 13 0;
-#X connect 12 0 0 0;
-#X connect 12 0 0 1;
 #X connect 14 0 15 0;

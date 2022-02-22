@@ -1,4 +1,5 @@
 local fn = require('utils/function')
+local text = require('utils/text')
 local grid = require('grid')
 local safe = fn.safe
 
@@ -7,6 +8,13 @@ local back = 255
 local front = 0
 
 grid.init(8)
+
+local font = text.makeFont("fonts/DejaVuSansMono.ttf", 35)
+
+-- eyeballed to match pd's dimensions
+-- https://github.com/cviejo/mPD/blob/main/src/libs/pd/pure-data/src/s_main.c#L171
+local lineHeight = 14 * 4
+font:setLineHeight(lineHeight)
 
 local setHex = safe(pipe(of.hexToInt, of.setHexColor))
 
@@ -22,15 +30,32 @@ end
 
 local shapeEq = propEq('shape')
 
+local cmdEq = propEq('cmd')
+
+local function drawText(item)
+	local x, y = item.points[1].x, item.points[1].y
+	y = y + lineHeight / 4 - 3
+
+	of.scale(.25, .25)
+	font:drawString(item.text, x * 4, y * 4)
+	of.scale(4, 4)
+end
+
 local function drawLine(item)
+	local line = of.Polyline()
+	of.setColor(255)
+	of.fill()
+	of.beginShape()
+	for _, p in ipairs(item.points) do
+		line:addVertex(p.x, p.y)
+		of.vertex(p.x, p.y)
+	end
+	of.endShape()
+	of.setColor(front)
 	setHex(item.fill)
 	of.setLineWidth(tonumber(item.width) * Scale)
-	local polyline = of.Polyline()
-	for _, p in ipairs(item.points) do
-		polyline:addVertex(p.x, p.y) --
-	end
 	of.disableSmoothing()
-	polyline:draw()
+	line:draw()
 end
 
 local function drawRectangle(item)
@@ -65,7 +90,13 @@ local function message(msg)
 
 		if found then found.points = msg.points end
 	elseif msg.cmd == 'move' then
-		-- console.log("msg", msg);
+		local found = findByTag(msg.id, items)
+
+		if found then
+			local point = found.points[1]
+			point.x = point.x + msg.points[1].x
+			point.y = point.y + msg.points[1].y
+		end
 	elseif msg.cmd == 'delete' then
 		items = reject(hasTag(msg.tag), items)
 	elseif msg.cmd == 'configure' then
@@ -93,6 +124,7 @@ local drawItem = pipe(
 		{shapeEq('line'), drawLine},
 		{shapeEq('oval'), drawOval},
 		{shapeEq('rectangle'), drawRectangle},
+		{cmdEq('new-text'), drawText},
 	})
 )
 -- LuaFormatter on
@@ -102,9 +134,10 @@ local function draw()
 	of.background(back)
 	of.scale(Scale, Scale)
 	of.enableAntiAliasing()
+	of.enableSmoothing()
 	of.enableAlphaBlending()
 
-	if Scale > 1 then grid.draw(0, 0) end
+	if Scale >= 1 then grid.draw(-1, -1) end
 
 	forEach(drawItem, items)
 
