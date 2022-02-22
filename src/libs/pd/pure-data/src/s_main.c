@@ -167,8 +167,10 @@ int sys_nearestfontsize(int fontsize)
 
 int sys_hostfontsize(int fontsize, int zoom)
 {
-    zoom = (zoom < 1 ? 1 : (zoom > NZOOM ? NZOOM : zoom));
-    return (sys_gotfonts[zoom-1][sys_findfont(fontsize)].fi_pointsize);
+    // mPD
+    return 14;
+    /* zoom = (zoom < 1 ? 1 : (zoom > NZOOM ? NZOOM : zoom)); */
+    /* return (sys_gotfonts[zoom-1][sys_findfont(fontsize)].fi_pointsize); */
 }
 
 int sys_zoomfontwidth(int fontsize, int zoomarg, int worstcase)
@@ -185,7 +187,7 @@ int sys_zoomfontwidth(int fontsize, int zoomarg, int worstcase)
 int sys_zoomfontheight(int fontsize, int zoomarg, int worstcase)
 {
     // mPD
-    return 13;
+    return 14;
     /* int zoom = (zoomarg < 1 ? 1 : (zoomarg > NZOOM ? NZOOM : zoomarg)), ret; */
     /* if (worstcase) */
     /*     ret = (zoom * sys_fontspec[sys_findfont(fontsize)].fi_height); */

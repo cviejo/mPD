@@ -12,4 +12,4 @@ local draw = function(str, x, y)
 	current:drawString(str, x, y)
 end
 
-return {draw = draw}
+return {draw = draw, makeFont = makeFont}

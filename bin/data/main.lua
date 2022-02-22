@@ -11,12 +11,14 @@ local parse = require('parse')
 
 Target = 'desktop'
 Scaling = false
-Scale = 2
+Scale = 1
 UpdateNeeded = true
 
 local editmode = 0
 local trace = fifo(30)
 local canvasId
+
+local clampScale = clamp(0.5, 4)
 
 function setup()
 	of.setVerticalSync(false) -- false for fps > 60 (desktop only, apparently)
@@ -39,6 +41,7 @@ function setup()
 end
 
 function draw()
+	Scale = clampScale(Scale)
 	pd.flush()
 
 	if UpdateNeeded then
@@ -48,7 +51,13 @@ function draw()
 	frame.draw(0, 0)
 
 	of.setColor(0, 0, 0, 100)
-	text.draw(math.floor(of.getFrameRate()) .. " items:" .. #canvas.items(), 50, 60)
+	-- LuaFormatter off
+	text.draw(
+		math.floor(of.getFrameRate()) ..
+		' items:' .. #canvas.items() ..
+		' scale:' .. Scale, 50, 60
+	)
+	-- LuaFormatter on
 	text.draw(s.joinLines(trace.items()), 50, 120)
 end
 
@@ -87,10 +96,11 @@ function keyPressed(key)
 end
 
 function gotMessage(msg)
+	-- console.log("msg", msg);
 	local parsed = parse(msg)
 
 	if parsed == nil then
-		log('not parsed', msg)
+		-- log('not parsed', msg)
 	elseif parsed.cmd == 'new-canvas' then
 		canvasId = parsed.canvasId
 		pd.queue(canvasId, 'map 1')

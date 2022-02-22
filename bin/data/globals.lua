@@ -16,6 +16,7 @@ _G.swig_type = swig_type
 -- than then dynamic approach below
 _G.T = R.T
 _G.always = R.always
+_G.clamp = R.clamp
 _G.cond = R.cond
 _G.draw = R.draw
 _G.either = R.either
