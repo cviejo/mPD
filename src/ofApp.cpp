@@ -4,6 +4,8 @@
 void ofApp::setup() {
 	watcher.addPath(ofToDataPath("main.lua", true));
 	watcher.addPath(ofToDataPath("canvas.lua", true));
+	watcher.addPath(ofToDataPath("parse.lua", true));
+	watcher.addPath(ofToDataPath("events.lua", true));
 	watcher.start();
 
 #if defined(TARGET_ANDROID)

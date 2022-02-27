@@ -14,14 +14,16 @@ _G.swig_type = swig_type
 
 -- adding explictly to the global table works better with the linter
 -- than then dynamic approach below
+_G.R = R
 _G.T = R.T
+_G.any = R.any
 _G.always = R.always
+_G.both = R.both
 _G.clamp = R.clamp
 _G.cond = R.cond
 _G.draw = R.draw
 _G.either = R.either
 _G.equals = R.equals
-_G.filter = R.filter
 _G.filter = R.filter
 _G.find = R.find
 _G.forEach = R.forEach

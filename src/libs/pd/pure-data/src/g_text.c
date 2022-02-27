@@ -1294,14 +1294,16 @@ void glist_drawiofor(t_glist *glist, t_object *ob, int firsttime,
     /* draw over border, so assume border width = 1 pixel * glist->gl_zoom */
     for (i = 0; i < n; i++)
     {
+        // mPD
+        const char* signalTag = obj_issignaloutlet(ob, i) ? "signal" : "control";
         int onset = x1 + (width - iow) * i / nplus;
         if (firsttime)
             sys_vgui(".x%lx.c create rectangle %d %d %d %d "
-                "-tags [list %so%d outlet] -fill black\n",
+                "-tags [list %so%d outlet %s] -fill black\n", // mPD
                 glist_getcanvas(glist),
                 onset, y2 - oh + glist->gl_zoom,
                 onset + iow, y2,
-                tag, i);
+                tag, i, signalTag); // mPD
         else
             sys_vgui(".x%lx.c coords %so%d %d %d %d %d\n",
                 glist_getcanvas(glist), tag, i,
@@ -1312,14 +1314,16 @@ void glist_drawiofor(t_glist *glist, t_object *ob, int firsttime,
     nplus = (n == 1 ? 1 : n-1);
     for (i = 0; i < n; i++)
     {
+        // mPD
+        const char* signalTag = obj_issignalinlet(ob, i) ? "signal" : "control";
         int onset = x1 + (width - iow) * i / nplus;
         if (firsttime)
             sys_vgui(".x%lx.c create rectangle %d %d %d %d "
-                "-tags [list %si%d inlet] -fill black\n",
+                "-tags [list %si%d inlet %s] -fill black\n", // mPD
                 glist_getcanvas(glist),
                 onset, y1,
                 onset + iow, y1 + ih - glist->gl_zoom,
-                tag, i);
+                tag, i, signalTag);// mPD
         else
             sys_vgui(".x%lx.c coords %si%d %d %d %d %d\n",
                 glist_getcanvas(glist), tag, i,
@@ -1377,7 +1381,9 @@ void text_drawborder(t_text *x, t_glist *glist,
     }
     else if (x->te_type == T_ATOM)
     {
-        int grabbed = glist->gl_zoom * ((t_gatom *)x)->a_grabbed;
+        // mPD
+        int grabbed = 0; // glist->gl_zoom * ((t_gatom *)x)->a_grabbed;
+
         int x1p = x1 + grabbed, y1p = y1 + grabbed;
         corner = ((y2-y1)/4);
         if (firsttime)
@@ -1392,8 +1398,9 @@ void text_drawborder(t_text *x, t_glist *glist,
                 glist_getcanvas(glist), tag,
                 x1p, y1p,  x2-corner, y1p,  x2, y1p+corner,  x2, y2,
                     x1p, y2,  x1p, y1p);
-            sys_vgui(".x%lx.c itemconfigure %sR -width %d\n",
-                glist_getcanvas(glist), tag, glist->gl_zoom+grabbed);
+            // mPD
+            /* sys_vgui(".x%lx.c itemconfigure %sR -width %d\n", */
+            /*     glist_getcanvas(glist), tag, glist->gl_zoom+grabbed); */
         }
     }
         /* for comments, just draw a bar on RHS if unlocked; when a visible

@@ -1,7 +1,11 @@
-local fn = require('utils/function')
-local text = require('utils/text')
 local grid = require('grid')
-local safe = fn.safe
+local each = require('libs/fun').each
+local text = require('utils/text')
+local f = require('utils/function')
+local gfx = require('utils/graphics')
+local findByTag, filterByTag = f.findByTag, f.filterByTag
+local hasTag, safe, intersects = f.hasTag, f.safe, f.intersects
+local moveBy = gfx.moveBy
 
 local items = {}
 local back = 255
@@ -18,32 +22,43 @@ font:setLineHeight(lineHeight)
 
 local setHex = safe(pipe(of.hexToInt, of.setHexColor))
 
-local hasTag = function(tag)
-	return function(x)
-		return (x.tags and includes(tag, x.tags))
-	end
-end
+local isObject = pipe(prop('tags'), intersects({'obj', 'atom', 'msg'}))
 
-local findByTag = function(tag, xs)
-	return find(hasTag(tag), xs)
-end
-
-local shapeEq = propEq('shape')
-
-local cmdEq = propEq('cmd')
+local purr = true
 
 local function drawText(item)
 	local x, y = item.points[1].x, item.points[1].y
 	y = y + lineHeight / 4 - 3
 
 	of.scale(.25, .25)
+	of.setColor(20) -- purr
 	font:drawString(item.text, x * 4, y * 4)
 	of.scale(4, 4)
 end
 
 local function drawLine(item)
 	local line = of.Polyline()
-	of.setColor(255)
+	local cord = includes('cord', item.tags)
+	local width = tonumber(item.width)
+
+	if (#item.points == 2) then
+		of.enableSmoothing()
+		of.setColor(front)
+		setHex(item.fill)
+		if (width > 1 and cord) then
+			of.setColor(128, 128, 147) -- purr
+		end
+		of.setLineWidth(item.width * Scale)
+		local p1, p2 = item.points[1], item.points[2]
+		of.drawLine(p1.x, p1.y, p2.x, p2.y)
+		return
+	end
+
+	if (purr and isObject(item)) then
+		of.setColor(246, 248, 248)
+	else
+		of.setColor(255)
+	end
 	of.fill()
 	of.beginShape()
 	for _, p in ipairs(item.points) do
@@ -53,7 +68,10 @@ local function drawLine(item)
 	of.endShape()
 	of.setColor(front)
 	setHex(item.fill)
-	of.setLineWidth(tonumber(item.width) * Scale)
+	if (isObject(item)) then of.setColor(204) end
+	if (cord) then of.setColor(88, 101, 86) end
+	if (cord and item.width > 1) then of.setColor(128, 128, 147) end
+	of.setLineWidth(item.width * Scale)
 	of.disableSmoothing()
 	line:draw()
 end
@@ -61,15 +79,29 @@ end
 local function drawRectangle(item)
 	local x, y = item.points[1].x, item.points[1].y
 	local w, h = item.points[2].x - x, item.points[2].y - y
-	if (item.fill) then
+	local signal = includes('signal', item.tags)
+	local control = includes('control', item.tags)
+	if (item.fill and not signal and not control) then
 		setHex(item.fill)
+		of.fill()
+		of.drawRectangle(x, y, w, h)
+	end
+	if (signal) then
+		of.setColor(128, 128, 147)
 		of.fill()
 		of.drawRectangle(x, y, w, h)
 	end
 	of.noFill()
 	of.setColor(front)
 	setHex(item.outline)
+	if (control and h > 1) then of.setColor(100) end
+	-- if (io and h > 1) then of.setColor(100) end
+	if (signal) then of.setColor(118, 118, 147) end
 	of.drawRectangle(x, y, w, h)
+	-- of.scale(.25, .25)
+	-- font:drawString(inspect(R.tail(item.tags)), item.points[1].x * 4,
+	--                 item.points[1].y * 4)
+	-- of.scale(4, 4)
 end
 
 local function drawOval(item)
@@ -84,33 +116,6 @@ local function drawOval(item)
 	end
 end
 
-local function message(msg)
-	if msg.cmd == 'coords' then
-		local found = findByTag(msg.id, items)
-
-		if found then found.points = msg.points end
-	elseif msg.cmd == 'move' then
-		local found = findByTag(msg.id, items)
-
-		if found then
-			local point = found.points[1]
-			point.x = point.x + msg.points[1].x
-			point.y = point.y + msg.points[1].y
-		end
-	elseif msg.cmd == 'delete' then
-		items = reject(hasTag(msg.tag), items)
-	elseif msg.cmd == 'configure' then
-		local found = findByTag(msg.id, items)
-
-		if found then --
-			if msg.fill then found.fill = msg.fill end
-			if msg.outline then found.outline = msg.outline end
-		end
-	else
-		table.insert(items, msg)
-	end
-end
-
 local resetStyles = function()
 	of.noFill()
 	of.setColor(front)
@@ -121,13 +126,37 @@ end
 local drawItem = pipe(
 	tap(resetStyles),
 	cond({
-		{shapeEq('line'), drawLine},
-		{shapeEq('oval'), drawOval},
-		{shapeEq('rectangle'), drawRectangle},
-		{cmdEq('new-text'), drawText},
+		{propEq('shape', 'line'), drawLine},
+		{propEq('shape', 'oval'), drawOval},
+		{propEq('shape', 'rectangle'), drawRectangle},
+		{propEq('cmd', 'new-text'), drawText},
 	})
 )
 -- LuaFormatter on
+
+local function updateItem(update, item)
+	if not item then return end
+	if update.width then item.width = update.width end
+	if update.fill then item.fill = update.fill end
+	if update.outline then item.outline = update.outline end
+	if update.text then item.text = update.text end
+	if update.points then item.points = update.points end
+end
+
+local function message(msg)
+	local cmd, tag = msg.cmd, msg.tag
+	if cmd == 'coords' or cmd == 'set-text' or cmd == 'configure' then
+		updateItem(msg, findByTag(tag, items))
+	elseif msg.cmd == 'delete' then
+		items = reject(hasTag(tag), items)
+	elseif msg.cmd == 'move' then
+		forEach(function(x)
+			x.points = map(moveBy(msg.points[1]), x.points)
+		end, filterByTag(tag, items))
+	else
+		table.insert(items, msg)
+	end
+end
 
 local function draw()
 	of.pushMatrix()
@@ -135,13 +164,11 @@ local function draw()
 	of.scale(Scale, Scale)
 	of.enableAntiAliasing()
 	of.enableSmoothing()
-	of.enableAlphaBlending()
 
 	if Scale >= 1 then grid.draw(-1, -1) end
 
-	forEach(drawItem, items)
+	each(drawItem, items)
 
-	of.disableAlphaBlending()
 	of.popMatrix()
 end
 

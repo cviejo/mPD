@@ -53,6 +53,11 @@ int sys_pollgui(void);
   void sigmund_tilde_setup(void);
   void stdout_setup(void);
 #endif
+// mPD todo move to external file
+void keyboard_setup(void);
+void biplot_setup(void);
+void pad_setup(void);
+// mPD todo move to external file
 
 static PERTHREAD t_atom *s_argv = NULL;
 static PERTHREAD t_atom *s_curr = NULL;
@@ -93,6 +98,11 @@ int libpd_init(void) {
   sys_libdir = gensym("");
   post("pd %d.%d.%d%s", PD_MAJOR_VERSION, PD_MINOR_VERSION,
     PD_BUGFIX_VERSION, PD_TEST_VERSION);
+  // mPD todo move to external file
+  keyboard_setup();
+  biplot_setup();
+  pad_setup();
+  // mPD todo move to external file
 #ifdef LIBPD_EXTRA
   bob_tilde_setup();
   bonk_tilde_setup();

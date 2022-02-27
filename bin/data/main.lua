@@ -8,17 +8,18 @@ local pd = require('pd')
 local frame = require('ui/frame')
 local canvas = require('canvas')
 local parse = require('parse')
+local events = require('events')
 
 Target = 'desktop'
 Scaling = false
-Scale = 1
+Scale = 2
 UpdateNeeded = true
 
 local editmode = 0
 local trace = fifo(30)
 local canvasId
 
-local clampScale = clamp(0.5, 4)
+local clampScale = clamp(0.5, 5)
 
 function setup()
 	of.setVerticalSync(false) -- false for fps > 60 (desktop only, apparently)
@@ -31,12 +32,12 @@ function setup()
 	if Target == 'android' then
 		success = mpd.initAudio(1, 2, 44100)
 	else
-		success = mpd.initAudio("Apple Inc.: MacBook Pro Microphone",
-		                        "Apple Inc.: MacBook Pro Speakers", 48000)
+		success = mpd.initAudio("Pro Microphone", "Pro Speakers", 48000)
 	end
 
 	if (success) then
 		pd.queue('pd open test.pd', file.getPath('.')) --
+		-- pd.queue('pd open ignore.test.pd', file.getPath('.')) --
 	end
 end
 
@@ -62,15 +63,17 @@ function draw()
 end
 
 function touchEvent(touch)
-	local x = math.floor(touch.x / Scale)
-	local y = math.floor(touch.y / Scale)
+	touch.x = math.floor(touch.x / Scale)
+	touch.y = math.floor(touch.y / Scale)
+
+	events.event(touch)
 
 	if (touch.type == of.TouchEventArgs_down) then
-		pd.queue(canvasId, 'mouse', x, y, '1 0')
+		pd.queue(canvasId, 'mouse', touch.x, touch.y, '1 0')
 	elseif (touch.type == of.TouchEventArgs_up) then
-		pd.queue(canvasId, 'mouseup', x, y, '1')
+		pd.queue(canvasId, 'mouseup', touch.x, touch.y, '1')
 	elseif (touch.type == of.TouchEventArgs_move) then
-		pd.queue(canvasId, 'motion', x, y, '0')
+		pd.queue(canvasId, 'motion', touch.x, touch.y, '0')
 	elseif (touch.type == of.TouchEventArgs_doubleTap) then
 		if (editmode == 1) then
 			editmode = 0
@@ -84,6 +87,11 @@ end
 function keyPressed(key)
 	if (s.keyEq('e', key)) then
 		pd.queue(canvasId, 'editmode 0') --
+		-- https://github.com/cviejo/mPD/blob/main/src/libs/pd/pure-data/src/g_editor.c#L3399
+	elseif (s.keyEq('q', key)) then
+		pd.queue(canvasId, 'menuclose 1') --
+	elseif (s.keyEq('s', key)) then
+		pd.queue(canvasId, 'menusave') --
 	elseif (s.keyEq('a', key)) then
 		pd.queue(canvasId, 'selectall') --
 	elseif (s.keyEq('w', key)) then
@@ -96,17 +104,18 @@ function keyPressed(key)
 end
 
 function gotMessage(msg)
-	-- console.log("msg", msg);
 	local parsed = parse(msg)
 
 	if parsed == nil then
-		-- log('not parsed', msg)
+		log('not parsed', msg)
 	elseif parsed.cmd == 'new-canvas' then
 		canvasId = parsed.canvasId
 		pd.queue(canvasId, 'map 1')
 		pd.queue(canvasId, 'query-editmode')
 		pd.queue(canvasId, 'updatemenu')
 		pd.queue(canvasId, 'editmode', editmode)
+	elseif parsed.cmd == 'bind' then
+		events.bind(parsed)
 	else
 		canvas.message(parsed)
 		UpdateNeeded = true
@@ -117,12 +126,3 @@ function exit()
 end
 
 touchMoved = touchEvent
--- function(touch)
--- 	touchCount = touchCount + 1
---
--- 		touchEvent(touch)
--- 	elseif touchable then
--- 		touchEvent(touch)
--- 		touchable = false
--- 	end
--- end

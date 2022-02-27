@@ -1,13 +1,21 @@
-local s = require('utils/string')
+local str = require('utils/string')
 local fn = require('utils/function')
-local match, gmatch = s.match, s.gmatch
-local safe = fn.safe
+local match = str.match
+local safe, firstOf = fn.safe, fn.firstOf
 
 local toNumber = unary(tonumber)
 
 local toPoint = function(tuple)
 	return {x = tuple[1], y = tuple[2]}
 end
+
+local s = '%s*' -- spaces
+
+local w = '([^%s]*)' -- word
+
+local n = '([-%d%s%.]*)' -- number
+
+local gmatch = pipe(unapply(join(s)), str.gmatch)
 
 local text = match('%-text%s-{(.-)}')
 
@@ -16,8 +24,12 @@ local anchor = match('%-anchor%s+(%w+)')
 local width = match('%-width%s+(%d+)')
 
 -- LuaFormatter off
-local tags = pipe(
-	either(match('%-tags%W-list%s*(.-)]'), match('%-tags%s*(%w*)')),
+local parseTags = pipe(
+	firstOf(
+		match('%-tags%W-list%s*(.-)]'),
+		match('%-tags%s*{(.-)}'),
+		match('%-tags' .. s .. w)
+	),
 	when(isString, split(' '))
 )
 
@@ -40,60 +52,64 @@ local parseColor = function(param)
 	return match('%-' .. param .. '%s*#?(%w*)')
 end
 
+local parsePoints = pipe(split(' '), map(toNumber), splitEvery(2), map(toPoint))
+
 local fill = pipe(parseColor('fill'), safe(toHex))
 
 local outline = pipe(parseColor('outline'), safe(toHex))
 
-local canvas = "(%.%w-%.c)"
+local raiseCord = gmatch(w, '(raise)', 'cord')
 
-local raiseCord = gmatch(canvas .. ' (raise) cord')
+local coords = gmatch(w, 'coords', w, n)
 
-local coords = gmatch(canvas .. ' coords ([^%s]-) ([-%d%s%.]*)')
+local move = gmatch(w, 'move', w, n)
 
-local move = gmatch(canvas .. ' move ([^%s]-) ([-%d%s%.]*)')
+local configure = gmatch(w, 'itemconfigure', w, '(.*)')
 
-local configure = gmatch(canvas .. ' itemconfigure ([^%s]-) (.*)')
+local create = gmatch(w, 'create', w, n, '(%-.*)')
 
-local create = gmatch(canvas .. ' create (%w+) ([-%d%s%.]*) (%-.*)')
+local bind = gmatch(w, 'bind', w, w, '.*concat', '(.*)\\;')
 
-local setText = gmatch('pdtk_text_set ' .. canvas .. ' ([^%s]-) {(.*)}')
+local newText = gmatch('pdtk_text_new ', w, '{(.-)}', n, '{(.-)} (.*) (.*)')
 
--- LuaFormatter off
-local newText = gmatch('pdtk_text_new ' .. canvas .. ' {(.-)} ([-%d%s%.]*) {(.-)} (.*) (.*)')
+local setText = gmatch('pdtk_text_set ', w, s, w, '{(.*)}')
 
-local newCanvas = gmatch('pdtk_canvas_new (%.%w-) (%d-) (%d-) ')
+local newCanvas = gmatch('pdtk_canvas_new', w, n, n)
 
-local delete = gmatch(canvas .. ' delete ([%.%w]+)')
--- LuaFormatter on
-local parsePoints = pipe(split(' '), map(toNumber), splitEvery(2), map(toPoint))
+local delete = gmatch(w, 'delete', w)
 
+-- incremental parsing would be more performant than this, but for now:
+-- https://c.tenor.com/5uf-u2UYhxoAAAAC/pig-car.gif
 return function(line)
 	for canvasId, cmd in raiseCord(line) do
 		return {cmd = cmd, canvasId = canvasId} --
 	end
-	for canvasId, id, points in coords(line) do
+	for canvasId, tag in delete(line) do
+		return {cmd = 'delete', canvasId = canvasId, tag = tag}
+	end
+	for canvasId, tag, points in coords(line) do
 		return {
 			cmd = 'coords',
 			canvasId = canvasId,
-			id = id,
+			tag = tag,
 			points = parsePoints(points)
 		}
 	end
-	for canvasId, id, params in configure(line) do
+	for canvasId, tag, params in configure(line) do
 		return {
 			cmd = 'configure',
 			canvasId = canvasId,
-			id = id,
+			tag = tag,
 			width = width(params),
 			fill = fill(params),
 			outline = outline(params)
 		}
 	end
-	for canvasId, id, points in move(line) do
+	for canvasId, tag, points in move(line) do
 		return {
 			cmd = 'move',
 			canvasId = canvasId,
-			id = id,
+			tag = tag,
 			points = parsePoints(points)
 		}
 	end
@@ -107,7 +123,7 @@ return function(line)
 			outline = outline(params),
 			font = font(line),
 			points = parsePoints(points),
-			tags = tags(params),
+			tags = parseTags(params),
 			width = width(params)
 		}
 	end
@@ -121,8 +137,8 @@ return function(line)
 			points = parsePoints(points)
 		}
 	end
-	for canvasId, id, text in setText(line) do
-		return {canvasId = canvasId, id = id, text = text}
+	for canvasId, tag, text in setText(line) do
+		return {cmd = 'set-text', canvasId = canvasId, tag = tag, text = text}
 	end
 	for canvasId, width, height in newCanvas(line) do
 		return {
@@ -132,7 +148,13 @@ return function(line)
 			height = height
 		}
 	end
-	for canvasId, tag in delete(line) do
-		return {cmd = 'delete', canvasId = canvasId, tag = tag}
+	for canvasId, tag, action, callback in bind(line) do
+		return {
+			cmd = 'bind',
+			canvasId = canvasId,
+			tag = tag,
+			action = action,
+			callback = callback
+		}
 	end
 end
