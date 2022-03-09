@@ -1,9 +1,8 @@
 local str = require('utils/string')
 local fn = require('utils/function')
-local match = str.match
 local safe, firstOf = fn.safe, fn.firstOf
 
-local toNumber = unary(tonumber)
+local toNumber = safe(unary(tonumber))
 
 local toPoint = function(tuple)
 	return {x = tuple[1], y = tuple[2]}
@@ -15,13 +14,13 @@ local w = '([^%s]*)' -- word
 
 local n = '([-%d%s%.]*)' -- number
 
+local match = pipe(unapply(join(s)), str.match)
+
 local gmatch = pipe(unapply(join(s)), str.gmatch)
 
-local text = match('%-text%s-{(.-)}')
+local text = match('%-text', s, '{(.-)}')
 
-local anchor = match('%-anchor%s+(%w+)')
-
-local width = match('%-width%s+(%d+)')
+local width = pipe(match('%-width%s+(%d+)'), toNumber)
 
 -- LuaFormatter off
 local parseTags = pipe(
@@ -52,7 +51,9 @@ local parseColor = function(param)
 	return match('%-' .. param .. '%s*#?(%w*)')
 end
 
-local parsePoints = pipe(split(' '), map(toNumber), splitEvery(2), map(toPoint))
+local parseNumbers = pipe(split(' '), map(toNumber))
+
+local parsePoints = pipe(parseNumbers, splitEvery(2), map(toPoint))
 
 local fill = pipe(parseColor('fill'), safe(toHex))
 
@@ -78,7 +79,9 @@ local newCanvas = gmatch('pdtk_canvas_new', w, n, n)
 
 local delete = gmatch(w, 'delete', w)
 
--- incremental parsing would be more performant than this, but for now:
+local scale = gmatch('scale', w, n)
+
+-- incremental parsing would perform better than this, but for now:
 -- https://c.tenor.com/5uf-u2UYhxoAAAAC/pig-car.gif
 return function(line)
 	for canvasId, cmd in raiseCord(line) do
@@ -100,6 +103,7 @@ return function(line)
 			cmd = 'configure',
 			canvasId = canvasId,
 			tag = tag,
+			text = text(params),
 			width = width(params),
 			fill = fill(params),
 			outline = outline(params)
@@ -114,17 +118,20 @@ return function(line)
 		}
 	end
 	for canvasId, shape, points, params in create(line) do
+		local parsedPoints = parsePoints(points)
+		if (shape == 'line' and #parsedPoints ~= 2) then shape = 'polyline' end
 		-- not sure what dash or capstyle do
 		return {
 			cmd = 'create',
 			shape = shape,
 			canvasId = canvasId,
+			points = parsedPoints,
 			fill = fill(params),
 			outline = outline(params),
 			font = font(line),
-			points = parsePoints(points),
 			tags = parseTags(params),
-			width = width(params)
+			width = width(params),
+			text = text(params)
 		}
 	end
 	for canvasId, tags, points, text, _, color in newText(line) do
@@ -155,6 +162,16 @@ return function(line)
 			tag = tag,
 			action = action,
 			callback = callback
+		}
+	end
+	for type, values in scale(line) do
+		local parsed = parseNumbers(values)
+		return {
+			cmd = 'scale',
+			type = type,
+			value = parsed[1],
+			x = parsed[2],
+			y = parsed[3]
 		}
 	end
 end

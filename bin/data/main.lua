@@ -19,7 +19,7 @@ local editmode = 0
 local trace = fifo(30)
 local canvasId
 
-local clampScale = clamp(0.5, 5)
+local clampScale = clamp(0.5, 6)
 
 function setup()
 	of.setVerticalSync(false) -- false for fps > 60 (desktop only, apparently)
@@ -37,6 +37,8 @@ function setup()
 
 	if (success) then
 		pd.queue('pd open test.pd', file.getPath('.')) --
+		-- pd.queue('pd open help.pd', file.getPath('.')) --
+		-- pd.queue('pd open cnv.pd', file.getPath('.')) --
 		-- pd.queue('pd open ignore.test.pd', file.getPath('.')) --
 	end
 end
@@ -52,17 +54,10 @@ function draw()
 	frame.draw(0, 0)
 
 	of.setColor(0, 0, 0, 100)
-	-- LuaFormatter off
-	text.draw(
-		math.floor(of.getFrameRate()) ..
-		' items:' .. #canvas.items() ..
-		' scale:' .. Scale, 50, 60
-	)
-	-- LuaFormatter on
 	text.draw(s.joinLines(trace.items()), 50, 120)
 end
 
-function touchEvent(touch)
+local function touchEvent(touch)
 	touch.x = math.floor(touch.x / Scale)
 	touch.y = math.floor(touch.y / Scale)
 
@@ -106,6 +101,8 @@ end
 function gotMessage(msg)
 	local parsed = parse(msg)
 
+	if parsed then parsed.message = msg end
+
 	if parsed == nil then
 		log('not parsed', msg)
 	elseif parsed.cmd == 'new-canvas' then
@@ -126,3 +123,11 @@ function exit()
 end
 
 touchMoved = touchEvent
+
+-- LuaFormatter off
+	-- text.draw(
+	-- 	math.floor(of.getFrameRate()) ..
+	-- 	' items:' .. #canvas.items() ..
+	-- 	' scale:' .. Scale, 50, 60
+	-- )
+	-- LuaFormatter on

@@ -225,28 +225,33 @@ void mpd::audioOut(float *output, int size, int channelCount) {
 
 //--------------------------------------------------------------------
 bool mpd::scale(const string& type, float value, int x, int y) {
-	if (type == "scaleBegin") {
-		scaling = true;
-	}
-	if (type == "scaleEnd") {
-		scaling = false;
-	}
-	mtx.lock();
-	if (type == "scale" || type == "scroll") {
-		float scale = (float)lua.getNumber("Scale", 1);
-		if (type == "scroll") {
-			scale +=  value * 0.1f;
-		} else if (type == "scale") {
-			scale *=  value;
-		}
-		lua.setNumber("Scale", scale);
-		lua.setBool("UpdateNeeded", true);
-	}
-	else if (type == "scaleBegin") {
-		lastTouch.type = ofTouchEventArgs::up;
-		lua.scriptTouchMoved(lastTouch); // finalize touch
-	}
-	mtx.unlock();
+	auto content = "scale " + type + " " + ofToString(value)  + " " + ofToString(x)  + " " +  ofToString(y);
+	auto message = ofMessage(content);
+	pdMessages.push(message);
+
+	// if (type == "scaleBegin") {
+	// 	scaling = true;
+	// }
+	// if (type == "scaleEnd") {
+	// 	scaling = false;
+	// }
+	// mtx.lock();
+	// if (type == "scale" || type == "scroll") {
+	// 	float scale = (float)lua.getNumber("Scale", 1);
+	// 	if (type == "scroll") {
+	// 		scale +=  value * 0.1f;
+	// 	} else if (type == "scale") {
+	// 		scale *=  value;
+	// 	}
+	// 	lua.setNumber("Scale", scale);
+	// 	lua.setBool("UpdateNeeded", true);
+	// }
+	// else if (type == "scaleBegin") {
+	// 	lastTouch.type = ofTouchEventArgs::up;
+	// 	lua.scriptTouchMoved(lastTouch); // finalize touch
+	// }
+	// mtx.unlock();
+
 	return true;
 }
 

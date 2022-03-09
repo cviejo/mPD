@@ -1,4 +1,4 @@
-#N canvas 461 291 698 506 12;
+#N canvas 421 417 898 506 12;
 #X obj 27 237 dac~;
 #X obj 28 107 osc~ 200;
 #X obj 94 164 tgl 15 0 empty empty empty 17 7 0 10 -4034 -258113 -1
@@ -29,7 +29,7 @@
 #X obj 124 118 metro 2000;
 #X obj 124 153 hradio 15 1 0 8 empty empty empty 0 -8 0 10 -262144
 -1 -1 0;
-#X msg 130 40 some msg;
+#X msg 28 22 some msg;
 #X obj 193 88 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 27 133 *~ 0.02;
@@ -47,6 +47,8 @@
 #X floatatom 419 189 6 0 0 0 - - -;
 #X floatatom 471 189 6 0 0 0 - - -;
 #X obj 424 160 unpack;
+#X msg 34 279 some msg this multiline bla bla dsddsf dfsffffffd ffs
+fff fsf ffsfsf;
 #X connect 1 0 12 0;
 #X connect 3 0 1 0;
 #X connect 4 0 8 0;

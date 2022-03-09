@@ -21,6 +21,7 @@ _G.always = R.always
 _G.both = R.both
 _G.clamp = R.clamp
 _G.cond = R.cond
+_G.contains = R.contains
 _G.draw = R.draw
 _G.either = R.either
 _G.equals = R.equals

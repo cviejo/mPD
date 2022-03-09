@@ -23,7 +23,8 @@
 #define ATOM_RMARGIN 2
 #define ATOM_BMARGIN 4 /* 1 pixel smaller than object TMARGIN+BMARGIN */
 
-#define MESSAGE_CLICK_WIDTH 5
+// mPD
+#define MESSAGE_CLICK_WIDTH 3
 
 t_class *text_class;
 static t_class *message_class;
