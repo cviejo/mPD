@@ -5,7 +5,7 @@ return function(limit)
 
 	-- @TODO inmutable
 	M.push = function(x)
-		table.insert(xs, x)
+		table.insert(xs, inspect(x))
 		if #xs > limit then table.remove(xs, 1) end
 	end
 

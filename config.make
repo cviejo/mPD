@@ -105,8 +105,7 @@ OF_ROOT = /Users/carlosviejo/developer/OF/of_v0.11.2_osx_release
 #
 #   Note: Leave a leading space when adding list items with the += operator
 ################################################################################
-# PROJECT_CFLAGS = -DLIBPD_EXTRA -DLIBPD_USE_STD_MUTEX 
-PROJECT_CFLAGS = -DHAVE_UNISTD_H -DUSEAPI_DUMMY -DPD
+PROJECT_CFLAGS = -DLIBPD_EXTRA -DHAVE_UNISTD_H -DUSEAPI_DUMMY -DPD 
 
 ################################################################################
 # PROJECT OPTIMIZATION CFLAGS

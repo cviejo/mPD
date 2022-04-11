@@ -24,3 +24,5 @@ obj
 *.xcodeproj
 *.plist
 *.xcconfig
+
+.luarc.json

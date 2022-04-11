@@ -2714,37 +2714,27 @@ SWIG_Lua_dostring(lua_State *L, const char *str) {
 
 /* -------- TYPES TABLE (BEGIN) -------- */
 
-#define SWIGTYPE_p_PdMessage swig_types[0]
-#define SWIGTYPE_p_PdNode swig_types[1]
-#define SWIGTYPE_p_ofKeyEventArgs swig_types[2]
-#define SWIGTYPE_p_ofTouchEventArgs swig_types[3]
-#define SWIGTYPE_p_std__mapT_std__string_std__string_std__lessT_std__string_t_t swig_types[4]
-#define SWIGTYPE_p_std__string swig_types[5]
-#define SWIGTYPE_p_std__vectorT_ofPoint_t swig_types[6]
-#define SWIGTYPE_p_std__vectorT_std__string_t swig_types[7]
-#define SWIGTYPE_p_t_gobj swig_types[8]
-static swig_type_info *swig_types[10];
-static swig_module_info swig_module = {swig_types, 9, 0, 0, 0, 0};
+#define SWIGTYPE_p_std__string swig_types[0]
+static swig_type_info *swig_types[2];
+static swig_module_info swig_module = {swig_types, 1, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
 /* -------- TYPES TABLE (END) -------- */
 
-#define SWIG_name      "mpd"
-#define SWIG_init      luaopen_mpd
-#define SWIG_init_user luaopen_mpd_user
+#define SWIG_name      "audio"
+#define SWIG_init      luaopen_audio
+#define SWIG_init_user luaopen_audio_user
 
-#define SWIG_LUACODE   luaopen_mpd_luacode
+#define SWIG_LUACODE   luaopen_audio_luacode
 
 namespace swig {
 typedef struct{} LANGUAGE_OBJ;
 }
 
 
-   #include "mpd.h"
-   #include "utils/graphics.h"
-   using namespace mpd;
-   using namespace gfx;
+   #include "audio.h"
+   using namespace audio;
 
 
 #include <typeinfo>
@@ -3045,391 +3035,31 @@ static swig_lua_class *swig_string_bases[] = {0};
 static const char *swig_string_base_names[] = {0};
 static swig_lua_class _wrap_class_string = { "string", "string", &SWIGTYPE_p_std__string,_proxy__wrap_new_string, swig_delete_string, swig_string_methods, swig_string_attributes, &swig_string_Sf_SwigStatic, swig_string_meta, swig_string_bases, swig_string_base_names };
 
-static int _wrap_PdNode_x_set(lua_State* L) { int SWIG_arg = 0; PdNode *arg1 = (PdNode *) 0 ; int arg2 ;
-  SWIG_check_num_args("PdNode::x",2,2) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdNode::x",1,"PdNode *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("PdNode::x",2,"int");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdNode,0))){ SWIG_fail_ptr("PdNode_x_set",1,SWIGTYPE_p_PdNode); } 
-  arg2 = (int)lua_tonumber(L, 2); if (arg1) (arg1)->x = arg2; return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L);
-  return SWIG_arg; }
-static int _wrap_PdNode_x_get(lua_State* L) { int SWIG_arg = 0; PdNode *arg1 = (PdNode *) 0 ; int result;
-  SWIG_check_num_args("PdNode::x",1,1) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdNode::x",1,"PdNode *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdNode,0))){ SWIG_fail_ptr("PdNode_x_get",1,SWIGTYPE_p_PdNode); } 
-  result = (int) ((arg1)->x); lua_pushnumber(L, (lua_Number) result); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail; fail:
-  lua_error(L); return SWIG_arg; }
-static int _wrap_PdNode_y_set(lua_State* L) { int SWIG_arg = 0; PdNode *arg1 = (PdNode *) 0 ; int arg2 ;
-  SWIG_check_num_args("PdNode::y",2,2) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdNode::y",1,"PdNode *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("PdNode::y",2,"int");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdNode,0))){ SWIG_fail_ptr("PdNode_y_set",1,SWIGTYPE_p_PdNode); } 
-  arg2 = (int)lua_tonumber(L, 2); if (arg1) (arg1)->y = arg2; return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L);
-  return SWIG_arg; }
-static int _wrap_PdNode_y_get(lua_State* L) { int SWIG_arg = 0; PdNode *arg1 = (PdNode *) 0 ; int result;
-  SWIG_check_num_args("PdNode::y",1,1) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdNode::y",1,"PdNode *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdNode,0))){ SWIG_fail_ptr("PdNode_y_get",1,SWIGTYPE_p_PdNode); } 
-  result = (int) ((arg1)->y); lua_pushnumber(L, (lua_Number) result); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail; fail:
-  lua_error(L); return SWIG_arg; }
-static int _wrap_PdNode_width_set(lua_State* L) { int SWIG_arg = 0; PdNode *arg1 = (PdNode *) 0 ; int arg2 ;
-  SWIG_check_num_args("PdNode::width",2,2) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdNode::width",1,"PdNode *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("PdNode::width",2,"int");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdNode,0))){
-    SWIG_fail_ptr("PdNode_width_set",1,SWIGTYPE_p_PdNode); }  arg2 = (int)lua_tonumber(L, 2); if (arg1) (arg1)->width = arg2;
-  return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdNode_width_get(lua_State* L) { int SWIG_arg = 0; PdNode *arg1 = (PdNode *) 0 ; int result;
-  SWIG_check_num_args("PdNode::width",1,1) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdNode::width",1,"PdNode *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdNode,0))){
-    SWIG_fail_ptr("PdNode_width_get",1,SWIGTYPE_p_PdNode); }  result = (int) ((arg1)->width);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdNode_height_set(lua_State* L) { int SWIG_arg = 0; PdNode *arg1 = (PdNode *) 0 ; int arg2 ;
-  SWIG_check_num_args("PdNode::height",2,2) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdNode::height",1,"PdNode *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("PdNode::height",2,"int");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdNode,0))){
-    SWIG_fail_ptr("PdNode_height_set",1,SWIGTYPE_p_PdNode); }  arg2 = (int)lua_tonumber(L, 2); if (arg1) (arg1)->height = arg2;
-  return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdNode_height_get(lua_State* L) { int SWIG_arg = 0; PdNode *arg1 = (PdNode *) 0 ; int result;
-  SWIG_check_num_args("PdNode::height",1,1) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdNode::height",1,"PdNode *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdNode,0))){
-    SWIG_fail_ptr("PdNode_height_get",1,SWIGTYPE_p_PdNode); }  result = (int) ((arg1)->height);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdNode_outletCount_set(lua_State* L) { int SWIG_arg = 0; PdNode *arg1 = (PdNode *) 0 ; int arg2 ;
-  SWIG_check_num_args("PdNode::outletCount",2,2) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdNode::outletCount",1,"PdNode *");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("PdNode::outletCount",2,"int");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdNode,0))){
-    SWIG_fail_ptr("PdNode_outletCount_set",1,SWIGTYPE_p_PdNode); }  arg2 = (int)lua_tonumber(L, 2);
-  if (arg1) (arg1)->outletCount = arg2; return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdNode_outletCount_get(lua_State* L) { int SWIG_arg = 0; PdNode *arg1 = (PdNode *) 0 ; int result;
-  SWIG_check_num_args("PdNode::outletCount",1,1) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdNode::outletCount",1,"PdNode *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdNode,0))){
-    SWIG_fail_ptr("PdNode_outletCount_get",1,SWIGTYPE_p_PdNode); }  result = (int) ((arg1)->outletCount);
-  lua_pushnumber(L, (lua_Number) result); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdNode_ref_set(lua_State* L) { int SWIG_arg = 0; PdNode *arg1 = (PdNode *) 0 ; t_gobj *arg2 = (t_gobj *) 0 ;
-  SWIG_check_num_args("PdNode::ref",2,2) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdNode::ref",1,"PdNode *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("PdNode::ref",2,"t_gobj *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdNode,0))){ SWIG_fail_ptr("PdNode_ref_set",1,SWIGTYPE_p_PdNode); }
-   if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_t_gobj,SWIG_POINTER_DISOWN))){
-    SWIG_fail_ptr("PdNode_ref_set",2,SWIGTYPE_p_t_gobj); }  if (arg1) (arg1)->ref = arg2; return SWIG_arg; if(0) SWIG_fail;
+static int _wrap_init__SWIG_0(lua_State* L) { int SWIG_arg = 0; string *arg1 = 0 ; string *arg2 = 0 ; float arg3 ;
+  string temp1 ; string temp2 ; bool result; SWIG_check_num_args("audio::init",3,3)
+  if(!lua_isstring(L,1)) SWIG_fail_arg("audio::init",1,"string const &");
+  if(!lua_isstring(L,2)) SWIG_fail_arg("audio::init",2,"string const &");
+  if(!lua_isnumber(L,3)) SWIG_fail_arg("audio::init",3,"float"); temp1.assign(lua_tostring(L,1),lua_rawlen(L,1)); arg1=&temp1;
+  temp2.assign(lua_tostring(L,2),lua_rawlen(L,2)); arg2=&temp2; arg3 = (float)lua_tonumber(L, 3);
+  result = (bool)audio::init((std::string const &)*arg1,(std::string const &)*arg2,arg3);
+  lua_pushboolean(L,(int)(result!=0)); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
+static int _wrap_init__SWIG_1(lua_State* L) { int SWIG_arg = 0; int arg1 ; int arg2 ; float arg3 ; bool result;
+  SWIG_check_num_args("audio::init",3,3) if(!lua_isnumber(L,1)) SWIG_fail_arg("audio::init",1,"int");
+  if(!lua_isnumber(L,2)) SWIG_fail_arg("audio::init",2,"int"); if(!lua_isnumber(L,3)) SWIG_fail_arg("audio::init",3,"float");
+  arg1 = (int)lua_tonumber(L, 1); arg2 = (int)lua_tonumber(L, 2); arg3 = (float)lua_tonumber(L, 3);
+  result = (bool)audio::init(arg1,arg2,arg3); lua_pushboolean(L,(int)(result!=0)); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail;
   fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdNode_ref_get(lua_State* L) { int SWIG_arg = 0; PdNode *arg1 = (PdNode *) 0 ; t_gobj *result = 0 ;
-  SWIG_check_num_args("PdNode::ref",1,1) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdNode::ref",1,"PdNode *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdNode,0))){ SWIG_fail_ptr("PdNode_ref_get",1,SWIGTYPE_p_PdNode); }
-   result = (t_gobj *) ((arg1)->ref); SWIG_NewPointerObj(L,result,SWIGTYPE_p_t_gobj,0); SWIG_arg++;  return SWIG_arg;
-  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_new_PdNode(lua_State* L) { int SWIG_arg = 0; PdNode *result = 0 ; SWIG_check_num_args("PdNode::PdNode",0,0)
-  result = (PdNode *)new PdNode(); SWIG_NewPointerObj(L,result,SWIGTYPE_p_PdNode,1); SWIG_arg++;  return SWIG_arg;
-  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static void swig_delete_PdNode(void *obj) {
-PdNode *arg1 = (PdNode *) obj;
-delete arg1;
-}
-static int _proxy__wrap_new_PdNode(lua_State *L) {
-    assert(lua_istable(L,1));
-    lua_pushcfunction(L,_wrap_new_PdNode);
-    assert(!lua_isnil(L,-1));
-    lua_replace(L,1); /* replace our table with real constructor */
-    lua_call(L,lua_gettop(L)-1,1);
-    return 1;
-}
-static swig_lua_attribute swig_PdNode_attributes[] = {
-    { "x", _wrap_PdNode_x_get, _wrap_PdNode_x_set },
-    { "y", _wrap_PdNode_y_get, _wrap_PdNode_y_set },
-    { "width", _wrap_PdNode_width_get, _wrap_PdNode_width_set },
-    { "height", _wrap_PdNode_height_get, _wrap_PdNode_height_set },
-    { "outletCount", _wrap_PdNode_outletCount_get, _wrap_PdNode_outletCount_set },
-    { "ref", _wrap_PdNode_ref_get, _wrap_PdNode_ref_set },
-    {0,0,0}
-};
-static swig_lua_method swig_PdNode_methods[]= {
-    {0,0}
-};
-static swig_lua_method swig_PdNode_meta[] = {
-    {0,0}
-};
-
-static swig_lua_attribute swig_PdNode_Sf_SwigStatic_attributes[] = {
-    {0,0,0}
-};
-static swig_lua_const_info swig_PdNode_Sf_SwigStatic_constants[]= {
-    {0,0,0,0,0,0}
-};
-static swig_lua_method swig_PdNode_Sf_SwigStatic_methods[]= {
-    {0,0}
-};
-static swig_lua_class* swig_PdNode_Sf_SwigStatic_classes[]= {
-    0
-};
-
-static swig_lua_namespace swig_PdNode_Sf_SwigStatic = {
-    "PdNode",
-    swig_PdNode_Sf_SwigStatic_methods,
-    swig_PdNode_Sf_SwigStatic_attributes,
-    swig_PdNode_Sf_SwigStatic_constants,
-    swig_PdNode_Sf_SwigStatic_classes,
-    0
-};
-static swig_lua_class *swig_PdNode_bases[] = {0};
-static const char *swig_PdNode_base_names[] = {0};
-static swig_lua_class _wrap_class_PdNode = { "PdNode", "PdNode", &SWIGTYPE_p_PdNode,_proxy__wrap_new_PdNode, swig_delete_PdNode, swig_PdNode_methods, swig_PdNode_attributes, &swig_PdNode_Sf_SwigStatic, swig_PdNode_meta, swig_PdNode_bases, swig_PdNode_base_names };
-
-static int _wrap_PdMessage_canvasId_set(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ; string *arg2 = 0 ;
-  string temp2 ; SWIG_check_num_args("PdMessage::canvasId",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::canvasId",1,"PdMessage *");
-  if(!lua_isstring(L,2)) SWIG_fail_arg("PdMessage::canvasId",2,"string const &");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_canvasId_set",1,SWIGTYPE_p_PdMessage); } 
-  temp2.assign(lua_tostring(L,2),lua_rawlen(L,2)); arg2=&temp2; if (arg1) (arg1)->canvasId = *arg2; return SWIG_arg;
-  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdMessage_canvasId_get(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ;
-  string *result = 0 ; SWIG_check_num_args("PdMessage::canvasId",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::canvasId",1,"PdMessage *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_canvasId_get",1,SWIGTYPE_p_PdMessage); }  result = (string *) & ((arg1)->canvasId);
-  lua_pushlstring(L,result->data(),result->size()); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L);
-  return SWIG_arg; }
-static int _wrap_PdMessage_cmd_set(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ; string *arg2 = 0 ;
-  string temp2 ; SWIG_check_num_args("PdMessage::cmd",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::cmd",1,"PdMessage *");
-  if(!lua_isstring(L,2)) SWIG_fail_arg("PdMessage::cmd",2,"string const &");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_cmd_set",1,SWIGTYPE_p_PdMessage); }  temp2.assign(lua_tostring(L,2),lua_rawlen(L,2)); arg2=&temp2;
-  if (arg1) (arg1)->cmd = *arg2; return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdMessage_cmd_get(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ; string *result = 0 ;
-  SWIG_check_num_args("PdMessage::cmd",1,1) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::cmd",1,"PdMessage *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_cmd_get",1,SWIGTYPE_p_PdMessage); }  result = (string *) & ((arg1)->cmd);
-  lua_pushlstring(L,result->data(),result->size()); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L);
-  return SWIG_arg; }
-static int _wrap_PdMessage_message_set(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ; string *arg2 = 0 ;
-  string temp2 ; SWIG_check_num_args("PdMessage::message",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::message",1,"PdMessage *");
-  if(!lua_isstring(L,2)) SWIG_fail_arg("PdMessage::message",2,"string const &");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_message_set",1,SWIGTYPE_p_PdMessage); } 
-  temp2.assign(lua_tostring(L,2),lua_rawlen(L,2)); arg2=&temp2; if (arg1) (arg1)->message = *arg2; return SWIG_arg;
-  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdMessage_message_get(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ;
-  string *result = 0 ; SWIG_check_num_args("PdMessage::message",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::message",1,"PdMessage *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_message_get",1,SWIGTYPE_p_PdMessage); }  result = (string *) & ((arg1)->message);
-  lua_pushlstring(L,result->data(),result->size()); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L);
-  return SWIG_arg; }
-static int _wrap_PdMessage_value_set(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ; string *arg2 = 0 ;
-  string temp2 ; SWIG_check_num_args("PdMessage::value",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::value",1,"PdMessage *");
-  if(!lua_isstring(L,2)) SWIG_fail_arg("PdMessage::value",2,"string const &");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_value_set",1,SWIGTYPE_p_PdMessage); } 
-  temp2.assign(lua_tostring(L,2),lua_rawlen(L,2)); arg2=&temp2; if (arg1) (arg1)->value = *arg2; return SWIG_arg;
-  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdMessage_value_get(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ; string *result = 0 ;
-  SWIG_check_num_args("PdMessage::value",1,1) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::value",1,"PdMessage *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_value_get",1,SWIGTYPE_p_PdMessage); }  result = (string *) & ((arg1)->value);
-  lua_pushlstring(L,result->data(),result->size()); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L);
-  return SWIG_arg; }
-static int _wrap_PdMessage_tags_set(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ;
-  std::vector< string > *arg2 = (std::vector< string > *) 0 ; SWIG_check_num_args("PdMessage::tags",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::tags",1,"PdMessage *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("PdMessage::tags",2,"std::vector< string > *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_tags_set",1,SWIGTYPE_p_PdMessage); } 
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_std__vectorT_std__string_t,0))){
-    SWIG_fail_ptr("PdMessage_tags_set",2,SWIGTYPE_p_std__vectorT_std__string_t); }  if (arg1) (arg1)->tags = *arg2;
+static int _wrap_init(lua_State* L) { int argc; int argv[4]={ 1,2,3,4} ; argc = lua_gettop(L); if (argc == 3) { int _v; {
+      _v = lua_isnumber(L,argv[0]); }  if (_v) { { _v = lua_isnumber(L,argv[1]); }  if (_v) { { _v = lua_isnumber(L,argv[2]); } 
+        if (_v) { return _wrap_init__SWIG_1(L);}  }  }  }  if (argc == 3) { int _v; { _v = lua_isstring(L,argv[0]); }  if (_v) {
+      { _v = lua_isstring(L,argv[1]); }  if (_v) { { _v = lua_isnumber(L,argv[2]); }  if (_v) { return _wrap_init__SWIG_0(L);}  }
+       }  }  SWIG_Lua_pusherrstring(L,"Wrong arguments for overloaded function 'init'\n" "  Possible C/C++ prototypes are:\n"
+  "    audio::init(string const &,string const &,float)\n" "    audio::init(int,int,float)\n"); lua_error(L);return 0; }
+static int _wrap_mute(lua_State* L) { int SWIG_arg = 0; bool arg1 ; SWIG_check_num_args("audio::mute",1,1)
+  if(!lua_isboolean(L,1)) SWIG_fail_arg("audio::mute",1,"bool"); arg1 = (lua_toboolean(L, 1)!=0); audio::mute(arg1);
   return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdMessage_tags_get(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ;
-  std::vector< string > *result = 0 ; SWIG_check_num_args("PdMessage::tags",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::tags",1,"PdMessage *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_tags_get",1,SWIGTYPE_p_PdMessage); }  result = (std::vector< string > *)& ((arg1)->tags);
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p_std__vectorT_std__string_t,0); SWIG_arg++;  return SWIG_arg; if(0) SWIG_fail; fail:
-  lua_error(L); return SWIG_arg; }
-static int _wrap_PdMessage_points_set(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ;
-  std::vector< ofPoint > *arg2 = (std::vector< ofPoint > *) 0 ; SWIG_check_num_args("PdMessage::points",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::points",1,"PdMessage *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("PdMessage::points",2,"std::vector< ofPoint > *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_points_set",1,SWIGTYPE_p_PdMessage); } 
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_std__vectorT_ofPoint_t,0))){
-    SWIG_fail_ptr("PdMessage_points_set",2,SWIGTYPE_p_std__vectorT_ofPoint_t); }  if (arg1) (arg1)->points = *arg2;
+static int _wrap_clear(lua_State* L) { int SWIG_arg = 0; SWIG_check_num_args("audio::clear",0,0) audio::clear();
   return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdMessage_points_get(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ;
-  std::vector< ofPoint > *result = 0 ; SWIG_check_num_args("PdMessage::points",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::points",1,"PdMessage *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_points_get",1,SWIGTYPE_p_PdMessage); }  result = (std::vector< ofPoint > *)& ((arg1)->points);
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p_std__vectorT_ofPoint_t,0); SWIG_arg++;  return SWIG_arg; if(0) SWIG_fail; fail:
-  lua_error(L); return SWIG_arg; }
-static int _wrap_PdMessage_params_set(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ;
-  map< string,string > *arg2 = (map< string,string > *) 0 ; SWIG_check_num_args("PdMessage::params",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::params",1,"PdMessage *");
-  if(!SWIG_isptrtype(L,2)) SWIG_fail_arg("PdMessage::params",2,"map< string,string > *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_params_set",1,SWIGTYPE_p_PdMessage); } 
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,2,(void**)&arg2,SWIGTYPE_p_std__mapT_std__string_std__string_std__lessT_std__string_t_t,0))){
-    SWIG_fail_ptr("PdMessage_params_set",2,SWIGTYPE_p_std__mapT_std__string_std__string_std__lessT_std__string_t_t); } 
-  if (arg1) (arg1)->params = *arg2; return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdMessage_params_get(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ;
-  map< string,string > *result = 0 ; SWIG_check_num_args("PdMessage::params",1,1)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::params",1,"PdMessage *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_params_get",1,SWIGTYPE_p_PdMessage); }  result = (map< string,string > *)& ((arg1)->params);
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p_std__mapT_std__string_std__string_std__lessT_std__string_t_t,0); SWIG_arg++; 
-  return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_PdMessage_addPoint(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ; string arg2 ;
-  string arg3 ; SWIG_check_num_args("PdMessage::addPoint",3,3)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::addPoint",1,"PdMessage *");
-  if(!lua_isstring(L,2)) SWIG_fail_arg("PdMessage::addPoint",2,"string");
-  if(!lua_isstring(L,3)) SWIG_fail_arg("PdMessage::addPoint",3,"string");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_addPoint",1,SWIGTYPE_p_PdMessage); }  (&arg2)->assign(lua_tostring(L,2),lua_rawlen(L,2));
-  (&arg3)->assign(lua_tostring(L,3),lua_rawlen(L,3)); (arg1)->addPoint(arg2,arg3); return SWIG_arg; if(0) SWIG_fail; fail:
-  lua_error(L); return SWIG_arg; }
-static int _wrap_PdMessage_hasTag(lua_State* L) { int SWIG_arg = 0; PdMessage *arg1 = (PdMessage *) 0 ; string *arg2 = 0 ;
-  string temp2 ; bool result; SWIG_check_num_args("PdMessage::hasTag",2,2)
-  if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("PdMessage::hasTag",1,"PdMessage *");
-  if(!lua_isstring(L,2)) SWIG_fail_arg("PdMessage::hasTag",2,"string const &");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_PdMessage,0))){
-    SWIG_fail_ptr("PdMessage_hasTag",1,SWIGTYPE_p_PdMessage); }  temp2.assign(lua_tostring(L,2),lua_rawlen(L,2)); arg2=&temp2;
-  result = (bool)(arg1)->hasTag((string const &)*arg2); lua_pushboolean(L,(int)(result!=0)); SWIG_arg++; return SWIG_arg;
-  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_new_PdMessage(lua_State* L) { int SWIG_arg = 0; PdMessage *result = 0 ;
-  SWIG_check_num_args("PdMessage::PdMessage",0,0) result = (PdMessage *)new PdMessage();
-  SWIG_NewPointerObj(L,result,SWIGTYPE_p_PdMessage,1); SWIG_arg++;  return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L);
-  return SWIG_arg; }
-static void swig_delete_PdMessage(void *obj) {
-PdMessage *arg1 = (PdMessage *) obj;
-delete arg1;
-}
-static int _proxy__wrap_new_PdMessage(lua_State *L) {
-    assert(lua_istable(L,1));
-    lua_pushcfunction(L,_wrap_new_PdMessage);
-    assert(!lua_isnil(L,-1));
-    lua_replace(L,1); /* replace our table with real constructor */
-    lua_call(L,lua_gettop(L)-1,1);
-    return 1;
-}
-static swig_lua_attribute swig_PdMessage_attributes[] = {
-    { "canvasId", _wrap_PdMessage_canvasId_get, _wrap_PdMessage_canvasId_set },
-    { "cmd", _wrap_PdMessage_cmd_get, _wrap_PdMessage_cmd_set },
-    { "message", _wrap_PdMessage_message_get, _wrap_PdMessage_message_set },
-    { "value", _wrap_PdMessage_value_get, _wrap_PdMessage_value_set },
-    { "tags", _wrap_PdMessage_tags_get, _wrap_PdMessage_tags_set },
-    { "points", _wrap_PdMessage_points_get, _wrap_PdMessage_points_set },
-    { "params", _wrap_PdMessage_params_get, _wrap_PdMessage_params_set },
-    {0,0,0}
-};
-static swig_lua_method swig_PdMessage_methods[]= {
-    { "addPoint", _wrap_PdMessage_addPoint},
-    { "hasTag", _wrap_PdMessage_hasTag},
-    {0,0}
-};
-static swig_lua_method swig_PdMessage_meta[] = {
-    {0,0}
-};
-
-static swig_lua_attribute swig_PdMessage_Sf_SwigStatic_attributes[] = {
-    {0,0,0}
-};
-static swig_lua_const_info swig_PdMessage_Sf_SwigStatic_constants[]= {
-    {0,0,0,0,0,0}
-};
-static swig_lua_method swig_PdMessage_Sf_SwigStatic_methods[]= {
-    {0,0}
-};
-static swig_lua_class* swig_PdMessage_Sf_SwigStatic_classes[]= {
-    0
-};
-
-static swig_lua_namespace swig_PdMessage_Sf_SwigStatic = {
-    "PdMessage",
-    swig_PdMessage_Sf_SwigStatic_methods,
-    swig_PdMessage_Sf_SwigStatic_attributes,
-    swig_PdMessage_Sf_SwigStatic_constants,
-    swig_PdMessage_Sf_SwigStatic_classes,
-    0
-};
-static swig_lua_class *swig_PdMessage_bases[] = {0};
-static const char *swig_PdMessage_base_names[] = {0};
-static swig_lua_class _wrap_class_PdMessage = { "PdMessage", "PdMessage", &SWIGTYPE_p_PdMessage,_proxy__wrap_new_PdMessage, swig_delete_PdMessage, swig_PdMessage_methods, swig_PdMessage_attributes, &swig_PdMessage_Sf_SwigStatic, swig_PdMessage_meta, swig_PdMessage_bases, swig_PdMessage_base_names };
-
-static int _wrap_setup(lua_State* L) { int SWIG_arg = 0; SWIG_check_num_args("mpd::setup",0,0) mpd::setup(); return SWIG_arg;
-  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_draw(lua_State* L) { int SWIG_arg = 0; SWIG_check_num_args("mpd::draw",0,0) mpd::draw(); return SWIG_arg;
-  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_update(lua_State* L) { int SWIG_arg = 0; SWIG_check_num_args("mpd::update",0,0) mpd::update(); return SWIG_arg;
-  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_key(lua_State* L) { int SWIG_arg = 0; ofKeyEventArgs *arg1 = 0 ; SWIG_check_num_args("mpd::key",1,1)
-  if(!lua_isuserdata(L,1)) SWIG_fail_arg("mpd::key",1,"ofKeyEventArgs &");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_ofKeyEventArgs,0))){
-    SWIG_fail_ptr("key",1,SWIGTYPE_p_ofKeyEventArgs); }  mpd::key(*arg1); return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L);
-  return SWIG_arg; }
-static int _wrap_touch(lua_State* L) { int SWIG_arg = 0; ofTouchEventArgs *arg1 = 0 ; SWIG_check_num_args("mpd::touch",1,1)
-  if(!lua_isuserdata(L,1)) SWIG_fail_arg("mpd::touch",1,"ofTouchEventArgs &");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_ofTouchEventArgs,0))){
-    SWIG_fail_ptr("touch",1,SWIGTYPE_p_ofTouchEventArgs); }  mpd::touch(*arg1); return SWIG_arg; if(0) SWIG_fail; fail:
-  lua_error(L); return SWIG_arg; }
-static int _wrap_scale(lua_State* L) { int SWIG_arg = 0; string *arg1 = 0 ; float arg2 ; int arg3 ; int arg4 ; string temp1 ;
-  SWIG_check_num_args("mpd::scale",4,4) if(!lua_isstring(L,1)) SWIG_fail_arg("mpd::scale",1,"string const &");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("mpd::scale",2,"float"); if(!lua_isnumber(L,3)) SWIG_fail_arg("mpd::scale",3,"int");
-  if(!lua_isnumber(L,4)) SWIG_fail_arg("mpd::scale",4,"int"); temp1.assign(lua_tostring(L,1),lua_rawlen(L,1)); arg1=&temp1;
-  arg2 = (float)lua_tonumber(L, 2); arg3 = (int)lua_tonumber(L, 3); arg4 = (int)lua_tonumber(L, 4);
-  mpd::scale((std::string const &)*arg1,arg2,arg3,arg4); return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_reload(lua_State* L) { int SWIG_arg = 0; SWIG_check_num_args("mpd::reload",0,0) mpd::reload(); return SWIG_arg;
-  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_getNode(lua_State* L) { int SWIG_arg = 0; int arg1 ; int arg2 ; PdNode *result = 0 ;
-  SWIG_check_num_args("mpd::getNode",2,2) if(!lua_isnumber(L,1)) SWIG_fail_arg("mpd::getNode",1,"int");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("mpd::getNode",2,"int"); arg1 = (int)lua_tonumber(L, 1); arg2 = (int)lua_tonumber(L, 2);
-  result = (PdNode *)mpd::getNode(arg1,arg2); SWIG_NewPointerObj(L,result,SWIGTYPE_p_PdNode,0); SWIG_arg++;  return SWIG_arg;
-  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_findBox(lua_State* L) { int SWIG_arg = 0; int arg1 ; int arg2 ; t_gobj *result = 0 ;
-  SWIG_check_num_args("mpd::findBox",2,2) if(!lua_isnumber(L,1)) SWIG_fail_arg("mpd::findBox",1,"int");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("mpd::findBox",2,"int"); arg1 = (int)lua_tonumber(L, 1); arg2 = (int)lua_tonumber(L, 2);
-  result = (t_gobj *)mpd::findBox(arg1,arg2); SWIG_NewPointerObj(L,result,SWIGTYPE_p_t_gobj,0); SWIG_arg++;  return SWIG_arg;
-  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_outletCount(lua_State* L) { int SWIG_arg = 0; t_gobj *arg1 = (t_gobj *) 0 ; int result;
-  SWIG_check_num_args("mpd::outletCount",1,1) if(!SWIG_isptrtype(L,1)) SWIG_fail_arg("mpd::outletCount",1,"t_gobj *");
-  if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_t_gobj,0))){ SWIG_fail_ptr("outletCount",1,SWIGTYPE_p_t_gobj); } 
-  result = (int)mpd::outletCount(arg1); lua_pushnumber(L, (lua_Number) result); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail;
-  fail: lua_error(L); return SWIG_arg; }
-static int _wrap_selectionActive(lua_State* L) { int SWIG_arg = 0; bool result; SWIG_check_num_args("mpd::selectionActive",0,0)
-  result = (bool)mpd::selectionActive(); lua_pushboolean(L,(int)(result!=0)); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail;
-  fail: lua_error(L); return SWIG_arg; }
-static int _wrap_pdsend(lua_State* L) { int SWIG_arg = 0; string *arg1 = 0 ; string temp1 ;
-  SWIG_check_num_args("mpd::pdsend",1,1) if(!lua_isstring(L,1)) SWIG_fail_arg("mpd::pdsend",1,"string const &");
-  temp1.assign(lua_tostring(L,1),lua_rawlen(L,1)); arg1=&temp1; mpd::pdsend((std::string const &)*arg1); return SWIG_arg;
-  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_drawRectangle(lua_State* L) { int SWIG_arg = 0; int arg1 ; int arg2 ; int arg3 ; int arg4 ; string *arg5 = 0 ;
-  string *arg6 = 0 ; string temp5 ; string temp6 ; SWIG_check_num_args("gfx::drawRectangle",6,6)
-  if(!lua_isnumber(L,1)) SWIG_fail_arg("gfx::drawRectangle",1,"int");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("gfx::drawRectangle",2,"int");
-  if(!lua_isnumber(L,3)) SWIG_fail_arg("gfx::drawRectangle",3,"int");
-  if(!lua_isnumber(L,4)) SWIG_fail_arg("gfx::drawRectangle",4,"int");
-  if(!lua_isstring(L,5)) SWIG_fail_arg("gfx::drawRectangle",5,"string const &");
-  if(!lua_isstring(L,6)) SWIG_fail_arg("gfx::drawRectangle",6,"string const &"); arg1 = (int)lua_tonumber(L, 1);
-  arg2 = (int)lua_tonumber(L, 2); arg3 = (int)lua_tonumber(L, 3); arg4 = (int)lua_tonumber(L, 4);
-  temp5.assign(lua_tostring(L,5),lua_rawlen(L,5)); arg5=&temp5; temp6.assign(lua_tostring(L,6),lua_rawlen(L,6)); arg6=&temp6;
-  gfx::drawRectangle(arg1,arg2,arg3,arg4,(std::string const &)*arg5,(std::string const &)*arg6); return SWIG_arg;
-  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
-static int _wrap_drawEllipse(lua_State* L) { int SWIG_arg = 0; int arg1 ; int arg2 ; int arg3 ; int arg4 ; string *arg5 = 0 ;
-  string *arg6 = 0 ; string temp5 ; string temp6 ; SWIG_check_num_args("gfx::drawEllipse",6,6)
-  if(!lua_isnumber(L,1)) SWIG_fail_arg("gfx::drawEllipse",1,"int");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("gfx::drawEllipse",2,"int");
-  if(!lua_isnumber(L,3)) SWIG_fail_arg("gfx::drawEllipse",3,"int");
-  if(!lua_isnumber(L,4)) SWIG_fail_arg("gfx::drawEllipse",4,"int");
-  if(!lua_isstring(L,5)) SWIG_fail_arg("gfx::drawEllipse",5,"string const &");
-  if(!lua_isstring(L,6)) SWIG_fail_arg("gfx::drawEllipse",6,"string const &"); arg1 = (int)lua_tonumber(L, 1);
-  arg2 = (int)lua_tonumber(L, 2); arg3 = (int)lua_tonumber(L, 3); arg4 = (int)lua_tonumber(L, 4);
-  temp5.assign(lua_tostring(L,5),lua_rawlen(L,5)); arg5=&temp5; temp6.assign(lua_tostring(L,6),lua_rawlen(L,6)); arg6=&temp6;
-  gfx::drawEllipse(arg1,arg2,arg3,arg4,(std::string const &)*arg5,(std::string const &)*arg6); return SWIG_arg; if(0) SWIG_fail;
-  fail: lua_error(L); return SWIG_arg; }
-static int _wrap_drawLine(lua_State* L) { int SWIG_arg = 0; int arg1 ; int arg2 ; int arg3 ; int arg4 ; string *arg5 = 0 ;
-  float arg6 ; string temp5 ; SWIG_check_num_args("gfx::drawLine",6,6)
-  if(!lua_isnumber(L,1)) SWIG_fail_arg("gfx::drawLine",1,"int"); if(!lua_isnumber(L,2)) SWIG_fail_arg("gfx::drawLine",2,"int");
-  if(!lua_isnumber(L,3)) SWIG_fail_arg("gfx::drawLine",3,"int"); if(!lua_isnumber(L,4)) SWIG_fail_arg("gfx::drawLine",4,"int");
-  if(!lua_isstring(L,5)) SWIG_fail_arg("gfx::drawLine",5,"string const &");
-  if(!lua_isnumber(L,6)) SWIG_fail_arg("gfx::drawLine",6,"float"); arg1 = (int)lua_tonumber(L, 1);
-  arg2 = (int)lua_tonumber(L, 2); arg3 = (int)lua_tonumber(L, 3); arg4 = (int)lua_tonumber(L, 4);
-  temp5.assign(lua_tostring(L,5),lua_rawlen(L,5)); arg5=&temp5; arg6 = (float)lua_tonumber(L, 6);
-  gfx::drawLine(arg1,arg2,arg3,arg4,(std::string const &)*arg5,arg6); return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L);
-  return SWIG_arg; }
 static swig_lua_attribute swig_SwigModule_attributes[] = {
     {0,0,0}
 };
@@ -3437,27 +3067,13 @@ static swig_lua_const_info swig_SwigModule_constants[]= {
     {0,0,0,0,0,0}
 };
 static swig_lua_method swig_SwigModule_methods[]= {
-    { "setup", _wrap_setup},
-    { "draw", _wrap_draw},
-    { "update", _wrap_update},
-    { "key", _wrap_key},
-    { "touch", _wrap_touch},
-    { "scale", _wrap_scale},
-    { "reload", _wrap_reload},
-    { "getNode", _wrap_getNode},
-    { "findBox", _wrap_findBox},
-    { "outletCount", _wrap_outletCount},
-    { "selectionActive", _wrap_selectionActive},
-    { "pdsend", _wrap_pdsend},
-    { "drawRectangle", _wrap_drawRectangle},
-    { "drawEllipse", _wrap_drawEllipse},
-    { "drawLine", _wrap_drawLine},
+    { "init", _wrap_init},
+    { "mute", _wrap_mute},
+    { "clear", _wrap_clear},
     {0,0}
 };
 static swig_lua_class* swig_SwigModule_classes[]= {
 &_wrap_class_string,
-&_wrap_class_PdNode,
-&_wrap_class_PdMessage,
     0
 };
 static swig_lua_namespace* swig_SwigModule_namespaces[] = {
@@ -3465,7 +3081,7 @@ static swig_lua_namespace* swig_SwigModule_namespaces[] = {
 };
 
 static swig_lua_namespace swig_SwigModule = {
-    "mpd",
+    "audio",
     swig_SwigModule_methods,
     swig_SwigModule_attributes,
     swig_SwigModule_constants,
@@ -3478,48 +3094,16 @@ static swig_lua_namespace swig_SwigModule = {
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
-static swig_type_info _swigt__p_PdMessage = {"_p_PdMessage", "PdMessage *", 0, 0, (void*)&_wrap_class_PdMessage, 0};
-static swig_type_info _swigt__p_PdNode = {"_p_PdNode", "PdNode *", 0, 0, (void*)&_wrap_class_PdNode, 0};
-static swig_type_info _swigt__p_ofKeyEventArgs = {"_p_ofKeyEventArgs", "ofKeyEventArgs *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_ofTouchEventArgs = {"_p_ofTouchEventArgs", "ofTouchEventArgs *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_std__mapT_std__string_std__string_std__lessT_std__string_t_t = {"_p_std__mapT_std__string_std__string_std__lessT_std__string_t_t", "std::map< std::string,std::string > *|map< string,string > *|std::map< std::string,std::string,std::less< std::string > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__string = {"_p_std__string", "std::string *|string *", 0, 0, (void*)&_wrap_class_string, 0};
-static swig_type_info _swigt__p_std__vectorT_ofPoint_t = {"_p_std__vectorT_ofPoint_t", "std::vector< ofPoint > *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_std__vectorT_std__string_t = {"_p_std__vectorT_std__string_t", "std::vector< std::string > *|std::vector< string > *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_t_gobj = {"_p_t_gobj", "t_gobj *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
-  &_swigt__p_PdMessage,
-  &_swigt__p_PdNode,
-  &_swigt__p_ofKeyEventArgs,
-  &_swigt__p_ofTouchEventArgs,
-  &_swigt__p_std__mapT_std__string_std__string_std__lessT_std__string_t_t,
   &_swigt__p_std__string,
-  &_swigt__p_std__vectorT_ofPoint_t,
-  &_swigt__p_std__vectorT_std__string_t,
-  &_swigt__p_t_gobj,
 };
 
-static swig_cast_info _swigc__p_PdMessage[] = {  {&_swigt__p_PdMessage, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_PdNode[] = {  {&_swigt__p_PdNode, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_ofKeyEventArgs[] = {  {&_swigt__p_ofKeyEventArgs, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_ofTouchEventArgs[] = {  {&_swigt__p_ofTouchEventArgs, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_std__mapT_std__string_std__string_std__lessT_std__string_t_t[] = {  {&_swigt__p_std__mapT_std__string_std__string_std__lessT_std__string_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__string[] = {  {&_swigt__p_std__string, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_std__vectorT_ofPoint_t[] = {  {&_swigt__p_std__vectorT_ofPoint_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_std__vectorT_std__string_t[] = {  {&_swigt__p_std__vectorT_std__string_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_t_gobj[] = {  {&_swigt__p_t_gobj, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
-  _swigc__p_PdMessage,
-  _swigc__p_PdNode,
-  _swigc__p_ofKeyEventArgs,
-  _swigc__p_ofTouchEventArgs,
-  _swigc__p_std__mapT_std__string_std__string_std__lessT_std__string_t_t,
   _swigc__p_std__string,
-  _swigc__p_std__vectorT_ofPoint_t,
-  _swigc__p_std__vectorT_std__string_t,
-  _swigc__p_t_gobj,
 };
 
 

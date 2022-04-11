@@ -1865,7 +1865,8 @@ int canvas_hitbox(t_canvas *x, t_gobj *y, int xpos, int ypos,
 }
 
     /* find the last gobj, if any, containing the point. */
-static t_gobj *canvas_findhitbox(t_canvas *x, int xpos, int ypos,
+// mPD
+t_gobj *canvas_findhitbox(t_canvas *x, int xpos, int ypos,
     int *x1p, int *y1p, int *x2p, int *y2p)
 {
     t_gobj *y, *rval = 0;
@@ -2293,7 +2294,7 @@ static int snap_got_anchor;
 /* extern int sys_snaptogrid; #<{(| whether we are snapping to grid or not |)}># */
 /* extern int sys_gridsize; */
 int sys_snaptogrid = 1; /* whether we are snapping to grid or not */
-int sys_gridsize = 8;
+int sys_gridsize = 12;
 // mPD
 
 
@@ -3241,6 +3242,12 @@ static void delay_move(t_canvas *x)
     /*     dx = xnew - xwas; */
     /*     dy = ynew - ywas; */
     /* } */
+
+    // mPD
+    if (dx == 0 && dy == 0) {
+        return;
+    }
+
     canvas_displaceselection(x, dx, dy);
     x->gl_editor->e_xwas = xnew;
     x->gl_editor->e_ywas = ynew;

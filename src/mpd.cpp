@@ -1,151 +1,74 @@
 #pragma once
 
+#include <queue>
 #include "mpd.h"
 #include "ofxLua.h"
-#include <queue>
 #if defined(TARGET_ANDROID)
 #include "ofxAndroid.h"
 #endif
-
-using std::queue;
+#include "g_canvas.h"
+#include "graphics.h"
 
 extern "C" {
+	t_object* pd_checkobject(t_pd* x);
+	t_canvas* canvas_getcurrent(void);
+	t_gobj*
+	canvas_findhitbox(t_canvas* x, int xpos, int ypos, int* x1p, int* y1p, int* x2p, int* y2p);
+	int obj_noutlets(const t_object* x);
 	int luaopen_mpd(lua_State* L);
+	int luaopen_audio(lua_State* L);
 }
 
-// mtx.lock fixes luajit crashes when accessed from different threads (scale events on android)
-pd::PdBase base;
-ofxLua lua;
-ofMutex mtx;
-ofSoundStream soundStream;
-ofSoundStreamSettings settings;
+using namespace mpd;
 
-int ticks = 8;
-bool computing = true;
-bool touchable = true;
-bool scaling = false;
-float* inputBuffer = NULL;
-ofTouchEventArgs lastTouch;
-queue<ofMessage> pdMessages;
+void pushGlobals();
+
+auto lua = ofxLua();
+auto msgs = queue<string>();
+auto partial = string("");
+auto scaling = false;
+auto touchable = true;  // limits touch rate to draw rate
 
 //--------------------------------------------------------------------
-void gui_hook(char* buffer){
-	if (!ofIsStringInString(buffer, "pdtk_canvas_getscroll")){
-		auto message = ofMessage(buffer);
-		pdMessages.push(message);
-	}
-}
-
-//--------------------------------------------------------------
-void mpd::pdsend(const string& cmd){
-	t_binbuf* buffer = binbuf_new();
-
-	binbuf_text(buffer, (char*)cmd.c_str(), cmd.length());
-	binbuf_eval(buffer, 0, 0, 0);
-	binbuf_free(buffer);
+void luaMessage(const string& x) {
+	auto message = ofMessage(x);
+	lua.scriptGotMessage(message);
 }
 
 //--------------------------------------------------------------------
-bool mpd::initAudio(int inputChannels, int outputChannels, float sampleRate) {
-	settings.numInputChannels = inputChannels;
-	settings.numOutputChannels = outputChannels;
-	settings.sampleRate = sampleRate;
-	settings.bufferSize = base.blockSize() * ticks;
-	settings.setInListener(ofGetAppPtr());
-	settings.setOutListener(ofGetAppPtr());
-	
-	inputBuffer = new float[inputChannels * settings.bufferSize];
-
-	soundStream.setup(settings);
-
-	bool result = base.init(inputChannels, outputChannels, sampleRate, false);
-
-	if (result) {
-		base.computeAudio(true);
-	}
-
-	return result;
+bool includes(const string& needle, char* hay) {
+	return ofIsStringInString(hay, needle);
 }
 
 //--------------------------------------------------------------------
-bool mpd::initAudio(const string& input, const string& output, float sampleRate) {
-	auto inDevice = soundStream.getMatchingDevices(input)[0];
-	auto outDevice = soundStream.getMatchingDevices(output)[0];
-
-	settings.setInDevice(inDevice);
-	settings.setOutDevice(outDevice);
-
-	return initAudio(inDevice.inputChannels, outDevice.outputChannels, sampleRate);
-}
-
-//--------------------------------------------------------------------
-void mpd::init() {
-	lua.setErrorCallback([](string& message) {
-		ofLogWarning() << "Lua script error: " << message;
-	});
-
-	reload();
-}
-
-// - touchMoved: same fn for all events, since type is passed anyway
-// - touchable: limit rate to framerate
-//--------------------------------------------------------------------
-void mpd::touch(ofTouchEventArgs &touch) {
-	if (touch.id != 0 || scaling) {
+void gui_hook(char* msg) {
+	if (includes("pdtk_canvas_getscroll", msg) || includes("raise cord", msg)) {
 		return;
 	}
-	mtx.lock();
-	if (touch.type != ofTouchEventArgs::move || touchable) {
-		touchable = false;
-		lastTouch = touch;
-		lua.scriptTouchMoved(touch);
+	string str = msg;
+
+	if (str.back() == '\n') {
+		str.pop_back();
 	}
-	mtx.unlock();
-}
-
-//--------------------------------------------------------------------
-void mpd::key(ofKeyEventArgs &args) {
-	mtx.lock();
-	lua.scriptKeyPressed(args.key);
-	mtx.unlock();
-}
-
-//--------------------------------------------------------------------
-void mpd::clear() {
-	if(inputBuffer != NULL) {
-		delete[] inputBuffer;
-		inputBuffer = NULL;
-	}
-	base.clear();
-}
-
-//--------------------------------------------------------------------
-void pushGlobals() {
-#if defined(TARGET_ANDROID)
-	lua.setString("Target", "android");
-#endif
-	auto devices = soundStream.getDeviceList();
-	lua.newTable("devices");
-	lua.pushTable("devices");
-	for(size_t i = 0; i < devices.size(); i++) {
-		auto device = devices[i];
-		lua.newTable(i + 1);
-		lua.pushTable(i + 1);
-		lua.setString("name", device.name);
-		lua.setNumber("id", device.deviceID);
-		lua.setNumber("inputChannels", device.inputChannels);
-		lua.setNumber("outputChannels", device.outputChannels);
-		lua.setBool("isDefaultInput", device.isDefaultInput);
-		lua.setBool("isDefaultOutput", device.isDefaultOutput);
-		lua.newTable("sampleRates");
-		lua.pushTable("sampleRates");
-		for(size_t j = 0; j < device.sampleRates.size(); j++) {
-			lua.setNumber(j + 1, device.sampleRates[j]);
+	if (str.back() != '\\') {  // ignore multiline for now
+		if (!partial.empty()) {
+			partial += str;
+			msgs.push(partial);
+			ofLogVerbose("multiline") << partial;
+			partial = "";
+		} else {
+			msgs.push(str);
 		}
-		lua.popTable();
-		lua.popTable();
+	} else {
+		str.pop_back();
+		partial += str;
 	}
-	lua.popTable();
+}
+
+//--------------------------------------------------------------------
+void mpd::setup() {
+	lua.setErrorCallback([](string& message) { ofLogWarning() << "Lua script error: " << message; });
+	reload();
 }
 
 //--------------------------------------------------------------------
@@ -153,116 +76,193 @@ void mpd::reload() {
 	lua.scriptExit();
 	lua.init(true);
 	luaopen_mpd(lua);
-	lua.doScript("main.lua", true);
+	luaopen_audio(lua);
+	lua.doScript("app/main.lua", true);
 	pushGlobals();
 	lua.scriptSetup();
 }
 
 //--------------------------------------------------------------------
 void mpd::update() {
-	mtx.lock();
-	while (!pdMessages.empty()) {
-		lua.scriptGotMessage(pdMessages.front());
-		pdMessages.pop();
+	while (!msgs.empty()) {
+		luaMessage(msgs.front());
+		msgs.pop();
 	}
-	mtx.unlock();
 }
 
 //--------------------------------------------------------------------
 void mpd::draw() {
-	mtx.lock();
 	lua.scriptDraw();
-	mtx.unlock();
 	touchable = true;
 }
 
 //--------------------------------------------------------------------
-void updateSettings(int size, int inChannels, int outChannels){
-	auto changed = 
-		size != settings.bufferSize ||
-		inChannels != settings.numInputChannels ||
-		outChannels != settings.numOutputChannels;
-	if(changed) {
-		ticks = size / base.blockSize();
-		settings.bufferSize = size;
-		settings.numInputChannels = inChannels;
-		settings.numOutputChannels = outChannels;
-		// TODO
-		// init(settings);
-		base.computeAudio(computing);
+void mpd::key(ofKeyEventArgs& args) {
+	lua.scriptKeyPressed(args.key);
+}
+
+//--------------------------------------------------------------------
+void mpd::touch(ofTouchEventArgs& touch) {
+#if defined(TARGET_ANDROID)
+	if (touch.type == ofTouchEventArgs::doubleTap) {
+		auto temp = vector<string>{"one", "two", "three"};
+
+		ofxAndroidAlertListBox("grable grable", temp);
 	}
-}
-
-//--------------------------------------------------------------------
-void mpd::mute(bool state) {
-	// computing = !state;
-}
-
-//--------------------------------------------------------------------
-void mpd::audioIn(float *input, int size, int channelCount) {
-	if(!computing || inputBuffer == NULL) {
+#endif
+	if (touch.id != 0 || scaling) {
 		return;
 	}
-	try {
-		updateSettings(size, channelCount, settings.numOutputChannels);
-		memcpy(inputBuffer, input, size * channelCount * sizeof(float));
-	}
-	catch (...) {
-		ofLogError("Pd") << "could not copy input buffer";
+	if (touch.type != ofTouchEventArgs::move || touchable) {
+		touchable = false;
+		lua.scriptTouchMoved(touch);  // same fn for all events
 	}
 }
 
 //--------------------------------------------------------------------
-void mpd::audioOut(float *output, int size, int channelCount) {
-	if(!computing || inputBuffer == NULL) {
-		return;
-	}
-	updateSettings(size, settings.numInputChannels, channelCount);
-	if (!base.processFloat(ticks, inputBuffer, output)){
-		ofLogError("Pd") << "could not process output buffer";
-	}
+void mpd::scale(const string& type, float value, int x, int y) {
+	auto message =
+	   "scale " + type + " " + ofToString(value) + " " + ofToString(x) + " " + ofToString(y);
+	msgs.push(message);
 }
 
 //--------------------------------------------------------------------
-bool mpd::scale(const string& type, float value, int x, int y) {
-	if (type == "scaleBegin") {
-		scaling = true;
+int mpd::outletCount(t_gobj* x) {
+	auto object = pd_checkobject(&x->g_pd);
+	if (!object) {
+		return 0;
 	}
-	if (type == "scaleEnd") {
-		scaling = false;
-	}
-	mtx.lock();
-	if (type == "scale" || type == "scroll") {
-		float scale = (float)lua.getNumber("Scale", 1);
-		if (type == "scroll") {
-			scale +=  value * 0.1f;
-		} else if (type == "scale") {
-			scale *=  value;
-		}
-		lua.setNumber("Scale", scale);
-		lua.setBool("UpdateNeeded", true);
-	}
-	else if (type == "scaleBegin") {
-		lastTouch.type = ofTouchEventArgs::up;
-		lua.scriptTouchMoved(lastTouch); // finalize touch
-	}
-	mtx.unlock();
-	return true;
+	return obj_noutlets(object);
 }
 
+//--------------------------------------------------------------------
+bool mpd::selectionActive() {
+	return !!pd_getcanvaslist()->gl_editor->e_selection;
+}
+
+//--------------------------------------------------------------------
+void mpd::pdsend(const string& cmd) {
+	t_binbuf* buffer = binbuf_new();
+	binbuf_text(buffer, (char*)cmd.c_str(), cmd.length());
+	binbuf_eval(buffer, 0, 0, 0);
+	binbuf_free(buffer);
+}
+
+//--------------------------------------------------------------------
+t_gobj* mpd::findBox(int x, int y) {
+	int a, b, c, d;
+	auto canvas = pd_getcanvaslist();
+
+	auto selection = canvas->gl_editor->e_onmotion == MA_MOVE;
+
+	return canvas_findhitbox(canvas, x, y, &a, &b, &c, &d);
+}
+
+//--------------------------------------------------------------------
+PdNode* mpd::getNode(int x, int y) {
+	int x1, y1, x2, y2;
+	auto canvas = pd_getcanvaslist();
+	auto hit = canvas_findhitbox(canvas, x, y, &x1, &y1, &x2, &y2);
+
+	if (!hit) {
+		return NULL;
+	}
+
+	// auto selection = canvas->gl_editor->e_onmotion == MA_MOVE;
+
+	auto result = new PdNode();
+	result->ref = hit;
+	result->x = x1;
+	result->y = y1;
+	result->width = x2 - x1;
+	result->height = y2 - y1;
+	result->outletCount = mpd::outletCount(hit);
+
+	return result;
+}
+
+//--------------------------------------------------------------------
+void pushGlobals() {
+#if defined(TARGET_ANDROID)
+	lua.setString("Target", "android");
+#endif
+	// 	auto devices = soundStream.getDeviceList();
+	// 	lua.newTable("devices");
+	// 	lua.pushTable("devices");
+	// 	for (size_t i = 0; i < devices.size(); i++) {
+	// 		auto device = devices[i];
+	// 		lua.newTable(i + 1);
+	// 		lua.pushTable(i + 1);
+	// 		lua.setString("name", device.name);
+	// 		lua.setNumber("id", device.deviceID);
+	// 		lua.setNumber("inputChannels", device.inputChannels);
+	// 		lua.setNumber("outputChannels", device.outputChannels);
+	// 		lua.setBool("isDefaultInput", device.isDefaultInput);
+	// 		lua.setBool("isDefaultOutput", device.isDefaultOutput);
+	// 		lua.newTable("sampleRates");
+	// 		lua.pushTable("sampleRates");
+	// 		for (size_t j = 0; j < device.sampleRates.size(); j++) {
+	// 			lua.setNumber(j + 1, device.sampleRates[j]);
+	// 		}
+	// 		lua.popTable();
+	// 		lua.popTable();
+	// 	}
+	// 	lua.popTable();
+}
+
+// update
+//  mtx.lock();
+//  auto length = queue.size();
+//  auto copy = msgs;
+//  msgs.clear();
+//  mtx.unlock();
+//  auto size = copy.size();
+//  if (size > 1) {
+//  	ofLogVerbose("buffer size") << copy.size();
+//  }
+//  for (auto msg : copy) {
+//  	luaMessage(msg);
+//  }
+
+// //--------------------------------------------------------------------
+// void mpd::drawRectangle(int x, int y, int w, int h, const string& color, const string& fill) {
+// 	drawRectangle(x, y, w, h, color, fill);
+// }
+
+// if (type == "scaleBegin") {
+// 	scaling = true;
+// }
+// if (type == "scaleEnd") {
+// 	scaling = false;
+// }
+// mtx.lock();
+// if (type == "scale" || type == "scroll") {
+// 	float scale = (float)lua.getNumber("Scale", 1);
+// 	if (type == "scroll") {
+// 		scale +=  value * 0.1f;
+// 	} else if (type == "scale") {
+// 		scale *=  value;
+// 	}
+// 	lua.setNumber("Scale", scale);
+// 	lua.setBool("UpdateNeeded", true);
+// }
+// else if (type == "scaleBegin") {
+// 	lastTouch.type = ofTouchEventArgs::up;
+// 	lua.scriptTouchMoved(lastTouch); // finalize touch
+// }
+// mtx.unlock();
 //--------------------------------------------------------------------
 // Patch mpd::openPatch(const string& file, const string& folder) {
 // 	Patch patch = base.openPatch(file, folder);
-	// if(!patch.isValid()) {
-	// 	ofLogError("Pd") << "opening patch \"" + file + "\" failed";
-	// }
-	// else {
-	// 	canvas_map((t_canvas*)patch.handle(), 1);
-	// }
+// if(!patch.isValid()) {
+// 	ofLogError("Pd") << "opening patch \"" + file + "\" failed";
+// }
+// else {
+// 	canvas_map((t_canvas*)patch.handle(), 1);
+// }
 // 	return patch;
 // }
 // //--------------------------------------------------------------------
 // void mpd::closePatch(Patch& patch) {
 // 	base.closePatch(patch);
 // }
-

@@ -20,9 +20,9 @@
 #include "z_libpd.h"
 #include "x_libpdreceive.h"
 #include "z_hooks.h"
-#include "../pure-data/src/s_stuff.h"
-#include "../pure-data/src/m_imp.h"
-#include "../pure-data/src/g_all_guis.h"
+#include "s_stuff.h"
+#include "m_imp.h"
+#include "g_all_guis.h"
 
 #if PD_MINOR_VERSION < 46
 # define HAVE_SCHED_TICK_ARG
@@ -48,14 +48,11 @@ int sys_pollgui(void);
   void fiddle_tilde_setup(void);
   void loop_tilde_setup(void);
   void lrshift_tilde_setup(void);
-  void pd_tilde_setup(void);
   void pique_setup(void);
   void sigmund_tilde_setup(void);
-  void stdout_setup(void);
 #endif
 // mPD todo move to external file
 void keyboard_setup(void);
-void biplot_setup(void);
 void pad_setup(void);
 // mPD todo move to external file
 
@@ -100,7 +97,6 @@ int libpd_init(void) {
     PD_BUGFIX_VERSION, PD_TEST_VERSION);
   // mPD todo move to external file
   keyboard_setup();
-  biplot_setup();
   pad_setup();
   // mPD todo move to external file
 #ifdef LIBPD_EXTRA
@@ -110,10 +106,8 @@ int libpd_init(void) {
   fiddle_tilde_setup();
   loop_tilde_setup();
   lrshift_tilde_setup();
-  pd_tilde_setup();
   pique_setup();
   sigmund_tilde_setup();
-  stdout_setup();
 #endif
 #ifndef LIBPD_NO_NUMERIC
   setlocale(LC_NUMERIC, "C");

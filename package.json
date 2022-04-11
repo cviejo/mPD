@@ -1,0 +1,11 @@
+{
+   "name": "mpd",
+   "version": "1.0.0",
+   "description": "mPD dev utils",
+   "scripts": {
+      "build": "make && make run",
+      "run": "make run",
+      "deploy": "of=../../../../of_v0.11.2_android_release/apps/pd/mPD; rsync -r src $of; rsync -r bin/data $of/bin",
+      "swig": "cmd='swig -c++ -lua -fcompact -fvirtual'; $cmd -I../../../libs/openFrameworks src/mpd.i; $cmd src/utils/audio.i"
+   }
+}
