@@ -474,6 +474,11 @@ void rtext_erase(t_rtext *x)
 
 void rtext_displace(t_rtext *x, int dx, int dy)
 {
+    // mPD
+    if (dx == 0 && dy == 0){
+        return;
+    }
+
     sys_vgui(".x%lx.c move %s %d %d\n", glist_getcanvas(x->x_glist),
         x->x_tag, dx, dy);
 }

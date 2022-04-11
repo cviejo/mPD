@@ -17,4 +17,8 @@ M.draw = function(x, y)
 	frame:draw(x, y)
 end
 
+M.clear = function()
+	frame:clear()
+end
+
 return M

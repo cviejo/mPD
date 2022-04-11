@@ -1,0 +1,13 @@
+# general
+AccessModifierOffset: -3
+BasedOnStyle: Chromium
+ColumnLimit: 100
+Standard: Cpp11
+
+# indentation
+ContinuationIndentWidth: 3
+IndentExternBlock: Indent
+IndentWidth: 3
+NamespaceIndentation: All
+TabWidth: 3
+UseTab: ForIndentation

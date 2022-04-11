@@ -1,14 +1,33 @@
 ---@diagnostic disable: lowercase-global
 local R = require('libs/lamda')
+local L = require('libs/fun')
+
+local function format(code)
+	return function(x)
+		return "\027[" .. code .. "m" .. inspect(x) .. "\027[0m"
+	end
+end
 
 _G.inspect = require('libs/inspect')
 _G.log = require('utils/log')
 _G.console = {log = log}
+_G.red = format(31)
+_G.green = format(32)
+_G.blue = format(34)
 _G.noop = function()
 end
 
+_G._dev = false
+_G.time = function()
+	return os.clock() * 1000
+end
+
+_G.forEach = L.each
+_G.each = L.each
+
 _G.jit = jit
 _G.mpd = mpd
+_G.audio = audio
 _G.of = of
 _G.swig_type = swig_type
 
@@ -22,18 +41,19 @@ _G.both = R.both
 _G.clamp = R.clamp
 _G.cond = R.cond
 _G.contains = R.contains
+_G.curry2 = R.curry2
 _G.draw = R.draw
 _G.either = R.either
 _G.equals = R.equals
 _G.filter = R.filter
 _G.find = R.find
-_G.forEach = R.forEach
 _G.identity = R.identity
 _G.includes = R.includes
 _G.isString = R.isString
 _G.join = R.join
 _G.keys = R.keys
 _G.map = R.map
+_G.pick = R.pick
 _G.pipe = R.pipe
 _G.prop = R.prop
 _G.propEq = R.propEq
@@ -46,6 +66,7 @@ _G.times = R.times
 _G.touchMoved = R.touchMoved
 _G.unary = R.unary
 _G.unapply = R.unapply
+_G.values = R.values
 _G.when = R.when
 
 -- local function makeGlobal(x, name)

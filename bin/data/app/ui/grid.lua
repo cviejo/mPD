@@ -9,11 +9,14 @@ M.init = function(step)
 	local w = of.getWidth() * scale + step
 	local h = of.getHeight() * scale + step
 
+	grid = of.Fbo()
 	grid:allocate(w, h)
 	grid:beginFbo()
 
+	of.noFill()
 	of.setLineWidth(1)
-	of.clear(255, 0);
+	of.clear(255, 0)
+	of.disableSmoothing()
 	of.pushMatrix()
 	of.scale(scale, scale)
 

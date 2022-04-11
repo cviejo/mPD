@@ -1,4 +1,3 @@
-local canvas = require('canvas')
 local pd = require('pd')
 local f = require('utils/function')
 local hasTag = f.hasTag
@@ -19,13 +18,13 @@ local hitTest = function(point)
 	end
 end
 
-M.event = function(e)
+M.event = function(e, items)
 	if (e.type == of.TouchEventArgs_up) then
 
 		local found = find(function(listener)
 			local testMatch = both(hasTag(listener.tag), hitTest(e))
 
-			return find(testMatch, canvas.items())
+			return find(testMatch, items)
 		end, listeners)
 
 		if found then pd.queue(found.callback) end

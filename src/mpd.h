@@ -1,38 +1,65 @@
 #pragma once
 
+#include <string>
+#include <vector>
 #include "ofMain.h"
 #if defined(TARGET_ANDROID)
 #include "ofxAndroid.h"
 #endif
-#include "./libs/pd/cpp/PdBase.hpp"
-#include "./libs/pd/pure-data/src/m_pd.h"
+#include "m_pd.h"
+#include "mpd.h"
 
-using namespace pd;
+using std::find;
+using std::map;
 using std::string;
 
+class PdNode {
+public:
+	int x;
+	int y;
+	int width;
+	int height;
+	int outletCount;
+
+	t_gobj* ref;
+};
+
+class PdMessage {
+public:
+	string canvasId;
+	string cmd;
+	string message;
+	string value;
+	vector<string> tags;
+	vector<ofPoint> points;
+	map<string, string> params;
+
+	void addPoint(string x, string y) {
+		auto point = ofPoint(ofToInt(x), ofToInt(y));
+		points.push_back(point);
+	}
+	bool hasTag(const string& tag) { return find(tags.begin(), tags.end(), tag) != tags.end(); }
+};
+
 namespace mpd {
-	void clear();
-	void reload();
-	void init();
-	bool initAudio(int inputChannels, int outputChannels, float sampleRate);
-	bool initAudio(const string& input, const string& output, float sampleRate);
+	void setup();
 	void draw();
 	void update();
 
-	void key(ofKeyEventArgs &args);
-	void touch(ofTouchEventArgs &touch);
+	void key(ofKeyEventArgs& args);
+	void touch(ofTouchEventArgs& touch);
+	void scale(const string& type, float value, int x, int y);
 
-	void mute(bool state);
-	void audioIn(float *input, int size, int channelCount);
-	void audioOut(float *output, int size, int channelCount);
+	void reload();
 
-	bool scale(const string& type, float value, int x, int y);
+	PdNode* getNode(int x, int y);
+	t_gobj* findBox(int x, int y);
+	int outletCount(t_gobj* x);
+	bool selectionActive();
+
+	void pdsend(const string& cmd);
 
 #if defined(TARGET_ANDROID)
 	void swipe(ofxAndroidSwipeEventArgs& args);
 #endif
-
-	void pdsend(const string& cmd);
-}
-	// Patch openPatch(const string& file, const string& folder);
-	// void closePatch(Patch& patch);
+}  // namespace mpd

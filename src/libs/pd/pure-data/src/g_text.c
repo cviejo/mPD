@@ -894,6 +894,11 @@ static void gatom_getwherelabel(t_gatom *x, t_glist *glist, int *xp, int *yp)
 static void gatom_displace(t_gobj *z, t_glist *glist,
     int dx, int dy)
 {
+    // mPD
+    if (dx == 0 && dy == 0){
+        return;
+    }
+
     t_gatom *x = (t_gatom*)z;
     text_displace(z, glist, dx, dy);
     sys_vgui(".x%lx.c move %lx.l %d %d\n", glist_getcanvas(glist),
