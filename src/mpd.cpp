@@ -162,13 +162,13 @@ bool mpd::selectionActive() {
 	return !!pd_getcanvaslist()->gl_editor->e_selection;
 }
 
-t_binbuf* buffer = binbuf_new();
 //--------------------------------------------------------------------
 void mpd::pdsend(const string& cmd) {
 	sys_lock();
+	t_binbuf* buffer = binbuf_new();
 	binbuf_text(buffer, (char*)cmd.c_str(), cmd.length());
 	binbuf_eval(buffer, 0, 0, 0);
-	// binbuf_free(buffer);
+	binbuf_free(buffer);
 	sys_unlock();
 }
 
