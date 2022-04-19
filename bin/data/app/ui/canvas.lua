@@ -1,169 +1,167 @@
 local grid = require('ui/grid')
 local drawItem = require('ui/draw-item')
-local each = require('libs/fun').each
-local fn = require('utils/function')
 local gfx = require('utils/graphics')
 local s = require('utils/string')
 local text = require('utils/text')
 local fifo = require('utils/fifo')
-local stopwatch = require('utils/stopwatch')
-local createViewport = require('ui.viewport')
+local cordMesh = require('ui/cord-mesh')
+local stack = require('utils/stack')
+local vec2 = require('utils/vec2')
+local createViewport = require('ui/viewport')
+local withViewport = require('ui/with-viewport')
+local pointsToPath = require('utils.points-to-path')
+local updateItem = require('utils.update-item')
 local pd = require('pd')
 local events = require('events')
-local findByTag, filterByTag = fn.findByTag, fn.filterByTag
-local rejectByTag = fn.rejectByTag
 local moveBy = gfx.moveBy
 
 local back = 255
 local iowidth = 7
-local gridStep = 12
 local trace = fifo(30)
-local width = of.getWidth()
-local height = of.getHeight()
 
-grid.init(gridStep)
-
-local function updateItem(update, item)
-	if not item then return end
-	if update.points then item.points = update.points end
-	if update.value then item.value = update.value end
-	if update.params then
-		if not item.params then
-			item.params = update.params
-		else
-			for key, value in pairs(update.params) do item.params[key] = value end
-		end
-	end
-end
-
-local toggleInt = function(x)
-	if (x == 0) then
-		return 1
-	else
-		return 0
-	end
-end
-
-local function getX(node, x)
+local function getOutletX(node, x)
 	if (node.outletCount == 1) then
-		return iowidth / 2 --
+		return iowidth / 2
 	end
-	local bla = x - node.x
-	local d = (node.width - iowidth) / (node.outletCount - 1)
-	local index = math.floor((bla + d / 2) / d)
-	return index * d + iowidth / 2
+	local distanceToLeft = x - node.x
+	local interval = (node.width - iowidth) / (node.outletCount - 1)
+	local index = math.floor((distanceToLeft + interval / 2) / interval)
+	return index * interval + iowidth / 2
 end
 
-return function(id)
+return function(id, x, y)
 	local M = {id = id, updateNeeded = true}
-	local items = {}
-	local viewport = createViewport(2)
+
 	local editmode = 0
+	local cords = {signal = cordMesh(), control = cordMesh()}
+	local viewport = createViewport(2)
 
 	local dragging = nil
-	local touchDown = nil
 	local lastTouch = nil
 
+	M.items = stack()
+
 	M.touch = function(touch)
-		local loc = viewport.screenToCanvas(touch)
+		local loc = viewport.screenToCanvas({x = touch.x - x, y = touch.y - y})
 
 		touch.x = math.floor(loc.x)
 		touch.y = math.floor(loc.y)
 
-		events.event(touch, items)
+		-- events.event(touch, items)
 
 		if (touch.type == of.TouchEventArgs_down) then
-			local selection = mpd.selectionActive()
 			local node = mpd.getNode(touch.x, touch.y)
-			--
-			-- if editmode == 1 and node and node.outletCount > 0 and not selection then
-			-- 	local x = getX(node, touch.x)
-			-- 	pd.queue(id, 'mouse', node.x + x, node.y + node.height, '1 0')
-			-- elseif editmode == 0 and not node then
+			local selection = mpd.selectionActive()
+
 			if editmode == 0 and not node then
 				dragging = loc
+			elseif editmode == 1 and node and not selection then
+				local iox = getOutletX(node, touch.x)
+				pd.queue(id, 'mouse', node.x + iox, node.y + node.height, '1 0')
 			else
 				pd.queue(id, 'mouse', touch.x, touch.y, '1 0')
 			end
-			touchDown = touch
 			lastTouch = touch
 		elseif (touch.type == of.TouchEventArgs_up) then
 			dragging = nil
-			touchDown = nil
 			pd.queue(id, 'mouseup', touch.x, touch.y, '1')
-		elseif (touch.type == of.TouchEventArgs_move) then
+		elseif (touch.type == of.TouchEventArgs_move) and lastTouch then
 			if dragging then
-				viewport.move(dragging - loc)
+				local diff = dragging - loc
+				viewport.move(diff)
+				grid.adjustToViewport(viewport)
 				M.updateNeeded = true
 			elseif touch.x ~= lastTouch.x or touch.y ~= lastTouch.y then
 				lastTouch = touch
 				pd.queue(id, 'motion', touch.x, touch.y, '0')
 			end
-		elseif (touch.type == of.TouchEventArgs_doubleTap) then
-			editmode = toggleInt(editmode)
-			pd.queue(id, 'editmode', editmode)
 		end
 	end
 
-	M.draw = function()
-		local scale = viewport.scale
-
-		of.pushMatrix()
-		of.scale(scale, scale)
-		of.translate(viewport.position() * -1)
+	M.draw = withViewport(function(scale)
+		of.translate(x / scale, y / scale)
 		of.background(back)
-		of.enableAntiAliasing()
-		of.enableSmoothing()
 
-		of.setColor(100)
-		if scale >= 1 then grid.draw(0, 0) end
-		of.setLineWidth(scale * 1.5)
-		of.noFill()
-		of.drawRectangle(0, 0, width + gridStep, height + gridStep)
+		if editmode == 1 and scale >= 1 then
+			of.setColor(100)
+			grid.draw()
+		end
 
-		-- mpd.drawItems(scale)
+		of.setLineWidth(2 * scale)
+		of.setHexColor(0x808093)
+		cords.signal.draw()
 
-		local finish = stopwatch.start('draw', 9)
-		each(drawItem(viewport), items)
-		finish()
+		of.setLineWidth(scale)
+		of.setHexColor(0x323232)
+		cords.control.draw()
 
-		of.popMatrix()
+		M.items.forEach(drawItem(viewport))
 
 		text.draw(s.joinLines(trace.items()), 50, 120)
 
 		M.updateNeeded = false
-	end
+	end, viewport)
 
 	M.message = function(msg)
-		local finish = stopwatch.start('message', 0.15)
 		local cmd, tag, points = msg.cmd, msg.tag, msg.points
-
-		if cmd == 'coords' or cmd == 'set-text' or cmd == 'itemconfigure' then
-			local match = findByTag(tag, items)
-			if match then updateItem(msg, match) end
-		elseif cmd == 'delete' then
-			items = rejectByTag(tag, items)
-		elseif cmd == 'scaleBegin' then
-			pd.queue(id, 'mouseup', touchDown.x, touchDown.y, '1')
-		elseif cmd == 'scale' then
-			viewport.setScale(msg)
-		elseif cmd == 'editmode' then
-			editmode = msg.value
-		elseif cmd == 'move' then
-			forEach(function(x)
-				x.points = map(moveBy(points[1]), x.points)
-			end, filterByTag(tag, items))
-		else
-			items[#items + 1] = msg
-		end
 
 		M.updateNeeded = true
 
-		if (not finish()) then log(msg.message, '\n') end
-	end
+		if cmd == 'array' then
+			local mesh = of.Mesh()
+			mesh:setMode(of.PRIMITIVE_LINES)
+			forEach(function(p)
+				mesh:addVertex(vec2(p))
+			end, msg.points)
+			msg.points = {}
+			msg.mesh = mesh
+		end
 
-	M.items = function()
-		return items
+		if cmd == 'polyline' or cmd == 'polygon' then
+			msg.path = pointsToPath(msg.points)
+			msg.points = {}
+		end
+
+		if cmd == 'coords' or cmd == 'set-text' or cmd == 'itemconfigure' then
+			if cords.signal.update(msg) then
+				return
+			end
+			if cords.control.update(msg) then
+				return
+			end
+			M.items.byTag(updateItem(msg), tag)
+		elseif cmd == 'delete' then
+			if cords.signal.delete(msg) then
+				return
+			end
+			if cords.control.delete(msg) then
+				return
+			end
+			M.items.delete(tag)
+		elseif cmd == 'scale' then
+			if msg.type == 'scaleBegin' then
+				-- dragging = vec2(lastTouch)
+				pd.queue(id, 'mouseup', lastTouch.x, lastTouch.y, '1')
+			else
+				viewport.setScale(msg)
+				grid.adjustToViewport(viewport)
+			end
+		elseif cmd == 'editmode' then
+			editmode = msg.value
+		elseif cmd == 'move' then
+			M.items.byTag(function(item)
+				item.points = map(moveBy(points[1]), item.points)
+			end, tag)
+		elseif not msg.id then
+			log(red("no id"))
+			log(msg.message)
+		elseif msg.cord and msg.params.width == 1 then
+			cords.control.add(msg)
+		elseif msg.cord then
+			cords.signal.add(msg)
+		else
+			M.items.add(msg)
+		end
 	end
 
 	return M

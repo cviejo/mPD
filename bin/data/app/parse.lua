@@ -1,11 +1,16 @@
+local parseText = TODO('parse text in curly braces')
+local parseList = TODO('parse arrays in [list *] or {*} format')
+
 local splitWords = function(s, nl)
 	local sep = '%S+'
-	if nl then sep = '[%S\n]+' end
+	if nl then
+		sep = '[%S\n]+'
+	end
 
 	local words = {}
 	for word in s:gmatch(sep) do
 		if word ~= '' then
-			words[#words + 1] = word --
+			words[#words + 1] = word
 		end
 	end
 	return words
@@ -24,6 +29,15 @@ local parseColor = function(x)
 	return x:sub(2)
 end
 
+local tagFlags = {cord = true, signal = true, control = true}
+
+local addTag = function(tag, match)
+	if tagFlags[tag] then
+		match[tag] = true
+	end
+	match.tags[#match.tags + 1] = tag
+end
+
 local parseParams = function(i, parts, match)
 	local size = #parts
 
@@ -40,16 +54,22 @@ local parseParams = function(i, parts, match)
 			if (key == 'fill' or key == 'outline') then
 				match.params[key] = parseColor(value)
 				i = i + 2
+				-- elseif (key == 'font') then
+				-- while (value:sub(-1) ~= '') do
+				-- 	addTag(value, match)
+				-- 	i = i + 1
+				-- 	value = parts[i]
+				-- end
 			elseif (key == 'tags') then
 				if (value == '[list') then
 					i = i + 2
 					value = parts[i]
 					while (value:sub(-1) ~= ']') do
-						match.tags[#match.tags + 1] = value
+						addTag(value, match)
 						i = i + 1
 						value = parts[i]
 					end
-					match.tags[#match.tags + 1] = value:sub(1, -2)
+					addTag(value:sub(1, -2), match)
 				else
 					match.tags[#match.tags + 1] = value
 					i = i + 1
@@ -74,7 +94,9 @@ local parsePoints = function(i, parts, match)
 
 	while (i < size) do
 		local x = tonumber(parts[i])
-		if x == nil then break end
+		if x == nil then
+			break
+		end
 		match.points[#match.points + 1] = {x = x, y = tonumber(parts[i + 1])}
 		i = i + 2
 	end
@@ -94,8 +116,17 @@ return function(input)
 			match.cmd = parts[3];
 			local i = parsePoints(4, parts, match)
 			parseParams(i, parts, match)
-			if (match.cmd == 'line' and #match.points > 2) then match.cmd = 'polyline' end
-			if (#match.tags > 0) then match.id = match.tags[1] end
+			if (match.cmd == 'line' and #match.points > 2) then
+				match.cmd = 'polyline'
+			end
+			if (match.cmd == 'text') then
+				match.cmd = 'new-text'
+				match.value = match.params.text
+			end
+
+			if (#match.tags > 0) then
+				match.id = match.tags[1]
+			end
 		elseif (cmd == 'coords' or cmd == 'move' or cmd == 'delete') then
 			match.tag = parts[3];
 			parsePoints(4, parts, match)
@@ -134,6 +165,9 @@ return function(input)
 				match.value = match.value .. ' ' .. parts[i]
 				i = i + 1
 			end
+			if (#match.tags > 0) then
+				match.id = match.tags[1]
+			end
 		elseif (parts[1] == 'pdtk_text_set') then
 			match.cmd = 'set-text'
 			match.canvasId = parts[2]
@@ -145,7 +179,7 @@ return function(input)
 				i = i + 1
 			end
 		else
-			if _dev then log(red('not parsed'), input) end
+			log(red('not parsed'), input)
 			return nil
 		end
 		return match

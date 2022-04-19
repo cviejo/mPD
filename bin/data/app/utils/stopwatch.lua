@@ -25,3 +25,9 @@ M.start = function(label, threshold)
 end
 
 return M
+
+-- Usage:
+-- local finish = stopwatch.start('message', 0.25)
+-- canvas.message(parsed)
+-- if (not finish()) then log(msg.message, '\n') end
+-- or just finish()

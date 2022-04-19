@@ -3,10 +3,12 @@
 #include "utils/audio.h"
 
 void ofApp::setup() {
-	auto xs = vector<string>{"main.lua", "ui/canvas.lua", "parse.lua", "ui/draw-item.lua"};
+	auto xs = vector<string>{"main.lua",      "ui/cords.lua", "ui/button.lua",   "ui/frame2.lua",
+	                         "ui/canvas.lua", "parse.lua",    "ui/draw-item.lua"};
 	for (auto x : xs) {
-		watcher.addPath(ofToDataPath(x, true));
+		watcher.addPath(ofToDataPath("app/" + x, true));
 	}
+
 	watcher.start();
 #if defined(TARGET_ANDROID)
 	ofAddListener(ofxAndroidEvents().scaleBegin, this, &ofApp::scaleBegin);

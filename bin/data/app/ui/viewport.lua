@@ -1,6 +1,9 @@
 local screenWidth = of.getWidth()
 local screenHeight = of.getHeight()
 
+local centerX = screenWidth / 2
+local centerY = screenHeight / 2
+
 return function(scale)
 	local M = {}
 
@@ -14,8 +17,8 @@ return function(scale)
 	end
 
 	M.screenToCanvas = function(point)
-		local x = point.x / M.scale + M.rect.x
-		local y = point.y / M.scale + M.rect.y
+		local x = (point.x or centerX) / M.scale + M.rect.x
+		local y = (point.y or centerY) / M.scale + M.rect.y
 		return of.Vec2f(x, y)
 	end
 
@@ -23,7 +26,7 @@ return function(scale)
 		local before = M.screenToCanvas(msg)
 		if msg.type == 'scroll' then
 			M.scale = M.scale + msg.value * 0.1
-		elseif msg.type == 'scale' then
+		elseif msg.value then
 			M.scale = M.scale * msg.value
 		end
 		M.scale = clamp(0.5, 7, M.scale)

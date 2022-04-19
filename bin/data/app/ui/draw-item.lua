@@ -43,7 +43,9 @@ local function drawRectangle(item)
 	local x, y, w, h = toRect(item.points[1], item.points[2])
 
 	-- sliders, etc. TODO: only draw in editmode
-	if h == 1 then return end
+	if h == 1 then
+		return
+	end
 
 	local color = front
 	local fill = ''
@@ -69,6 +71,13 @@ local function drawRectangle(item)
 	end
 end
 
+local function drawArray(item)
+	local width = item.params.width or 1
+	of.setLineWidth(width * scale)
+	setHex(item.params.fill or front)
+	item.mesh:draw()
+end
+
 local function drawLine(item)
 	local cord = isCord(item)
 	local width = item.params.width or 1
@@ -87,40 +96,54 @@ local function drawLine(item)
 end
 
 local function drawPolyLine(item)
-	local line = of.Polyline()
+	-- local line = of.Path()
 	local graph = isGraph(item)
 	local object = intersects({'obj', 'atom', 'msg'}, item.tags)
 	local width = item.params.width or 1
 
 	local fill = item.params.fill
-	local outline = item.params.outline
+	local outline = item.params.outline or front
 
-	if object then fill = 'f6f8f8' end
-	if object then outline = '8c8c8c' end
-	if graph then fill = 'ffffff' end
-	if graph then outline = '000000' end
+	if object then
+		fill = 'f6f8f8'
+	end
+	if object then
+		outline = '8c8c8c'
+	end
+	if graph then
+		fill = 'ffffff'
+	end
+	if graph then
+		outline = '000000'
+	end
 
-	if (graph or object) and #item.points == 5 then
-		local x, y, w, h = toRect(item.points[1], item.points[3])
-		mpd.drawRectangle(x, y, w, h, outline, fill)
+	-- if (graph or object) and #item.points == 5 then
+	-- 	local x, y, w, h = toRect(item.points[1], item.points[3])
+	-- 	mpd.drawRectangle(x, y, w, h, outline, fill)
+	-- 	return
+	-- end
+	if not item.path then
+		log(red('no path'), item.message)
 		return
 	end
 
-	if object or graph then
-		of.fill()
-		setHex(fill)
+	if fill then
+		item.path:setHexColor(of.hexToInt(fill))
+		item.path:setFilled(true)
+		item.path:draw()
 	end
 
-	of.beginShape()
-	forEach(function(p)
-		line:addVertex(p.x, p.y)
-		of.vertex(p.x, p.y) --
-	end, item.points)
-	of.endShape()
+	-- setHex(outline or item.params.fill or front)
 
-	setHex(outline or item.params.fill or front)
+	-- item.path:setFilled(true)
+	-- item.path:draw()
+
 	of.setLineWidth(width * scale)
-	line:draw()
+	item.path:setFilled(false)
+	item.path:setStrokeHexColor(of.hexToInt(outline))
+	item.path:setStrokeWidth(scale);
+	item.path:draw()
+
 end
 
 local function drawOval(item)
@@ -158,11 +181,13 @@ return curry2(function(viewport, item)
 		drawPolyLine(item)
 	elseif item.cmd == 'oval' and inside(viewport.rect, item) then
 		drawOval(item)
-	elseif item.cmd == 'graph' then
-		of.setColor(255, 255, 255, 255)
-		item.fbo:draw(item.points[1].x, item.points[1].y)
-	elseif item.cmd == 'new-text' then
-		drawText(item)
+	elseif item.cmd == 'array' then
+		drawArray(item)
+		-- elseif item.cmd == 'graph' then
+		-- 	of.setColor(255, 255, 255, 255)
+		-- 	item.fbo:draw(item.points[1].x, item.points[1].y)
+		-- elseif item.cmd == 'new-text' then
+		-- 	drawText(item)
 	end
 
 	-- {propEq('shape', 'text'), drawText},

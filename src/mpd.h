@@ -50,7 +50,9 @@ namespace mpd {
 	void touch(ofTouchEventArgs& touch);
 	void scale(const string& type, float value, int x, int y);
 
+	void exit();
 	void reload();
+	float getDPI();
 
 	PdNode* getNode(int x, int y);
 	t_gobj* findBox(int x, int y);

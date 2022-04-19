@@ -1778,6 +1778,9 @@ static void plot_vis(t_gobj *z, t_glist *glist,
     {
         if (style == PLOTSTYLE_POINTS)
         {
+            // mPD
+            sys_vgui(".x%lx.c create array \\\n", glist_getcanvas(glist));
+
             t_float minyval = 1e20, maxyval = -1e20;
             int ndrawn = 0;
             for (xsum = basex + xloc, i = 0; i < nelem; i++)
@@ -1813,20 +1816,21 @@ static void plot_vis(t_gobj *z, t_glist *glist,
                     maxyval = yval;
                 if (i == nelem-1 || inextx != ixpix)
                 {
-                    sys_vgui(".x%lx.c create rectangle %d %d %d %d "
-                        "-fill black -width 0 -tags [list plot%lx array]\n",
-                        glist_getcanvas(glist),
-                        ixpix, (int)glist_ytopixels(glist,
-                            basey + fielddesc_cvttocoord(yfielddesc, minyval)),
-                        inextx, (int)(glist_ytopixels(glist,
-                            basey + fielddesc_cvttocoord(yfielddesc, maxyval))
-                                + linewidth), data);
+                    // mPD
+                    int y = (int)glist_ytopixels(glist, basey + fielddesc_cvttocoord(yfielddesc, minyval));
+                    sys_vgui("%d %d %d %d \\\n", ixpix, y, inextx, y);
+                    /* (int)glist_ytopixels(glist, basey + fielddesc_cvttocoord(yfielddesc, maxyval))); */
+
                     ndrawn++;
                     minyval = 1e20;
                     maxyval = -1e20;
                 }
                 if (ndrawn > 2000 || ixpix >= 3000) break;
             }
+
+            // mPD
+            sys_vgui("-width %d \\\n", (int)linewidth);
+            sys_vgui("-fill black -tags [list plot%lx array]\n", data);
         }
         else
         {

@@ -5,12 +5,13 @@ local queue = ''
 local joinWords = join(' ')
 
 M.queue = function(...)
-	mpd.pdsend(joinWords({...}))
-	-- queue = queue .. ';' .. joinWords({...})
+	queue = queue .. ';' .. joinWords({...})
 end
 
 M.flush = function()
-	if (queue == '') then return end
+	if (queue == '') then
+		return
+	end
 	mpd.pdsend(queue)
 	queue = ''
 end

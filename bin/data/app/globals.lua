@@ -1,26 +1,43 @@
 ---@diagnostic disable: lowercase-global
 local R = require('libs/lamda')
 local L = require('libs/fun')
+local logging = require('utils.logging')
+local inspect = require('libs.inspect')
 
-local function format(code)
-	return function(x)
-		return "\027[" .. code .. "m" .. inspect(x) .. "\027[0m"
-	end
+if _G.mpd then
+	_G.dpi = mpd.getDPI()
+else
+	_G.dpi = 1
 end
 
-_G.inspect = require('libs/inspect')
-_G.log = require('utils/log')
+_G.Target = 'desktop'
+
+_G.inspect = inspect
+_G.logging = logging
+_G.log = logging.verbose
 _G.console = {log = log}
-_G.red = format(31)
-_G.green = format(32)
-_G.blue = format(34)
+_G.red = logging.colour(31)
+_G.green = logging.colour(32)
+_G.blue = logging.colour(34)
 _G.noop = function()
 end
 
-_G._dev = false
 _G.time = function()
 	return os.clock() * 1000
 end
+
+_G.TODO = function(msg)
+	print(red('TODO'), msg)
+end
+
+TODO('remove lamda?')
+TODO('big grid')
+TODO('events/bind for externals')
+TODO("don't calculate grid.x/y on every frame, just on viewport change")
+TODO("buttons don't change on press (except toggles), render them an image/vbo")
+TODO('the whole lastTouch,dragging = loc thing and scaleBegin when edimode = 1')
+TODO('render text to image/texture?')
+TODO('overwrite object outline when selected (blue)')
 
 _G.forEach = L.each
 _G.each = L.each
@@ -29,6 +46,7 @@ _G.jit = jit
 _G.mpd = mpd
 _G.audio = audio
 _G.of = of
+_G.glm = glm
 _G.swig_type = swig_type
 
 -- adding explictly to the global table works better with the linter
@@ -68,9 +86,4 @@ _G.unary = R.unary
 _G.unapply = R.unapply
 _G.values = R.values
 _G.when = R.when
-
--- local function makeGlobal(x, name)
--- 	if not _G[name] and R.isFunction(x) then _G[name] = x end
--- end
--- R.forEach(makeGlobal, R)
-
+_G.tryCatch = R.tryCatch

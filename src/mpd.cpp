@@ -1,11 +1,12 @@
 #pragma once
 
-#include <queue>
 #include "mpd.h"
+#include <queue>
 #include "ofxLua.h"
 #if defined(TARGET_ANDROID)
 #include "ofxAndroid.h"
 #endif
+#include "audio.h"
 #include "g_canvas.h"
 #include "graphics.h"
 
@@ -17,11 +18,15 @@ extern "C" {
 	int obj_noutlets(const t_object* x);
 	int luaopen_mpd(lua_State* L);
 	int luaopen_audio(lua_State* L);
+	void sys_lock(void);
+	void sys_unlock(void);
 }
 
 using namespace mpd;
 
 void pushGlobals();
+
+ofMutex mtx;
 
 auto lua = ofxLua();
 auto msgs = queue<string>();
@@ -53,16 +58,31 @@ void gui_hook(char* msg) {
 	if (str.back() != '\\') {  // ignore multiline for now
 		if (!partial.empty()) {
 			partial += str;
+			mtx.lock();
 			msgs.push(partial);
-			ofLogVerbose("multiline") << partial;
+			mtx.unlock();
 			partial = "";
 		} else {
+			mtx.lock();
 			msgs.push(str);
+			mtx.unlock();
 		}
 	} else {
 		str.pop_back();
-		partial += str;
+		// not super sure about the space at the end, so far it only fixes this:
+		// https://github.com/cviejo/mPD/blob/main/src/libs/pd/pure-data/src/g_template.c#L1969
+		partial += str + " ";
 	}
+}
+
+//--------------------------------------------------------------------
+float mpd::getDPI() {
+#if defined(TARGET_ANDROID)
+	auto activity = ofGetOFActivityObject();
+	return ofxJavaCallFloatMethod(activity, "cc/openframeworks/mPD/OFActivity", "getDensity", "()F");
+#else
+	return 1.0f;
+#endif
 }
 
 //--------------------------------------------------------------------
@@ -84,10 +104,12 @@ void mpd::reload() {
 
 //--------------------------------------------------------------------
 void mpd::update() {
+	mtx.lock();
 	while (!msgs.empty()) {
 		luaMessage(msgs.front());
 		msgs.pop();
 	}
+	mtx.unlock();
 }
 
 //--------------------------------------------------------------------
@@ -97,19 +119,19 @@ void mpd::draw() {
 }
 
 //--------------------------------------------------------------------
+void mpd::exit() {
+	audio::clear();
+	lua.scriptExit();
+	ofExit(0);
+}
+
+//--------------------------------------------------------------------
 void mpd::key(ofKeyEventArgs& args) {
 	lua.scriptKeyPressed(args.key);
 }
 
 //--------------------------------------------------------------------
 void mpd::touch(ofTouchEventArgs& touch) {
-#if defined(TARGET_ANDROID)
-	if (touch.type == ofTouchEventArgs::doubleTap) {
-		auto temp = vector<string>{"one", "two", "three"};
-
-		ofxAndroidAlertListBox("grable grable", temp);
-	}
-#endif
 	if (touch.id != 0 || scaling) {
 		return;
 	}
@@ -123,7 +145,9 @@ void mpd::touch(ofTouchEventArgs& touch) {
 void mpd::scale(const string& type, float value, int x, int y) {
 	auto message =
 	   "scale " + type + " " + ofToString(value) + " " + ofToString(x) + " " + ofToString(y);
+	mtx.lock();
 	msgs.push(message);
+	mtx.unlock();
 }
 
 //--------------------------------------------------------------------
@@ -140,12 +164,14 @@ bool mpd::selectionActive() {
 	return !!pd_getcanvaslist()->gl_editor->e_selection;
 }
 
+t_binbuf* buffer = binbuf_new();
 //--------------------------------------------------------------------
 void mpd::pdsend(const string& cmd) {
-	t_binbuf* buffer = binbuf_new();
+	sys_lock();
 	binbuf_text(buffer, (char*)cmd.c_str(), cmd.length());
 	binbuf_eval(buffer, 0, 0, 0);
-	binbuf_free(buffer);
+	// binbuf_free(buffer);
+	sys_unlock();
 }
 
 //--------------------------------------------------------------------

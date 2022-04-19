@@ -1,5 +1,5 @@
-#include "PdBase.hpp"
 #include "audio.h"
+#include "PdBase.hpp"
 #include "ofMain.h"
 
 auto base = pd::PdBase();
@@ -22,7 +22,7 @@ bool audio::init(int inputChannels, int outputChannels, float sampleRate) {
 
 	soundStream.setup(soundStreamSettings);
 
-	bool result = base.init(inputChannels, outputChannels, sampleRate, false);
+	bool result = base.init(inputChannels, outputChannels, sampleRate, true);
 
 	if (result) {
 		base.computeAudio(true);
