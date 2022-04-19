@@ -56,17 +56,15 @@ void gui_hook(char* msg) {
 		str.pop_back();
 	}
 	if (str.back() != '\\') {  // ignore multiline for now
+		mtx.lock();
 		if (!partial.empty()) {
 			partial += str;
-			mtx.lock();
 			msgs.push(partial);
-			mtx.unlock();
 			partial = "";
 		} else {
-			mtx.lock();
 			msgs.push(str);
-			mtx.unlock();
 		}
+		mtx.unlock();
 	} else {
 		str.pop_back();
 		// not super sure about the space at the end, so far it only fixes this:

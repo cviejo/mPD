@@ -18,6 +18,7 @@
 *.app
 
 ignore.*
+playground
 obj
 .DS_Store
 
