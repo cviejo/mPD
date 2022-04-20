@@ -29,15 +29,37 @@ local function getOutletX(node, x)
 	return index * interval + iowidth / 2
 end
 
+local function init(canvasId)
+	pd.queue(canvasId, 'map 1')
+	pd.queue(canvasId, 'query-editmode')
+	pd.queue(canvasId, 'updatemenu')
+	pd.queue(canvasId, 'editmode', 1)
+end
+
 return function(id, x, y)
 	local M = {id = id, updateNeeded = true}
 
 	local editmode = 0
 	local cords = {signal = cordMesh(), control = cordMesh()}
 	local viewport = createViewport(2)
-
 	local dragging = nil
 	local lastTouch = nil
+
+	init(id)
+
+	-- LuaFormatter off
+	local function update(item)
+		if cords.signal.update(item) then return end
+		if cords.control.update(item) then return end
+		M.items.byTag(updateItem(item), item.tag)
+	end
+
+	local function delete(item)
+		if cords.signal.delete(item) then return end
+		if cords.control.delete(item) then return end
+		M.items.delete(item.tag)
+	end
+	-- LuaFormatter on
 
 	M.items = stack()
 
@@ -103,6 +125,7 @@ return function(id, x, y)
 	end, viewport)
 
 	M.message = function(msg)
+		console.log("msg", msg);
 		local cmd, tag, points = msg.cmd, msg.tag, msg.points
 
 		M.updateNeeded = true
@@ -115,29 +138,15 @@ return function(id, x, y)
 			end, msg.points)
 			msg.points = {}
 			msg.mesh = mesh
-		end
-
-		if cmd == 'polyline' or cmd == 'polygon' then
+		elseif cmd == 'polyline' or cmd == 'polygon' then
 			msg.path = pointsToPath(msg.points)
 			msg.points = {}
 		end
 
 		if cmd == 'coords' or cmd == 'set-text' or cmd == 'itemconfigure' then
-			if cords.signal.update(msg) then
-				return
-			end
-			if cords.control.update(msg) then
-				return
-			end
-			M.items.byTag(updateItem(msg), tag)
+			update(msg)
 		elseif cmd == 'delete' then
-			if cords.signal.delete(msg) then
-				return
-			end
-			if cords.control.delete(msg) then
-				return
-			end
-			M.items.delete(tag)
+			delete(msg)
 		elseif cmd == 'scale' then
 			if msg.type == 'scaleBegin' then
 				-- dragging = vec2(lastTouch)

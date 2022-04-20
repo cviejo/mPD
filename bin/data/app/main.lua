@@ -12,7 +12,7 @@ local events = require('events')
 local canvas = nil
 
 function setup()
-	of.setLogLevel(of.LOG_NOTICE)
+	of.setLogLevel(of.LOG_VERBOSE)
 	of.background(255)
 	of.setVerticalSync(false) -- needed for fps > 60 on desktop
 	of.setFrameRate(125)
@@ -36,9 +36,7 @@ end
 local function drawCanvas()
 	if not canvas then
 		return
-	end
-
-	if canvas.updateNeeded then
+	elseif canvas.updateNeeded then
 		frame.render(canvas.draw) --
 	elseif canvas then
 		canvas.items.cleanup()
@@ -60,12 +58,9 @@ local function touchEvent(touch)
 	if (touch.type == of.TouchEventArgs_down) then
 		local id, value = docks.touch(touch)
 		if (id) then
-			-- handle non canvas here
 			if not canvas then
 				return
-			end
-
-			if id == 'edit' then
+			elseif id == 'edit' then
 				pd.queue(canvas.id, 'editmode', value)
 			elseif id == 'zoom_in' then
 				canvas.message({cmd = 'scale', value = 1.4})
@@ -104,14 +99,8 @@ function gotMessage(msg)
 
 	if not parsed then
 		return
-	end
-
-	if parsed.cmd == 'new-canvas' then
-		canvas = Canvas(parsed.canvasId, 0, 0) -- docks.size)
-		pd.queue(canvas.id, 'map 1')
-		pd.queue(canvas.id, 'query-editmode')
-		pd.queue(canvas.id, 'updatemenu')
-		pd.queue(canvas.id, 'editmode', 1)
+	elseif parsed.cmd == 'new-canvas' then
+		canvas = Canvas(parsed.canvasId, 0, 0)
 	elseif parsed.cmd == 'bind' then
 		events.bind(parsed)
 	elseif canvas then

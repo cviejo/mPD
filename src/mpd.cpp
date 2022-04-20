@@ -192,8 +192,6 @@ PdNode* mpd::getNode(int x, int y) {
 		return NULL;
 	}
 
-	// auto selection = canvas->gl_editor->e_onmotion == MA_MOVE;
-
 	auto result = new PdNode();
 	result->ref = hit;
 	result->x = x1;
@@ -235,7 +233,6 @@ void pushGlobals() {
 }
 
 // update
-//  mtx.lock();
 //  auto length = queue.size();
 //  auto copy = msgs;
 //  msgs.clear();
