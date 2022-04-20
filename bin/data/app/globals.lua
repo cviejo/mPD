@@ -31,9 +31,9 @@ _G.TODO = function(msg)
 end
 
 TODO('remove lamda?')
+TODO('selected lines mesh')
 TODO('big grid')
 TODO('events/bind for externals')
-TODO("don't calculate grid.x/y on every frame, just on viewport change")
 TODO("buttons don't change on press (except toggles), render them an image/vbo")
 TODO('the whole lastTouch,dragging = loc thing and scaleBegin when edimode = 1')
 TODO('render text to image/texture?')

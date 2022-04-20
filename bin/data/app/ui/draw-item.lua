@@ -106,15 +106,13 @@ local function drawPolyLine(item)
 
 	if object then
 		fill = 'f6f8f8'
-	end
-	if object then
 		outline = '8c8c8c'
-	end
-	if graph then
+	elseif graph then
 		fill = 'ffffff'
-	end
-	if graph then
 		outline = '000000'
+	end
+	if item.params.fill == '0000ff' then
+		outline = '0000ff'
 	end
 
 	-- if (graph or object) and #item.points == 5 then
@@ -143,7 +141,6 @@ local function drawPolyLine(item)
 	item.path:setStrokeHexColor(of.hexToInt(outline))
 	item.path:setStrokeWidth(scale);
 	item.path:draw()
-
 end
 
 local function drawOval(item)

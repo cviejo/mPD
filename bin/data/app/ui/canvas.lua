@@ -125,8 +125,7 @@ return function(id, x, y)
 	end, viewport)
 
 	M.message = function(msg)
-		console.log("msg", msg);
-		local cmd, tag, points = msg.cmd, msg.tag, msg.points
+		local cmd = msg.cmd
 
 		M.updateNeeded = true
 
@@ -159,8 +158,8 @@ return function(id, x, y)
 			editmode = msg.value
 		elseif cmd == 'move' then
 			M.items.byTag(function(item)
-				item.points = map(moveBy(points[1]), item.points)
-			end, tag)
+				item.points = map(moveBy(msg.points[1]), item.points)
+			end, msg.tag)
 		elseif not msg.id then
 			log(red("no id"))
 			log(msg.message)
