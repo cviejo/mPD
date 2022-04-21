@@ -55,10 +55,9 @@ M.adjustToViewport = function(viewport)
 end
 
 M.draw = function()
-	of.pushMatrix()
 	of.scale(1 / printScale, 1 / printScale)
 	grid:draw(x, y)
-	of.popMatrix()
+	of.scale(printScale, printScale)
 end
 
 M.init()

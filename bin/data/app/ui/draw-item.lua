@@ -1,4 +1,4 @@
-local text = require('utils/text')
+local Font = require('utils/font')
 local fn = require('utils.functional')
 local ofx = require('utils/of')
 local safe, intersects, hasTag = fn.safe, fn.intersects, fn.hasTag
@@ -11,30 +11,28 @@ local isControl = hasTag('control')
 local isGraph = hasTag('graph')
 local isCord = hasTag('cord')
 
-local fontScale = 4
-local font = text.makeFont("fonts/DejaVuSansMono.ttf", 9 * fontScale - 1)
--- eyeballed to match pd's dimensions
--- https://github.com/cviejo/mPD/blob/main/src/libs/pd/pure-data/src/s_main.c#L171
-local lineHeight = 14 * fontScale
-font:setLineHeight(lineHeight)
-
 local setHex = safe(pipe(of.hexToInt, of.setHexColor))
 
-local drawString = function(txt, x, y)
-	of.scale(1 / fontScale, 1 / fontScale)
-	of.setColor(20)
-	font:drawString(txt, x * fontScale, y * fontScale)
-	of.scale(fontScale, fontScale)
-end
+local font = Font("DejaVuSansMono", 9)
+
+font.setLineHeight(14)
 
 local function drawText(item)
 	local x, y = item.points[1].x, item.points[1].y
 	if (item.cmd == 'new-text') then
-		y = y + lineHeight / fontScale - 3
+		y = y + font.lineHeight - 3
 	elseif (item.font) then
 		y = y + item.font.size / 2
 	end
-	drawString(item.value, x, y)
+	of.setColor(20)
+	font.drawString(item.value, x, y)
+end
+
+local function drawArray(item)
+	local width = item.params.width or 1
+	of.setLineWidth(width * scale)
+	setHex(item.params.fill or front)
+	item.mesh:draw()
 end
 
 local function drawRectangle(item)
@@ -69,13 +67,6 @@ local function drawRectangle(item)
 	else
 		mpd.drawRectangle(x, y, w, h, color, fill)
 	end
-end
-
-local function drawArray(item)
-	local width = item.params.width or 1
-	of.setLineWidth(width * scale)
-	setHex(item.params.fill or front)
-	item.mesh:draw()
 end
 
 local function drawLine(item)
@@ -163,11 +154,11 @@ return curry(function(viewport, item)
 		drawOval(item)
 	elseif item.cmd == 'array' then
 		drawArray(item)
+	elseif item.cmd == 'new-text' then
+		drawText(item)
 		-- elseif item.cmd == 'graph' then
 		-- 	of.setColor(255, 255, 255, 255)
 		-- 	item.fbo:draw(item.points[1].x, item.points[1].y)
-		-- elseif item.cmd == 'new-text' then
-		-- 	drawText(item)
 	end
 
 	-- {propEq('shape', 'text'), drawText},

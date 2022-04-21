@@ -179,24 +179,9 @@ return function(input)
 				i = i + 1
 			end
 		else
-			log(red('not parsed'), input)
+			-- log(red('not parsed'), input)
 			return nil
 		end
 		return match
 	end
 end
-
--- local isHyphen = function(x)
--- 	return x == '-'
--- end
---
--- local isDigit = function(x)
--- 	-- LuaFormatter off
--- 	return x == '0' or x == '1' or x == '2' or x == '3' or x == '4' or
--- 	       x == '5' or x == '6' or x == '7' or x == '8' or x == '9'
--- 	-- LuaFormatter on
--- end
---
--- local charAt = function(i, x)
--- 	return x:sub(i, i)
--- end
