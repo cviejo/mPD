@@ -55,12 +55,9 @@ return function()
 		end
 		dirty = false
 		local tmp = {}
-		for i = 1, #ordered do
-			local item = ordered[i]
-			if not item.deletion then
-				tmp[#tmp + 1] = item
-			end
-		end
+		M.forEach(function(item)
+			tmp[#tmp + 1] = item
+		end)
 		ordered = tmp
 	end
 

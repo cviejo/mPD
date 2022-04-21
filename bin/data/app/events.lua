@@ -1,5 +1,5 @@
 local pd = require('pd')
-local f = require('utils/function')
+local f = require('utils.functional')
 local hasTag = f.hasTag
 
 local M = {}
@@ -27,7 +27,9 @@ M.event = function(e, items)
 			return find(testMatch, items)
 		end, listeners)
 
-		if found then pd.queue(found.callback) end
+		if found then
+			pd.queue(found.callback)
+		end
 	end
 end
 

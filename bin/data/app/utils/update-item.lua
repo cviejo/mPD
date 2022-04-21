@@ -1,4 +1,4 @@
-local pointsToPath = require('utils.points-to-path')
+local pointsToPath = require('utils.of').pointsToPath
 
 return function(update)
 	return function(item)

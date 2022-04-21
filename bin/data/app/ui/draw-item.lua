@@ -1,6 +1,6 @@
 local text = require('utils/text')
-local fn = require('utils/function')
-local toRect = require('utils/to-rect')
+local fn = require('utils.functional')
+local ofx = require('utils/of')
 local safe, intersects, hasTag = fn.safe, fn.intersects, fn.hasTag
 
 local front = 0
@@ -40,7 +40,7 @@ end
 local function drawRectangle(item)
 	local signal = isSignal(item)
 	local control = isControl(item)
-	local x, y, w, h = toRect(item.points[1], item.points[2])
+	local x, y, w, h = ofx.toRect(item.points[1], item.points[2])
 
 	-- sliders, etc. TODO: only draw in editmode
 	if h == 1 then
@@ -163,7 +163,7 @@ end
 -- 	return true
 -- end
 
-return curry2(function(viewport, item)
+return curry(function(viewport, item)
 	scale = viewport.scale
 
 	of.noFill()
