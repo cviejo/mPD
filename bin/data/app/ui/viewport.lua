@@ -7,6 +7,8 @@ local centerY = screenHeight / 2
 return function(scale)
 	local M = {}
 
+	M.scaling = false
+	M.dragging = nil -- a bit nasty, both acts as both value and a bool/flag
 	M.scale = scale
 
 	M.rect = of.Rectangle(0, 0, screenWidth / M.scale, screenHeight / M.scale)
@@ -14,6 +16,12 @@ return function(scale)
 	M.move = function(offset)
 		M.rect = M.rect + offset:vec2()
 		return M.rect
+	end
+
+	M.drag = function(point)
+		if (M.dragging) then
+			M.move(M.dragging - point)
+		end
 	end
 
 	M.screenToCanvas = function(point)
@@ -24,16 +32,23 @@ return function(scale)
 
 	M.setScale = function(msg)
 		local before = M.screenToCanvas(msg)
-		if msg.type == 'scroll' then
+
+		if msg.type == 'scaleBegin' then
+			M.scaling = true
+			M.dragging = before
+		elseif msg.type == 'scaleEnd' then
+			M.scaling = false
+			M.dragging = nil
+			return
+		elseif msg.type == 'scroll' then
 			M.scale = M.scale + msg.value * 0.1
-		elseif msg.value then
+		elseif msg.type == 'scale' and msg.value then
 			M.scale = M.scale * msg.value
 		end
+
 		M.scale = clamp(0.5, 7, M.scale)
-		local offset = before - M.screenToCanvas(msg)
-
-		M.move(offset)
-
+		M.move(before - M.screenToCanvas(msg))
+		M.drag(before)
 		M.rect:setSize(screenWidth / M.scale, screenHeight / M.scale)
 	end
 

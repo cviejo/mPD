@@ -3,17 +3,16 @@
 #include "utils/audio.h"
 
 void ofApp::setup() {
-#if defined(TARGET_ANDROID)
-	ofAddListener(ofxAndroidEvents().scaleBegin, this, &ofApp::scaleBegin);
-	ofAddListener(ofxAndroidEvents().scale, this, &ofApp::scale);
-	ofAddListener(ofxAndroidEvents().scaleEnd, this, &ofApp::scaleEnd);
-#else
 	auto xs = vector<string>{"main.lua",      "ui/cords.lua", "ui/button.lua",   "ui/frame2.lua",
 	                         "ui/canvas.lua", "parse.lua",    "ui/draw-item.lua"};
 	for (auto x : xs) {
 		watcher.addPath(ofToDataPath("app/" + x, true));
 	}
 	watcher.start();
+#if defined(TARGET_ANDROID)
+	ofAddListener(ofxAndroidEvents().scaleBegin, this, &ofApp::scaleBegin);
+	ofAddListener(ofxAndroidEvents().scale, this, &ofApp::scale);
+	ofAddListener(ofxAndroidEvents().scaleEnd, this, &ofApp::scaleEnd);
 #endif
 	mpd::setup();
 }

@@ -30,9 +30,13 @@ end
 
 local log = function(logLevel)
 	return function(...)
-		local args = toPrintable({...})
+		local content = join('\t', toPrintable({...}))
 
-		of.log(logLevel, join('\t', args))
+		if _G.Target == 'android' then -- for logcat filtering
+			content = '[mPD] ' .. content
+		end
+
+		of.log(logLevel, content)
 	end
 end
 

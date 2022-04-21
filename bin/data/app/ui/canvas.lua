@@ -39,7 +39,6 @@ return function(id, x, y)
 	local editmode = 0
 	local cords = {signal = cordMesh(), control = cordMesh()}
 	local viewport = createViewport(2)
-	local dragging = nil
 	local lastTouch = nil
 
 	init(id)
@@ -63,51 +62,62 @@ return function(id, x, y)
 		end, tag)
 	end
 
+	local function updateGrid()
+		grid.adjustToViewport(viewport)
+		M.updateNeeded = true
+	end
+
 	local function setScale(msg)
 		if msg.type == 'scaleBegin' then -- dragging = vec2(lastTouch)
 			pd.queue(id, 'mouseup', lastTouch.x, lastTouch.y, '1')
-		else
-			viewport.setScale(msg)
-			grid.adjustToViewport(viewport)
 		end
+		viewport.setScale(msg)
+		updateGrid()
 	end
 
 	M.items = stack()
 
 	M.touch = function(touch)
+		if viewport.scaling then
+			return
+		end
+
+		-- take a look into this, should probably land here already offsetted
 		local loc = viewport.screenToCanvas({x = touch.x - x, y = touch.y - y})
 
 		touch.x = math.floor(loc.x)
 		touch.y = math.floor(loc.y)
 
+		local touchDown = touch.type == of.TouchEventArgs_down
+		local touchUp = touch.type == of.TouchEventArgs_up
+		local touchMoved = touch.type == of.TouchEventArgs_move
+
 		-- events.event(touch, items)
 
-		if (touch.type == of.TouchEventArgs_down) then
+		if viewport.dragging and touchUp then
+			viewport.dragging = nil
+		elseif viewport.dragging and touchMoved then
+			viewport.drag(loc)
+			updateGrid()
+		elseif touchUp then
+			pd.queue(id, 'mouseup', touch.x, touch.y, '1')
+		elseif touchMoved and lastTouch and not ofx.equals(touch, lastTouch) then
+			lastTouch = touch
+			pd.queue(id, 'motion', touch.x, touch.y, '0')
+		elseif touchDown then
 			local node = mpd.getNode(touch.x, touch.y)
 			local selection = mpd.selectionActive()
 
-			if editmode == 0 and not node then
-				dragging = loc
+			if editmode == 0 and not node and not viewport.dragging then
+				viewport.dragging = loc
 			elseif editmode == 1 and node and not selection then
 				local iox = getOutletX(node, touch.x)
 				pd.queue(id, 'mouse', node.x + iox, node.y + node.height, '1 0')
 			else
 				pd.queue(id, 'mouse', touch.x, touch.y, '1 0')
 			end
+
 			lastTouch = touch
-		elseif (touch.type == of.TouchEventArgs_up) then
-			dragging = nil
-			pd.queue(id, 'mouseup', touch.x, touch.y, '1')
-		elseif (touch.type == of.TouchEventArgs_move) and lastTouch then
-			if dragging then
-				local diff = dragging - loc
-				viewport.move(diff)
-				grid.adjustToViewport(viewport)
-				M.updateNeeded = true
-			elseif touch.x ~= lastTouch.x or touch.y ~= lastTouch.y then
-				lastTouch = touch
-				pd.queue(id, 'motion', touch.x, touch.y, '0')
-			end
 		end
 	end
 
@@ -141,7 +151,7 @@ return function(id, x, y)
 		if msg.cmd == 'array' then
 			msg.mesh = ofx.pointsToMesh(msg.points)
 			msg.points = {}
-		elseif msg.cmd == 'polyline' or cmd == 'polygon' then
+		elseif msg.cmd == 'polyline' or msg.cmd == 'polygon' then
 			msg.path = ofx.pointsToPath(msg.points)
 			msg.points = {}
 		end

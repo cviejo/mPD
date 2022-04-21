@@ -28,8 +28,8 @@ function setup()
 	end
 
 	if (success) then
-		-- pd.queue('pd open test.pd', utils.getPath('ignore.patches')) --
-		pd.queue('pd open main.pd', ofx.getPath('ignore.patches/filters')) --
+		pd.queue('pd open test.pd', ofx.getPath('ignore.patches')) --
+		-- pd.queue('pd open main.pd', ofx.getPath('ignore.patches/filters')) --
 	end
 end
 
@@ -63,9 +63,9 @@ local function touchEvent(touch)
 			elseif id == 'edit' then
 				pd.queue(canvas.id, 'editmode', value)
 			elseif id == 'zoom_in' then
-				canvas.message({cmd = 'scale', value = 1.4})
+				canvas.message({cmd = 'scale', type = 'scale', value = 1.4})
 			elseif id == 'zoom_out' then
-				canvas.message({cmd = 'scale', value = 0.7})
+				canvas.message({cmd = 'scale', type = 'scale', value = 0.7})
 			elseif (id == 'undo' or id == 'copy' or id == 'paste') then
 				pd.queue(canvas.id, id)
 			elseif id == 'clear' then

@@ -10,6 +10,10 @@ M.vec2 = function(p)
 	return glm.vec3(p.x, p.y, 0)
 end
 
+M.equals = function(p1, p2)
+	return p1.x == p2.x and p1.y == p2.y
+end
+
 M.toRect = function(p1, p2)
 	return p1.x, p1.y, p2.x - p1.x, p2.y - p1.y
 end
