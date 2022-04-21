@@ -1,4 +1,4 @@
-local vec2 = require('utils/vec2')
+local vec2 = require('utils.of').vec2
 
 return function()
 	local M = {}

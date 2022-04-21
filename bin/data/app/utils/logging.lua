@@ -1,9 +1,14 @@
-local R = require('libs/lamda')
-local inspect = require('libs/inspect')
+local inspect = require('libs.inspect')
+local F = require('utils.functional')
 
-local isPrintable = R.anyPass(R.isNil, R.isNumber, R.isString, R.isBoolean)
+local map, unless, join = F.map, F.unless, F.join
 
-local toPrintable = R.map(R.unless(isPrintable, inspect))
+local isPrintable = function(x)
+	local t = type(x)
+	return t == 'nil' or t == 'number' or t == 'string' or t == 'boolean'
+end
+
+local toPrintable = map(unless(isPrintable, inspect))
 
 local of = _G.of or {
 	LOG_VERBOSE = '[verbose]',
@@ -27,7 +32,7 @@ local log = function(logLevel)
 	return function(...)
 		local args = toPrintable({...})
 
-		of.log(logLevel, R.join('\t', args))
+		of.log(logLevel, join('\t', args))
 	end
 end
 

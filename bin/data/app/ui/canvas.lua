@@ -1,19 +1,16 @@
 local grid = require('ui/grid')
 local drawItem = require('ui/draw-item')
-local gfx = require('utils/graphics')
 local s = require('utils/string')
 local text = require('utils/text')
 local fifo = require('utils/fifo')
 local cordMesh = require('ui/cord-mesh')
 local stack = require('utils/stack')
-local vec2 = require('utils/vec2')
 local createViewport = require('ui/viewport')
 local withViewport = require('ui/with-viewport')
-local pointsToPath = require('utils.points-to-path')
 local updateItem = require('utils.update-item')
+local ofx = require('utils.of')
 local pd = require('pd')
 local events = require('events')
-local moveBy = gfx.moveBy
 
 local back = 255
 local iowidth = 7
@@ -60,6 +57,20 @@ return function(id, x, y)
 		M.items.delete(item.tag)
 	end
 	-- LuaFormatter on
+	local function move(tag, offset)
+		M.items.byTag(function(item)
+			item.points = map(ofx.moveBy(offset), item.points)
+		end, tag)
+	end
+
+	local function setScale(msg)
+		if msg.type == 'scaleBegin' then -- dragging = vec2(lastTouch)
+			pd.queue(id, 'mouseup', lastTouch.x, lastTouch.y, '1')
+		else
+			viewport.setScale(msg)
+			grid.adjustToViewport(viewport)
+		end
+	end
 
 	M.items = stack()
 
@@ -125,41 +136,26 @@ return function(id, x, y)
 	end, viewport)
 
 	M.message = function(msg)
-		local cmd = msg.cmd
-
 		M.updateNeeded = true
 
-		if cmd == 'array' then
-			local mesh = of.Mesh()
-			mesh:setMode(of.PRIMITIVE_LINES)
-			forEach(function(p)
-				mesh:addVertex(vec2(p))
-			end, msg.points)
+		if msg.cmd == 'array' then
+			msg.mesh = ofx.pointsToMesh(msg.points)
 			msg.points = {}
-			msg.mesh = mesh
-		elseif cmd == 'polyline' or cmd == 'polygon' then
-			msg.path = pointsToPath(msg.points)
+		elseif msg.cmd == 'polyline' or cmd == 'polygon' then
+			msg.path = ofx.pointsToPath(msg.points)
 			msg.points = {}
 		end
 
-		if cmd == 'coords' or cmd == 'set-text' or cmd == 'itemconfigure' then
+		if msg.cmd == 'coords' or msg.cmd == 'set-text' or msg.cmd == 'itemconfigure' then
 			update(msg)
-		elseif cmd == 'delete' then
+		elseif msg.cmd == 'delete' then
 			delete(msg)
-		elseif cmd == 'scale' then
-			if msg.type == 'scaleBegin' then
-				-- dragging = vec2(lastTouch)
-				pd.queue(id, 'mouseup', lastTouch.x, lastTouch.y, '1')
-			else
-				viewport.setScale(msg)
-				grid.adjustToViewport(viewport)
-			end
-		elseif cmd == 'editmode' then
+		elseif msg.cmd == 'scale' then
+			setScale(msg)
+		elseif msg.cmd == 'editmode' then
 			editmode = msg.value
-		elseif cmd == 'move' then
-			M.items.byTag(function(item)
-				item.points = map(moveBy(msg.points[1]), item.points)
-			end, msg.tag)
+		elseif msg.cmd == 'move' then
+			move(msg.tag, msg.points[1])
 		elseif not msg.id then
 			log(red("no id"))
 			log(msg.message)

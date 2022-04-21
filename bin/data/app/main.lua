@@ -1,6 +1,6 @@
 require('globals')
 local text = require('utils/text')
-local file = require('utils/io')
+local ofx = require('utils/of')
 local s = require('utils/string')
 local pd = require('pd')
 local frame = require('ui/frame')
@@ -28,8 +28,8 @@ function setup()
 	end
 
 	if (success) then
-		pd.queue('pd open test.pd', file.getPath('ignore.patches')) --
-		-- pd.queue('pd open main.pd', file.getPath('ignore.patches/filters')) --
+		-- pd.queue('pd open test.pd', utils.getPath('ignore.patches')) --
+		pd.queue('pd open main.pd', ofx.getPath('ignore.patches/filters')) --
 	end
 end
 
@@ -111,7 +111,7 @@ end
 function exit()
 	frame.clear()
 	if canvas then
-		pd.send(canvas.id, 'menuclose')
+		pd.send(canvas.id .. 'menuclose')
 	end
 	-- https://github.com/cviejo/mPD/blob/main/src/libs/pd/pure-data/src/g_editor.c#L3399
 end
