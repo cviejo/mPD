@@ -26,13 +26,11 @@ local edit = ToggleButton('edit', width / 2 - M.size / 2, lowY, M.size)
 
 local buttons = {zoomIn, zoomOut, copy, paste, clear, undo, edit}
 
--- can't be bothered to do inheritance in lua the proper way
-for i = 1, #buttons do
-	buttons[i].init()
-end
+forEach(function(x)
+	x.init()
+end, buttons)
 
 local drawFrame = function()
-
 	of.setColor(36, 38, 39)
 	of.fill()
 	of.drawRectRounded(width / 2 - M.size / 2, lowY, M.size, M.size + corner,
@@ -51,11 +49,9 @@ end
 
 M.draw = function()
 	drawFrame()
-
-	for i = 1, #buttons do
-		buttons[i].draw()
-	end
-
+	forEach(function(x)
+		x.draw()
+	end, buttons)
 	of.setColor(75)
 	of.drawRectangle(rightX + corner, menuY + M.size * 4, M.size, separator)
 end

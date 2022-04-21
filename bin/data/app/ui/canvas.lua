@@ -8,7 +8,7 @@ local stack = require('utils/stack')
 local createViewport = require('ui/viewport')
 local withViewport = require('ui/with-viewport')
 local updateItem = require('utils.update-item')
-local ofx = require('utils.of')
+local ofx = require('utils/of')
 local pd = require('pd')
 local events = require('events')
 
@@ -37,7 +37,7 @@ return function(id, x, y)
 	local M = {id = id, updateNeeded = true}
 
 	local editmode = 0
-	local cords = {signal = cordMesh(), control = cordMesh()}
+	local cords = {signal = cordMesh(0x808093), control = cordMesh(0x323232)}
 	local viewport = createViewport(2)
 	local lastTouch = nil
 
@@ -130,13 +130,10 @@ return function(id, x, y)
 			grid.draw()
 		end
 
-		of.setLineWidth(2 * scale)
-		of.setHexColor(0x808093)
-		cords.signal.draw()
-
 		of.setLineWidth(scale)
-		of.setHexColor(0x323232)
 		cords.control.draw()
+		of.setLineWidth(2 * scale)
+		cords.signal.draw()
 
 		M.items.forEach(drawItem(viewport))
 
@@ -197,14 +194,12 @@ end
 -- 	-- g.fbo:beginFbo()
 -- 	-- g.fbo:endFbo()
 -- 	local fbo = g.fbo
---
 -- 	fbo:beginFbo()
 -- 	of.enableAlphaBlending()
 -- 	of.clear(255, 0)
 -- 	of.background(255)
 -- 	of.disableAlphaBlending()
 -- 	fbo:endFbo()
---
 -- else
 -- local g = nil
 -- local initGraph = function(item)
@@ -225,7 +220,6 @@ end
 -- local color = g.hex(item.fill)
 -- -- if (g.isGrey(color)) then color:invert() end
 -- of.setColor(color)
---
 -- local prev = nil
 -- if msg.type == 'scaleEnd' then
 -- 	prev = nil

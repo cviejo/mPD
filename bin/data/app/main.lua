@@ -28,8 +28,8 @@ function setup()
 	end
 
 	if (success) then
-		pd.queue('pd open test.pd', ofx.getPath('ignore.patches')) --
-		-- pd.queue('pd open main.pd', ofx.getPath('ignore.patches/filters')) --
+		-- pd.queue('pd open test.pd', ofx.getPath('ignore.patches')) --
+		pd.queue('pd open main.pd', ofx.getPath('ignore.patches/filters')) --
 	end
 end
 
@@ -46,10 +46,8 @@ end
 
 function draw()
 	pd.flush()
-
 	drawCanvas()
 	docks.draw()
-
 	of.setColor(0, 0, 0, 100)
 	text.draw('fps: ' .. of.getFrameRate(), 50, 50)
 end

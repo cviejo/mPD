@@ -22,7 +22,6 @@ return function(id, x, y, size)
 		else
 			of.setColor(120)
 		end
-
 		M.img:draw(x + M.padding, y + M.padding)
 	end
 

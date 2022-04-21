@@ -96,7 +96,6 @@ local function drawLine(item)
 end
 
 local function drawPolyLine(item)
-	-- local line = of.Path()
 	local graph = isGraph(item)
 	local object = intersects({'obj', 'atom', 'msg'}, item.tags)
 	local width = item.params.width or 1
@@ -112,29 +111,17 @@ local function drawPolyLine(item)
 		outline = '000000'
 	end
 	if item.params.fill == '0000ff' then
-		outline = '0000ff'
+		outline = item.params.fill
 	end
 
-	-- if (graph or object) and #item.points == 5 then
-	-- 	local x, y, w, h = toRect(item.points[1], item.points[3])
-	-- 	mpd.drawRectangle(x, y, w, h, outline, fill)
-	-- 	return
-	-- end
 	if not item.path then
 		log(red('no path'), item.message)
 		return
-	end
-
-	if fill then
+	elseif fill then
 		item.path:setHexColor(of.hexToInt(fill))
 		item.path:setFilled(true)
 		item.path:draw()
 	end
-
-	-- setHex(outline or item.params.fill or front)
-
-	-- item.path:setFilled(true)
-	-- item.path:draw()
 
 	of.setLineWidth(width * scale)
 	item.path:setFilled(false)
@@ -158,10 +145,6 @@ local inside = function(rect, item)
 	       (p2.x > left and p2.x < right and p2.y > top and p2.y < bottom)
 	-- LuaFormatter on
 end
-
--- local inside = function(rect, item)
--- 	return true
--- end
 
 return curry(function(viewport, item)
 	scale = viewport.scale
