@@ -1,9 +1,6 @@
-local M = {}
-
--- local R = require('../libs/lamda')
--- local curry2 = require('../utils/function').curry2
--- local curry2 = require('../utils/function').curry2
 local F = require('utils.functional')
+
+local M = {}
 
 local join, curry = F.join, F.curry
 
@@ -15,9 +12,21 @@ M.includes = curry(function(pattern, x)
 	return string.find(string.lower(x), string.lower(pattern))
 end)
 
-M.gmatch = curry(string.gmatch)
+M.head = function(x)
+	return x:sub(1, 1)
+end
 
-M.match = curry(string.match)
+M.tail = function(x)
+	return x:sub(2)
+end
+
+M.init = function(x)
+	return x:sub(1, -2)
+end
+
+M.last = function(x)
+	return x:sub(-1)
+end
 
 M.joinLines = join("\n")
 

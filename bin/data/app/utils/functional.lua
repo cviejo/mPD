@@ -34,6 +34,11 @@ local curry3 = function(fn)
 	end
 end
 
+-- not is a lua keyword
+M.negate = function(x)
+	return not x
+end
+
 M.unapply = function(fn)
 	return function(...)
 		return fn({...})
@@ -49,6 +54,10 @@ M.curry = function(fn)
 		return curry3(fn)
 	end
 end
+
+M.equals = curry2(function(a, b)
+	return a == b
+end)
 
 M.isNil = function(x)
 	return x == nil
