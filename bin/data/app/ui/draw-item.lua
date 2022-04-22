@@ -1,15 +1,15 @@
 local Font = require('utils/font')
 local fn = require('utils.functional')
-local ofx = require('utils/of')
+local points = require('utils/points')
 local safe, intersects, hasTag = fn.safe, fn.intersects, fn.hasTag
 
 local front = 0
 local scale = 1
 
+-- only used once, remove
 local isSignal = hasTag('signal')
 local isControl = hasTag('control')
 local isGraph = hasTag('graph')
-local isCord = hasTag('cord')
 
 local setHex = safe(pipe(of.hexToInt, of.setHexColor))
 
@@ -34,6 +34,22 @@ local function drawText(item)
 	end
 end
 
+local function drawOval(item)
+	local p1, p2 = item.points[1], item.points[2]
+	mpd.drawEllipse(p1.x, p1.y, p2.x, p2.y, item.params.outline or '000000',
+	                item.params.fill or '')
+end
+
+local function drawLine(item)
+	local width = item.params.width or 1
+	local color = item.params.fill or front
+	if (item.tags[1] == 'x') then
+		color = '808093'
+	end
+	local p1, p2 = item.points[1], item.points[2]
+	mpd.drawLine(p1.x, p1.y, p2.x, p2.y, color, width * scale)
+end
+
 local function drawArray(item)
 	local width = item.params.width or 1
 	of.setLineWidth(width * scale)
@@ -44,7 +60,7 @@ end
 local function drawRectangle(item)
 	local signal = isSignal(item)
 	local control = isControl(item)
-	local x, y, w, h = ofx.toRect(item.points[1], item.points[2])
+	local x, y, w, h = points.toRect(item.points[1], item.points[2])
 
 	-- sliders, etc. TODO: only draw in editmode
 	if h == 1 then
@@ -73,23 +89,6 @@ local function drawRectangle(item)
 	else
 		mpd.drawRectangle(x, y, w, h, color, fill)
 	end
-end
-
-local function drawLine(item)
-	local cord = isCord(item)
-	local width = item.params.width or 1
-
-	local color = front
-
-	if (width > 1 and (cord or item.tags[1] == 'x')) then
-		color = '808093'
-	elseif cord then
-		color = '323232'
-	elseif item.params.fill then
-		color = item.params.fill
-	end
-	local p1, p2 = item.points[1], item.points[2]
-	mpd.drawLine(p1.x, p1.y, p2.x, p2.y, color, width * scale)
 end
 
 local function drawPolyLine(item)
@@ -125,12 +124,6 @@ local function drawPolyLine(item)
 	item.path:setStrokeHexColor(of.hexToInt(outline))
 	item.path:setStrokeWidth(scale);
 	item.path:draw()
-end
-
-local function drawOval(item)
-	local p1, p2 = item.points[1], item.points[2]
-	mpd.drawEllipse(p1.x, p1.y, p2.x, p2.y, item.params.outline or '000000',
-	                item.params.fill or '')
 end
 
 local inside = function(rect, item)

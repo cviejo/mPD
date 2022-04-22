@@ -37,17 +37,16 @@ _G.forEach = F.forEach
 _G.map = F.map
 _G.pipe = F.pipe
 _G.noop = F.noop
+_G.equals = F.equals
+_G.negate = F.negate
+_G.tern = F.tern
 
 _G.join = F.join
 _G.unapply = F.unapply
 _G.tryCatch = F.tryCatch
 _G.clamp = F.clamp
 
-TODO('remove lamda?')
-TODO('selected lines mesh')
-TODO('big grid')
 TODO('events/bind for externals')
+TODO('big grid')
 TODO("buttons don't change on press (except toggles), render them an image/vbo")
-TODO('the whole lastTouch,dragging = loc thing and scaleBegin when edimode = 1')
 TODO('render text to image/texture?')
-TODO('overwrite object outline when selected (blue)')

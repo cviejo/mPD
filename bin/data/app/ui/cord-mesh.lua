@@ -26,6 +26,16 @@ return function(hexColor)
 		index[#index + 1] = x.id
 	end
 
+	M.getPoints = function(x)
+		for i = 1, #index do
+			if index[i] == x.tag then
+				local v1 = mesh:getVertex(i * 2 - 2)
+				local v2 = mesh:getVertex(i * 2 - 1)
+				return {{x = v1.x, y = v1.y}, {x = v2.x, y = v2.y}}
+			end
+		end
+	end
+
 	M.update = function(x)
 		for i = 1, #index do
 			if index[i] == x.tag and x.points then

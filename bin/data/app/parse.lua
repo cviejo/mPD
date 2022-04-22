@@ -1,4 +1,14 @@
 TODO('parse arrays in [list *] or {*} format')
+local str = require('utils/string')
+local head, init, tail, last = str.head, str.init, str.tail, str.last
+
+local isKey = pipe(head, equals('-'))
+
+local tagFlags = {cord = true, signal = true, control = true}
+
+local function push(x, xs)
+	xs[#xs + 1] = x
+end
 
 local splitWords = function(s, nl)
 	local sep = '%S+'
@@ -9,14 +19,10 @@ local splitWords = function(s, nl)
 	local words = {}
 	for word in s:gmatch(sep) do
 		if word ~= '' then
-			words[#words + 1] = word
+			push(word, words)
 		end
 	end
 	return words
-end
-
-local isKey = function(s)
-	return s:sub(1, 1) == '-'
 end
 
 local parseColor = function(x)
@@ -25,43 +31,41 @@ local parseColor = function(x)
 	elseif x == 'blue' or x == 'Blue' then
 		return '0000ff'
 	end
-	return x:sub(2)
+	return tail(x)
 end
-
-local tagFlags = {cord = true, signal = true, control = true}
 
 local addTag = function(tag, match)
 	if tagFlags[tag] then
 		match[tag] = true
 	end
-	match.tags[#match.tags + 1] = tag
+	push(tag, match.tags)
 end
 
-local parseText = function(i, parts, match)
+local parseText = function(i, parts)
 	i = i + 1
-	local value = parts[i]:sub(2)
 	local text = ""
-	while (value:sub(-1) ~= '}') do
+	local value = tail(parts[i])
+	while (last(value) ~= '}') do
 		text = text .. value .. ' '
 		i = i + 1
 		value = parts[i]
 	end
-	return i, text .. value:sub(1, -2)
+	return i, text .. init(value)
 end
 
 local parseFont = function(i, parts, match)
-	parts[i + 1] = parts[i + 1]:sub(2)
+	parts[i + 1] = tail(parts[i + 1])
 	local font = ''
-	i, font = parseText(i, parts, match)
+	i, font = parseText(i, parts)
 	match.params.font = font
 	i = i + 1
 	local fontsize = parts[i]
 	if isKey(fontsize) then
-		match.params.fontsize = tonumber(fontsize:sub(2))
+		match.params.fontsize = tonumber(tail(fontsize))
 	else
 		match.params.fontsize = tonumber(fontsize)
 	end
-	while (parts[i]:sub(-1) ~= '}') do
+	while (last(parts[i]) ~= '}') do
 		i = i + 1
 	end
 	return i
@@ -73,14 +77,14 @@ local parseList = function(i, parts, match)
 	if (value == '[list') then
 		i = i + 1
 		value = parts[i]
-		while (value:sub(-1) ~= ']') do
+		while (last(value) ~= ']') do
 			addTag(value, match)
 			i = i + 1
 			value = parts[i]
 		end
-		addTag(value:sub(1, -2), match)
+		addTag(init(value), match)
 	else
-		match.tags[#match.tags + 1] = value
+		push(value, match.tags)
 		i = i + 1
 	end
 	return i
@@ -96,7 +100,7 @@ local parseParams = function(i, parts, match)
 		if (not isKey(parts[i])) then
 			i = i + 1
 		else
-			local key = parts[i]:sub(2)
+			local key = tail(parts[i])
 			local value = parts[i + 1]
 
 			if (key == 'fill' or key == 'outline') then
@@ -104,7 +108,7 @@ local parseParams = function(i, parts, match)
 				i = i + 2
 			elseif (key == 'text') then
 				local text = ''
-				i, text = parseText(i, parts, match)
+				i, text = parseText(i, parts)
 				match.params.text = text
 			elseif (key == 'font') then
 				i = parseFont(i, parts, match)
@@ -124,16 +128,17 @@ local parseParams = function(i, parts, match)
 end
 
 local parsePoints = function(i, parts, match)
-	local size = #parts
-
 	match.points = {}
+
+	local size = #parts
 
 	while (i < size) do
 		local x = tonumber(parts[i])
 		if x == nil then
 			break
 		end
-		match.points[#match.points + 1] = {x = x, y = tonumber(parts[i + 1])}
+		local point = {x = x, y = tonumber(parts[i + 1])}
+		push(point, match.points)
 		i = i + 2
 	end
 
@@ -168,7 +173,13 @@ return function(input)
 			parsePoints(4, parts, match)
 		elseif (cmd == 'itemconfigure') then
 			match.tag = parts[3]
-			parseParams(4, parts, match)
+			if (head(match.tag) == 'l') and parts[5] == 'blue' then
+				match.cmd = 'select-line'
+			elseif (head(match.tag) == 'l') and parts[5] == 'black' then
+				match.cmd = 'unselect-line'
+			else
+				parseParams(4, parts, match)
+			end
 		elseif (parts[1] == 'scale') then
 			match.cmd = parts[1]
 			match.type = parts[2]
@@ -193,9 +204,9 @@ return function(input)
 		elseif (parts[1] == 'pdtk_text_new') then
 			match.cmd = 'new-text'
 			match.canvasId = parts[2]
-			match.tags = {parts[3]:sub(2), parts[4], parts[5]:sub(1, -2)}
+			match.tags = {tail(parts[3]), parts[4], tail(parts[5])}
 			match.points = {{x = tonumber(parts[6]), y = tonumber(parts[7])}}
-			match.value = parts[8]:sub(2)
+			match.value = tail(parts[8])
 			local i = 9
 			while (parts[i] ~= '}') do
 				match.value = match.value .. ' ' .. parts[i]
@@ -208,7 +219,7 @@ return function(input)
 			match.cmd = 'set-text'
 			match.canvasId = parts[2]
 			match.tag = parts[3]
-			match.value = parts[4]:sub(2)
+			match.value = tail(parts[4])
 			local i = 5
 			while (parts[i] ~= '}') do
 				match.value = match.value .. ' ' .. parts[i]

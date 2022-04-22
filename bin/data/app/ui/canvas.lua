@@ -3,6 +3,7 @@ local text = require('utils/text')
 local drawItem = require('ui/draw-item')
 local s = require('utils/string')
 local fifo = require('utils/fifo')
+local points = require('utils/points')
 local cordMesh = require('ui/cord-mesh')
 local stack = require('utils/stack')
 local createViewport = require('ui/viewport')
@@ -37,7 +38,11 @@ return function(id, x, y)
 	local M = {id = id, updateNeeded = true}
 
 	local editmode = 0
-	local cords = {signal = cordMesh(0x808093), control = cordMesh(0x323232)}
+	local cords = {
+		signal = cordMesh(0x808093),
+		control = cordMesh(0x323232),
+		selected = nil
+	}
 	local viewport = createViewport(2)
 	local lastTouch = nil
 
@@ -51,6 +56,7 @@ return function(id, x, y)
 	end
 
 	local function delete(item)
+		cords.selected = nil
 		if cords.signal.delete(item) then return end
 		if cords.control.delete(item) then return end
 		M.items.delete(item.tag)
@@ -58,8 +64,18 @@ return function(id, x, y)
 	-- LuaFormatter on
 	local function move(tag, offset)
 		M.items.byTag(function(item)
-			item.points = map(ofx.moveBy(offset), item.points)
+			item.points = map(points.add(offset), item.points)
 		end, tag)
+	end
+
+	local function selectedCord(msg)
+		return {
+			cmd = 'line',
+			tag = msg.tag,
+			tags = {},
+			points = cords.control.getPoints(msg) or cords.signal.getPoints(msg),
+			params = {width = 2, fill = '0000ff'}
+		}
 	end
 
 	local function updateGrid()
@@ -101,7 +117,7 @@ return function(id, x, y)
 			updateGrid()
 		elseif touchUp then
 			pd.queue(id, 'mouseup', touch.x, touch.y, '1')
-		elseif touchMoved and lastTouch and not ofx.equals(touch, lastTouch) then
+		elseif touchMoved and lastTouch and not points.equals(touch, lastTouch) then
 			lastTouch = touch
 			pd.queue(id, 'motion', touch.x, touch.y, '0')
 		elseif touchDown then
@@ -134,6 +150,9 @@ return function(id, x, y)
 		cords.control.draw()
 		of.setLineWidth(2 * scale)
 		cords.signal.draw()
+		if (cords.selected) then
+			drawItem(viewport, cords.selected)
+		end
 
 		M.items.forEach(drawItem(viewport))
 
@@ -143,6 +162,7 @@ return function(id, x, y)
 	end, viewport)
 
 	M.message = function(msg)
+		console.log("msg", msg.message);
 		M.updateNeeded = true
 
 		if msg.cmd == 'array' then
@@ -151,6 +171,12 @@ return function(id, x, y)
 		elseif msg.cmd == 'polyline' or msg.cmd == 'polygon' then
 			msg.path = ofx.pointsToPath(msg.points)
 			msg.points = {}
+		elseif msg.cmd == 'select-line' then
+			cords.selected = selectedCord(msg)
+			return
+		elseif msg.cmd == 'unselect-line' then
+			cords.selected = nil
+			return
 		end
 
 		if msg.cmd == 'coords' or msg.cmd == 'set-text' or msg.cmd == 'itemconfigure' then

@@ -28,8 +28,8 @@ function setup()
 	end
 
 	if (success) then
-		-- pd.queue('pd open help.pd', ofx.getPath('ignore.patches')) --
-		pd.queue('pd open main.pd', ofx.getPath('ignore.patches/filters')) --
+		pd.queue('pd open test.pd', ofx.getPath('ignore.patches')) --
+		-- pd.queue('pd open main.pd', ofx.getPath('ignore.patches/filters')) --
 	end
 end
 
