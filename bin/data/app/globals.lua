@@ -51,4 +51,3 @@ TODO("buttons don't change on press (except toggles), render them an image/vbo")
 TODO('the whole lastTouch,dragging = loc thing and scaleBegin when edimode = 1')
 TODO('render text to image/texture?')
 TODO('overwrite object outline when selected (blue)')
-

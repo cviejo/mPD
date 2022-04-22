@@ -1,5 +1,4 @@
-local parseText = TODO('parse text in curly braces')
-local parseList = TODO('parse arrays in [list *] or {*} format')
+TODO('parse arrays in [list *] or {*} format')
 
 local splitWords = function(s, nl)
 	local sep = '%S+'
@@ -38,6 +37,55 @@ local addTag = function(tag, match)
 	match.tags[#match.tags + 1] = tag
 end
 
+local parseText = function(i, parts, match)
+	i = i + 1
+	local value = parts[i]:sub(2)
+	local text = ""
+	while (value:sub(-1) ~= '}') do
+		text = text .. value .. ' '
+		i = i + 1
+		value = parts[i]
+	end
+	return i, text .. value:sub(1, -2)
+end
+
+local parseFont = function(i, parts, match)
+	parts[i + 1] = parts[i + 1]:sub(2)
+	local font = ''
+	i, font = parseText(i, parts, match)
+	match.params.font = font
+	i = i + 1
+	local fontsize = parts[i]
+	if isKey(fontsize) then
+		match.params.fontsize = tonumber(fontsize:sub(2))
+	else
+		match.params.fontsize = tonumber(fontsize)
+	end
+	while (parts[i]:sub(-1) ~= '}') do
+		i = i + 1
+	end
+	return i
+end
+
+local parseList = function(i, parts, match)
+	i = i + 1
+	local value = parts[i]
+	if (value == '[list') then
+		i = i + 1
+		value = parts[i]
+		while (value:sub(-1) ~= ']') do
+			addTag(value, match)
+			i = i + 1
+			value = parts[i]
+		end
+		addTag(value:sub(1, -2), match)
+	else
+		match.tags[#match.tags + 1] = value
+		i = i + 1
+	end
+	return i
+end
+
 local parseParams = function(i, parts, match)
 	local size = #parts
 
@@ -54,26 +102,14 @@ local parseParams = function(i, parts, match)
 			if (key == 'fill' or key == 'outline') then
 				match.params[key] = parseColor(value)
 				i = i + 2
-				-- elseif (key == 'font') then
-				-- while (value:sub(-1) ~= '') do
-				-- 	addTag(value, match)
-				-- 	i = i + 1
-				-- 	value = parts[i]
-				-- end
+			elseif (key == 'text') then
+				local text = ''
+				i, text = parseText(i, parts, match)
+				match.params.text = text
+			elseif (key == 'font') then
+				i = parseFont(i, parts, match)
 			elseif (key == 'tags') then
-				if (value == '[list') then
-					i = i + 2
-					value = parts[i]
-					while (value:sub(-1) ~= ']') do
-						addTag(value, match)
-						i = i + 1
-						value = parts[i]
-					end
-					addTag(value:sub(1, -2), match)
-				else
-					match.tags[#match.tags + 1] = value
-					i = i + 1
-				end
+				i = parseList(i, parts, match)
 			elseif (key == 'width') then
 				match.params[key] = tonumber(value)
 				i = i + 2

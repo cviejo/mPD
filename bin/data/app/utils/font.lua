@@ -9,6 +9,7 @@ return function(name, size)
 
 	local M = {}
 
+	M.size = size
 	M.lineHeight = size
 
 	M.setLineHeight = function(x)
@@ -24,3 +25,4 @@ return function(name, size)
 
 	return M
 end
+

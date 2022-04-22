@@ -19,13 +19,19 @@ font.setLineHeight(14)
 
 local function drawText(item)
 	local x, y = item.points[1].x, item.points[1].y
-	if (item.cmd == 'new-text') then
+	setHex((item.params and item.params.fill) or '141414')
+	if (item.params and item.params.fontsize) then
+		y = y + item.params.fontsize / 3
+		local fontScale = (item.params.fontsize - 2) / font.size
+		of.pushMatrix()
+		of.translate(x, y)
+		of.scale(fontScale, fontScale)
+		font.drawString(item.value, 0, 0)
+		of.popMatrix()
+	else
 		y = y + font.lineHeight - 3
-	elseif (item.font) then
-		y = y + item.font.size / 2
+		font.drawString(item.value, x, y)
 	end
-	of.setColor(20)
-	font.drawString(item.value, x, y)
 end
 
 local function drawArray(item)
