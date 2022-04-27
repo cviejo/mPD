@@ -1,5 +1,6 @@
 local Button = require('ui/button')
 local toggleInt = require('utils/toggle-int')
+local points = require('utils/points')
 
 return function(id, x, y, size)
 	local M = Button(id, x, y, size)
@@ -19,7 +20,7 @@ return function(id, x, y, size)
 	end
 
 	M.touch = function(touch)
-		local inside = M.rect:inside(touch)
+		local inside = points.inside(M.rect, touch)
 
 		if inside then
 			M.value = toggleInt(M.value)

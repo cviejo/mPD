@@ -180,6 +180,11 @@ return function(input)
 			else
 				parseParams(4, parts, match)
 			end
+		elseif (parts[1] == 'touch') then
+			match.cmd = parts[1]
+			match.type = tonumber(parts[2])
+			match.x = tonumber(parts[3])
+			match.y = tonumber(parts[4])
 		elseif (parts[1] == 'scale') then
 			match.cmd = parts[1]
 			match.type = parts[2]
@@ -230,5 +235,7 @@ return function(input)
 			return nil
 		end
 		return match
+	elseif input == 'update-start' or input == 'update-end' then
+		return {cmd = input}
 	end
 end

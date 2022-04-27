@@ -1,7 +1,7 @@
 #pragma once
 
+#include <vector>
 #include "mpd.h"
-#include <queue>
 #include "ofxLua.h"
 #if defined(TARGET_ANDROID)
 #include "ofxAndroid.h"
@@ -10,32 +10,46 @@
 #include "g_canvas.h"
 #include "graphics.h"
 
+using namespace mpd;
+
 extern "C" {
 	t_object* pd_checkobject(t_pd* x);
 	t_canvas* canvas_getcurrent(void);
 	t_gobj*
 	canvas_findhitbox(t_canvas* x, int xpos, int ypos, int* x1p, int* y1p, int* x2p, int* y2p);
-	int obj_noutlets(const t_object* x);
 	int luaopen_mpd(lua_State* L);
 	int luaopen_audio(lua_State* L);
+	int obj_noutlets(const t_object* x);
 	void sys_lock(void);
 	void sys_unlock(void);
 }
 
-using namespace mpd;
-
-void pushGlobals();
-
 ofMutex mtx;
 
 auto lua = ofxLua();
-auto msgs = queue<string>();
+auto msgs = vector<string>();
 auto partial = string("");
 auto scaling = false;
 auto touchable = true;  // limits touch rate to draw rate
 
 //--------------------------------------------------------------------
-void luaMessage(const string& x) {
+void push(const string& x) {
+	mtx.lock();
+	msgs.push_back(x);
+	mtx.unlock();
+}
+
+//--------------------------------------------------------------------
+vector<string> pull() {
+	mtx.lock();
+	auto pulled = msgs;
+	msgs.clear();
+	mtx.unlock();
+	return pulled;
+}
+
+//--------------------------------------------------------------------
+void message(const string& x) {
 	auto message = ofMessage(x);
 	lua.scriptGotMessage(message);
 }
@@ -56,15 +70,13 @@ void gui_hook(char* msg) {
 		str.pop_back();
 	}
 	if (str.back() != '\\') {  // ignore multiline for now
-		mtx.lock();
 		if (!partial.empty()) {
 			partial += str;
-			msgs.push(partial);
+			push(partial);
 			partial = "";
 		} else {
-			msgs.push(str);
+			push(str);
 		}
-		mtx.unlock();
 	} else {
 		str.pop_back();
 		// not super sure about the space at the end, so far it only fixes this:
@@ -95,19 +107,24 @@ void mpd::reload() {
 	lua.init(true);
 	luaopen_mpd(lua);
 	luaopen_audio(lua);
+	lua.setString("Target", "android");
 	lua.doScript("app/main.lua", true);
-	pushGlobals();
 	lua.scriptSetup();
 }
 
 //--------------------------------------------------------------------
 void mpd::update() {
-	mtx.lock();
-	while (!msgs.empty()) {
-		luaMessage(msgs.front());
-		msgs.pop();
+	auto pulled = pull();
+	auto count = pulled.size();
+	if (count == 0) {
+		return;
 	}
-	mtx.unlock();
+	// ofLogVerbose("update") << count << "------------------------------";
+	message("update-start");
+	for (auto x : pulled) {
+		message(x);
+	}
+	message("update-end");
 }
 
 //--------------------------------------------------------------------
@@ -125,7 +142,9 @@ void mpd::exit() {
 
 //--------------------------------------------------------------------
 void mpd::key(ofKeyEventArgs& args) {
+#if !defined(TARGET_ANDROID)
 	lua.scriptKeyPressed(args.key);
+#endif
 }
 
 //--------------------------------------------------------------------
@@ -135,7 +154,9 @@ void mpd::touch(ofTouchEventArgs& touch) {
 	}
 	if (touch.type != ofTouchEventArgs::move || touchable) {
 		touchable = false;
-		lua.scriptTouchMoved(touch);  // same fn for all events
+		auto message = "touch " + ofToString(touch.type) + " " + " " + ofToString(touch.x) + " " +
+		               ofToString(touch.y);
+		push(message);
 	}
 }
 
@@ -143,9 +164,7 @@ void mpd::touch(ofTouchEventArgs& touch) {
 void mpd::scale(const string& type, float value, int x, int y) {
 	auto message =
 	   "scale " + type + " " + ofToString(value) + " " + ofToString(x) + " " + ofToString(y);
-	mtx.lock();
-	msgs.push(message);
-	mtx.unlock();
+	push(message);
 }
 
 //--------------------------------------------------------------------
@@ -202,88 +221,3 @@ PdNode* mpd::getNode(int x, int y) {
 
 	return result;
 }
-
-//--------------------------------------------------------------------
-void pushGlobals() {
-#if defined(TARGET_ANDROID)
-	lua.setString("Target", "android");
-#endif
-	// 	auto devices = soundStream.getDeviceList();
-	// 	lua.newTable("devices");
-	// 	lua.pushTable("devices");
-	// 	for (size_t i = 0; i < devices.size(); i++) {
-	// 		auto device = devices[i];
-	// 		lua.newTable(i + 1);
-	// 		lua.pushTable(i + 1);
-	// 		lua.setString("name", device.name);
-	// 		lua.setNumber("id", device.deviceID);
-	// 		lua.setNumber("inputChannels", device.inputChannels);
-	// 		lua.setNumber("outputChannels", device.outputChannels);
-	// 		lua.setBool("isDefaultInput", device.isDefaultInput);
-	// 		lua.setBool("isDefaultOutput", device.isDefaultOutput);
-	// 		lua.newTable("sampleRates");
-	// 		lua.pushTable("sampleRates");
-	// 		for (size_t j = 0; j < device.sampleRates.size(); j++) {
-	// 			lua.setNumber(j + 1, device.sampleRates[j]);
-	// 		}
-	// 		lua.popTable();
-	// 		lua.popTable();
-	// 	}
-	// 	lua.popTable();
-}
-
-// update
-//  auto length = queue.size();
-//  auto copy = msgs;
-//  msgs.clear();
-//  mtx.unlock();
-//  auto size = copy.size();
-//  if (size > 1) {
-//  	ofLogVerbose("buffer size") << copy.size();
-//  }
-//  for (auto msg : copy) {
-//  	luaMessage(msg);
-//  }
-
-// //--------------------------------------------------------------------
-// void mpd::drawRectangle(int x, int y, int w, int h, const string& color, const string& fill) {
-// 	drawRectangle(x, y, w, h, color, fill);
-// }
-
-// if (type == "scaleBegin") {
-// 	scaling = true;
-// }
-// if (type == "scaleEnd") {
-// 	scaling = false;
-// }
-// mtx.lock();
-// if (type == "scale" || type == "scroll") {
-// 	float scale = (float)lua.getNumber("Scale", 1);
-// 	if (type == "scroll") {
-// 		scale +=  value * 0.1f;
-// 	} else if (type == "scale") {
-// 		scale *=  value;
-// 	}
-// 	lua.setNumber("Scale", scale);
-// 	lua.setBool("UpdateNeeded", true);
-// }
-// else if (type == "scaleBegin") {
-// 	lastTouch.type = ofTouchEventArgs::up;
-// 	lua.scriptTouchMoved(lastTouch); // finalize touch
-// }
-// mtx.unlock();
-//--------------------------------------------------------------------
-// Patch mpd::openPatch(const string& file, const string& folder) {
-// 	Patch patch = base.openPatch(file, folder);
-// if(!patch.isValid()) {
-// 	ofLogError("Pd") << "opening patch \"" + file + "\" failed";
-// }
-// else {
-// 	canvas_map((t_canvas*)patch.handle(), 1);
-// }
-// 	return patch;
-// }
-// //--------------------------------------------------------------------
-// void mpd::closePatch(Patch& patch) {
-// 	base.closePatch(patch);
-// }

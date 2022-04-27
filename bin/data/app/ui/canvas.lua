@@ -34,19 +34,28 @@ local function init(canvasId)
 	pd.queue(canvasId, 'editmode', 1)
 end
 
-return function(id, x, y)
-	local M = {id = id, updateNeeded = true}
-
-	local editmode = 0
-	local cords = {
+local function createCords()
+	return {
 		signal = cordMesh(0x808093),
 		control = cordMesh(0x323232),
 		selected = nil
 	}
+end
+
+return function(id, position)
+	local M = {id = id, updateNeeded = true, items = stack()}
+
+	local editmode = 0
+	local cords = createCords()
 	local viewport = createViewport(2)
 	local lastTouch = nil
 
 	init(id)
+
+	local function reset()
+		cords = createCords()
+		M.items = stack()
+	end
 
 	-- LuaFormatter off
 	local function update(item)
@@ -73,8 +82,8 @@ return function(id, x, y)
 			cmd = 'line',
 			tag = msg.tag,
 			tags = {},
-			points = cords.control.getPoints(msg) or cords.signal.getPoints(msg),
-			params = {width = 2, fill = '0000ff'}
+			params = {width = 2, fill = '0000ff'},
+			points = cords.control.getPoints(msg) or cords.signal.getPoints(msg)
 		}
 	end
 
@@ -91,22 +100,19 @@ return function(id, x, y)
 		updateGrid()
 	end
 
-	M.items = stack()
-
 	M.touch = function(touch)
 		if viewport.scaling then
 			return
 		end
 
 		-- take a look into this, should probably land here already offsetted
-		local loc = viewport.screenToCanvas({x = touch.x - x, y = touch.y - y})
+		local loc = viewport.screenToCanvas(points.subtract(touch, position))
+		local x = math.floor(loc.x)
+		local y = math.floor(loc.y)
 
-		touch.x = math.floor(loc.x)
-		touch.y = math.floor(loc.y)
-
-		local touchDown = touch.type == of.TouchEventArgs_down
-		local touchUp = touch.type == of.TouchEventArgs_up
-		local touchMoved = touch.type == of.TouchEventArgs_move
+		local touchDown = touch.type == 0 -- of.TouchEventArgs_down
+		local touchUp = touch.type == 1 -- of.TouchEventArgs_up
+		local touchMoved = touch.type == 2 -- of.TouchEventArgs_move
 
 		-- events.event(touch, items)
 
@@ -116,29 +122,29 @@ return function(id, x, y)
 			viewport.drag(loc)
 			updateGrid()
 		elseif touchUp then
-			pd.queue(id, 'mouseup', touch.x, touch.y, '1')
+			pd.queue(id, 'mouseup', x, y, '1')
 		elseif touchMoved and lastTouch and not points.equals(touch, lastTouch) then
-			lastTouch = touch
-			pd.queue(id, 'motion', touch.x, touch.y, '0')
+			lastTouch = {x = x, y = y}
+			pd.queue(id, 'motion', x, y, '0')
 		elseif touchDown then
-			local node = mpd.getNode(touch.x, touch.y)
+			local node = mpd.getNode(x, y)
 			local selection = mpd.selectionActive()
 
 			if editmode == 0 and not node and not viewport.dragging then
 				viewport.dragging = loc
 			elseif editmode == 1 and node and not selection then
-				local iox = getOutletX(node, touch.x)
+				local iox = getOutletX(node, x)
 				pd.queue(id, 'mouse', node.x + iox, node.y + node.height, '1 0')
 			else
-				pd.queue(id, 'mouse', touch.x, touch.y, '1 0')
+				pd.queue(id, 'mouse', x, y, '1 0')
 			end
 
-			lastTouch = touch
+			lastTouch = {x = x, y = y}
 		end
 	end
 
 	M.draw = withViewport(function(scale)
-		of.translate(x / scale, y / scale)
+		of.translate(position.x / scale, position.y / scale)
 		of.background(back)
 
 		if editmode == 1 and scale >= 1 then
@@ -162,7 +168,6 @@ return function(id, x, y)
 	end, viewport)
 
 	M.message = function(msg)
-		console.log("msg", msg.message);
 		M.updateNeeded = true
 
 		if msg.cmd == 'array' then
@@ -182,7 +187,11 @@ return function(id, x, y)
 		if msg.cmd == 'coords' or msg.cmd == 'set-text' or msg.cmd == 'itemconfigure' then
 			update(msg)
 		elseif msg.cmd == 'delete' then
-			delete(msg)
+			if msg.tag == 'all' then
+				reset()
+			else
+				delete(msg)
+			end
 		elseif msg.cmd == 'scale' then
 			setScale(msg)
 		elseif msg.cmd == 'editmode' then

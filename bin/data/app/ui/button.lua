@@ -1,3 +1,5 @@
+local points = require('utils/points')
+
 return function(id, x, y, size)
 	local M = {}
 
@@ -13,7 +15,7 @@ return function(id, x, y, size)
 	end
 
 	M.touch = function(touch)
-		return M.rect:inside(touch)
+		return points.inside(M.rect, touch)
 	end
 
 	M.draw = function()
@@ -27,3 +29,5 @@ return function(id, x, y, size)
 
 	return M
 end
+
+-- return M.rect:inside(touch)

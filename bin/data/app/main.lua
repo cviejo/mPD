@@ -11,49 +11,18 @@ local events = require('events')
 
 local canvas = nil
 
-function setup()
-	of.setLogLevel(of.LOG_VERBOSE)
-	of.background(255)
-	of.setVerticalSync(false) -- needed for fps > 60 on desktop
-	of.setFrameRate(125)
-	of.enableSmoothing()
-	of.enableAntiAliasing()
-
-	local success = false
-
-	if Target == 'android' then
-		success = audio.init(2, 2, 44100)
-	else
-		success = audio.init("Pro Microphone", "Pro Speakers", 48000)
-	end
-
-	if (success) then
-		pd.queue('pd open test.pd', ofx.getPath('ignore.patches')) --
-		-- pd.queue('pd open main.pd', ofx.getPath('ignore.patches/filters')) --
-	end
-end
-
 local function drawCanvas()
 	if not canvas then
 		return
 	elseif canvas.updateNeeded then
 		frame.render(canvas.draw) --
-	elseif canvas then
-		canvas.items.cleanup()
 	end
 	frame.draw(0, 0)
 end
 
-function draw()
-	pd.flush()
-	drawCanvas()
-	docks.draw()
-	of.setColor(0, 0, 0, 100)
-	text.draw('fps: ' .. of.getFrameRate(), 50, 50)
-end
-
 local function touchEvent(touch)
-	if (touch.type == of.TouchEventArgs_down) then
+	-- if (touch.type == of.TouchEventArgs_down) then
+	if (touch.type == 0) then
 		local id, value = docks.touch(touch)
 		if (id) then
 			if not canvas then
@@ -77,7 +46,40 @@ local function touchEvent(touch)
 	end
 end
 
-function keyPressed(key)
+_G.setup = function()
+	of.setLogLevel(of.LOG_VERBOSE)
+	of.background(255)
+	of.setVerticalSync(false) -- needed for fps > 60 on desktop
+	of.setFrameRate(125)
+	of.enableSmoothing()
+	of.enableAntiAliasing()
+
+	local success = false
+
+	if Target == 'android' then
+		success = audio.init(2, 2, 44100)
+	else
+		success = audio.init("Pro Microphone", "Pro Speakers", 48000)
+	end
+
+	if (success) then
+		-- pd.queue('pd open sigbinops-help.pd', ofx.getPath('ignore.patches')) --
+		-- pd.queue('pd open test.pd', ofx.getPath('ignore.patches')) --
+		pd.queue('pd open main.pd', ofx.getPath('ignore.patches/filters')) --
+		-- pd.queue('pd open two-objects.pd', ofx.getPath('ignore.patches')) --
+	end
+end
+
+_G.draw = function()
+	pd.flush()
+	drawCanvas()
+	docks.draw()
+	of.setColor(0, 0, 0, 100)
+	text.draw('fps: ' .. of.getFrameRate(), 50, 50)
+	text.draw('gc: ' .. collectgarbage("count"), 50, 120)
+end
+
+_G.keyPressed = function(key)
 	if (s.keyEq('e', key)) then
 		pd.queue(canvas.id, 'editmode 0')
 	elseif (s.keyEq('q', key)) then
@@ -92,21 +94,28 @@ function keyPressed(key)
 	end
 end
 
-function gotMessage(msg)
+-- _G.gotMessage = tryCatch(function(msg)
+_G.gotMessage = function(msg)
 	local parsed = parse(msg)
 
 	if not parsed then
 		return
+	elseif parsed.cmd == 'touch' then
+		touchEvent(parsed)
 	elseif parsed.cmd == 'new-canvas' then
-		canvas = Canvas(parsed.canvasId, 0, 0)
+		canvas = Canvas(parsed.canvasId, {x = 0, y = 0})
 	elseif parsed.cmd == 'bind' then
 		events.bind(parsed)
+	elseif msg == 'update-start' then
+		return
+	elseif msg == 'update-end' and canvas then
+		canvas.items.cleanup()
 	elseif canvas then
 		canvas.message(parsed)
 	end
 end
 
-function exit()
+_G.exit = function()
 	frame.clear()
 	if canvas then
 		pd.send(canvas.id .. 'menuclose')
@@ -114,4 +123,4 @@ function exit()
 	-- https://github.com/cviejo/mPD/blob/main/src/libs/pd/pure-data/src/g_editor.c#L3399
 end
 
-touchMoved = tryCatch(touchEvent, logging.error)
+-- touchMoved = touchEvent
