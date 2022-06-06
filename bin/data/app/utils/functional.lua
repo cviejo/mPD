@@ -15,6 +15,10 @@ local curry2 = function(fn)
 	end
 end
 
+_G.t = function(...)
+	print(...)
+end
+
 local curry3 = function(fn)
 	local delayedA = nil
 	local delayedFn = curry2(function(b, c)
@@ -163,13 +167,6 @@ M.pipe = function(...)
 	end
 end
 
-M.hasTag = function(tag)
-	-- return M.pipe(M.prop('tags'), M.includes(tag))
-	return function(x)
-		return (x.tags and M.includes(tag, x.tags))
-	end
-end
-
 M.noop = function()
 end
 
@@ -199,5 +196,49 @@ M.clamp = M.curry(function(min, max, x)
 		return x
 	end
 end)
+
+M.pick = curry2(function(fields, obj)
+	local result = {}
+	M.forEach(function(field)
+		local value = obj[field]
+		if (value) then
+			result[field] = value
+		end
+	end, fields)
+	return result
+end)
+
+M.keys = function(x)
+	local result = {}
+	for key, _ in pairs(x) do
+		result[#result + 1] = key
+	end
+	return result
+end
+
+-- not pure, but for convenience let's keep them here
+M.assign = curry2(function(target, source)
+	for key, value in pairs(source) do
+		target[key] = value
+	end
+end)
+
+M.push = function(x, xs)
+	xs[#xs + 1] = x
+end
+-- not pure, but for convenience let's keep them here
+
+M.merge = curry2(function(a, b)
+	local result = {}
+	M.assign(result, a)
+	M.assign(result, b)
+	return result
+end)
+
+M.complement = function(fn)
+	return function(...)
+		return not fn(...)
+	end
+end
 
 return M

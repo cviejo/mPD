@@ -1,3 +1,5 @@
+local forEach = require('utils/functional').forEach
+
 local M = {}
 
 M.getPath = of.FilePath.getAbsolutePath

@@ -1,5 +1,5 @@
-local inspect = require('libs.inspect')
-local F = require('utils.functional')
+local inspect = require('libs/inspect')
+local F = require('utils/functional')
 
 local map, unless, join = F.map, F.unless, F.join
 
@@ -32,7 +32,7 @@ local log = function(logLevel)
 	return function(...)
 		local content = join('\t', toPrintable({...}))
 
-		if _G.Target == 'android' then -- for logcat filtering
+		if _G.target == 'android' then -- for logcat filtering
 			content = '[mPD] ' .. content
 		end
 

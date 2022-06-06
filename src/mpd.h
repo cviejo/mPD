@@ -48,11 +48,13 @@ namespace mpd {
 
 	void key(ofKeyEventArgs& args);
 	void touch(ofTouchEventArgs& touch);
-	void scale(const string& type, float value, int x, int y);
 
 	void exit();
 	void reload();
 	float getDPI();
+
+	void push(const string& push);
+	void cmd(const string& cmd);
 
 	PdNode* getNode(int x, int y);
 	t_gobj* findBox(int x, int y);

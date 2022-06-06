@@ -1,6 +1,5 @@
 local pd = require('pd')
-local f = require('utils.functional')
-local hasTag = f.hasTag
+local hasTag = require('utils/has-tag')
 
 local M = {}
 

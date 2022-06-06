@@ -431,6 +431,11 @@ extern void text_save(t_gobj *z, t_binbuf *b);
 t_class *class_new(t_symbol *s, t_newmethod newmethod, t_method freemethod,
     size_t size, int flags, t_atomtype type1, ...)
 {
+    // mPD
+    if (s) {
+        sys_vgui("pd-class %s \n", s->s_name);
+    }
+
     va_list ap;
     t_atomtype vec[MAXPDARG+1], *vp = vec;
     int count = 0, i;

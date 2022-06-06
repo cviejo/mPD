@@ -1,3 +1,7 @@
+local F = require('utils/functional')
+
+local curry = F.curry
+
 local M = {}
 
 M.equals = curry(function(p1, p2)

@@ -3366,12 +3366,6 @@ static int _wrap_touch(lua_State* L) { int SWIG_arg = 0; ofTouchEventArgs *arg1 
   if (!SWIG_IsOK(SWIG_ConvertPtr(L,1,(void**)&arg1,SWIGTYPE_p_ofTouchEventArgs,0))){
     SWIG_fail_ptr("touch",1,SWIGTYPE_p_ofTouchEventArgs); }  mpd::touch(*arg1); return SWIG_arg; if(0) SWIG_fail; fail:
   lua_error(L); return SWIG_arg; }
-static int _wrap_scale(lua_State* L) { int SWIG_arg = 0; string *arg1 = 0 ; float arg2 ; int arg3 ; int arg4 ; string temp1 ;
-  SWIG_check_num_args("mpd::scale",4,4) if(!lua_isstring(L,1)) SWIG_fail_arg("mpd::scale",1,"string const &");
-  if(!lua_isnumber(L,2)) SWIG_fail_arg("mpd::scale",2,"float"); if(!lua_isnumber(L,3)) SWIG_fail_arg("mpd::scale",3,"int");
-  if(!lua_isnumber(L,4)) SWIG_fail_arg("mpd::scale",4,"int"); temp1.assign(lua_tostring(L,1),lua_rawlen(L,1)); arg1=&temp1;
-  arg2 = (float)lua_tonumber(L, 2); arg3 = (int)lua_tonumber(L, 3); arg4 = (int)lua_tonumber(L, 4);
-  mpd::scale((std::string const &)*arg1,arg2,arg3,arg4); return SWIG_arg; if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
 static int _wrap_exit(lua_State* L) { int SWIG_arg = 0; SWIG_check_num_args("mpd::exit",0,0) mpd::exit(); return SWIG_arg;
   if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
 static int _wrap_reload(lua_State* L) { int SWIG_arg = 0; SWIG_check_num_args("mpd::reload",0,0) mpd::reload(); return SWIG_arg;
@@ -3379,6 +3373,14 @@ static int _wrap_reload(lua_State* L) { int SWIG_arg = 0; SWIG_check_num_args("m
 static int _wrap_getDPI(lua_State* L) { int SWIG_arg = 0; float result; SWIG_check_num_args("mpd::getDPI",0,0)
   result = (float)mpd::getDPI(); lua_pushnumber(L, (lua_Number) result); SWIG_arg++; return SWIG_arg; if(0) SWIG_fail; fail:
   lua_error(L); return SWIG_arg; }
+static int _wrap_push(lua_State* L) { int SWIG_arg = 0; string *arg1 = 0 ; string temp1 ; SWIG_check_num_args("mpd::push",1,1)
+  if(!lua_isstring(L,1)) SWIG_fail_arg("mpd::push",1,"string const &");
+  temp1.assign(lua_tostring(L,1),lua_rawlen(L,1)); arg1=&temp1; mpd::push((std::string const &)*arg1); return SWIG_arg;
+  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
+static int _wrap_cmd(lua_State* L) { int SWIG_arg = 0; string *arg1 = 0 ; string temp1 ; SWIG_check_num_args("mpd::cmd",1,1)
+  if(!lua_isstring(L,1)) SWIG_fail_arg("mpd::cmd",1,"string const &");
+  temp1.assign(lua_tostring(L,1),lua_rawlen(L,1)); arg1=&temp1; mpd::cmd((std::string const &)*arg1); return SWIG_arg;
+  if(0) SWIG_fail; fail: lua_error(L); return SWIG_arg; }
 static int _wrap_getNode(lua_State* L) { int SWIG_arg = 0; int arg1 ; int arg2 ; PdNode *result = 0 ;
   SWIG_check_num_args("mpd::getNode",2,2) if(!lua_isnumber(L,1)) SWIG_fail_arg("mpd::getNode",1,"int");
   if(!lua_isnumber(L,2)) SWIG_fail_arg("mpd::getNode",2,"int"); arg1 = (int)lua_tonumber(L, 1); arg2 = (int)lua_tonumber(L, 2);
@@ -3447,10 +3449,11 @@ static swig_lua_method swig_SwigModule_methods[]= {
     { "update", _wrap_update},
     { "key", _wrap_key},
     { "touch", _wrap_touch},
-    { "scale", _wrap_scale},
     { "exit", _wrap_exit},
     { "reload", _wrap_reload},
     { "getDPI", _wrap_getDPI},
+    { "push", _wrap_push},
+    { "cmd", _wrap_cmd},
     { "getNode", _wrap_getNode},
     { "findBox", _wrap_findBox},
     { "outletCount", _wrap_outletCount},

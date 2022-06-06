@@ -1,3 +1,7 @@
+local F = require('utils/functional')
+
+local pipe, join, unapply = F.pipe, F.join, F.unapply
+
 local M = {}
 
 local queue = ''

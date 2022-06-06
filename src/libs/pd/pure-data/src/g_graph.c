@@ -939,6 +939,11 @@ static void graph_displace(t_gobj *z, t_glist *glist, int dx, int dy)
         text_widgetbehavior.w_displacefn(z, glist, dx, dy);
     else
     {
+        // mPD
+        // performance of this is horrible for patches with a lot of
+        // canvases/graphs. basically deletes and redraws everything 
+        // inside sending a couple thousand messages. could be optimzed
+        // to just move?
         x->gl_obj.te_xpix += dx;
         x->gl_obj.te_ypix += dy;
         glist_redraw(x);

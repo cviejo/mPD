@@ -23,6 +23,17 @@ return function(name, size)
 		of.scale(printScale, printScale)
 	end
 
+	M.getStringBounds = function(str, x, y)
+		-- of.scale(1 / printScale, 1 / printScale)
+		local rect = font:getStringBoundingBox(str, x or 0, y or 0)
+		return {
+			x = rect.x / printScale,
+			y = rect.y / printScale,
+			width = rect.width / printScale,
+			height = rect.height / printScale
+		}
+	end
+
 	return M
 end
 

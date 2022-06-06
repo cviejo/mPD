@@ -5,7 +5,6 @@
 #if defined(TARGET_ANDROID)
 #include "ofxAndroid.h"
 #endif
-#include "./utils/PathWatcher.h"
 
 #if defined(TARGET_ANDROID)
 class ofApp : public ofxAndroidApp, ofxLuaListener {
@@ -14,8 +13,6 @@ class ofApp : public ofBaseApp, ofxLuaListener {
 #endif
 
 public:
-	PathWatcher watcher;
-
 	void setup();
 	void update();
 	void draw();
@@ -37,6 +34,7 @@ public:
 	bool scale(ofxAndroidScaleEventArgs& aArgs);
 	bool scaleEnd(ofxAndroidScaleEventArgs& aArgs);
 	void swipe(ofxAndroidSwipeDir swipeDir, int id);
+	void orientationChanged(ofOrientation& x);
 #else
 	void mousePressed(int x, int y, int button);
 	void mouseReleased(int x, int y, int button);

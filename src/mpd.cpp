@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include "mpd.h"
+#include <vector>
 #include "ofxLua.h"
 #if defined(TARGET_ANDROID)
 #include "ofxAndroid.h"
@@ -28,16 +28,10 @@ ofMutex mtx;
 
 auto lua = ofxLua();
 auto msgs = vector<string>();
+auto classes = vector<string>();
 auto partial = string("");
 auto scaling = false;
 auto touchable = true;  // limits touch rate to draw rate
-
-//--------------------------------------------------------------------
-void push(const string& x) {
-	mtx.lock();
-	msgs.push_back(x);
-	mtx.unlock();
-}
 
 //--------------------------------------------------------------------
 vector<string> pull() {
@@ -61,7 +55,11 @@ bool includes(const string& needle, char* hay) {
 
 //--------------------------------------------------------------------
 void gui_hook(char* msg) {
-	if (includes("pdtk_canvas_getscroll", msg) || includes("raise cord", msg)) {
+	if (includes("pd-class", msg)) {
+		auto parts = ofSplitString(msg, " ");
+		classes.push_back(parts[1]);
+		return;
+	} else if (includes("pdtk_canvas_getscroll", msg) || includes("raise cord", msg)) {
 		return;
 	}
 	string str = msg;
@@ -107,24 +105,23 @@ void mpd::reload() {
 	lua.init(true);
 	luaopen_mpd(lua);
 	luaopen_audio(lua);
-	lua.setString("Target", "android");
 	lua.doScript("app/main.lua", true);
+#if defined(TARGET_ANDROID)
+	lua.setString("target", "android");
+#endif
 	lua.scriptSetup();
 }
 
 //--------------------------------------------------------------------
 void mpd::update() {
 	auto pulled = pull();
-	auto count = pulled.size();
-	if (count == 0) {
-		return;
+	if (pulled.size() > 0) {
+		message("update-start");
+		for (auto x : pulled) {
+			message(x);
+		}
+		message("update-end");
 	}
-	// ofLogVerbose("update") << count << "------------------------------";
-	message("update-start");
-	for (auto x : pulled) {
-		message(x);
-	}
-	message("update-end");
 }
 
 //--------------------------------------------------------------------
@@ -161,10 +158,10 @@ void mpd::touch(ofTouchEventArgs& touch) {
 }
 
 //--------------------------------------------------------------------
-void mpd::scale(const string& type, float value, int x, int y) {
-	auto message =
-	   "scale " + type + " " + ofToString(value) + " " + ofToString(x) + " " + ofToString(y);
-	push(message);
+void mpd::push(const string& x) {
+	mtx.lock();
+	msgs.push_back(x);
+	mtx.unlock();
 }
 
 //--------------------------------------------------------------------
@@ -179,6 +176,15 @@ int mpd::outletCount(t_gobj* x) {
 //--------------------------------------------------------------------
 bool mpd::selectionActive() {
 	return !!pd_getcanvaslist()->gl_editor->e_selection;
+}
+
+//--------------------------------------------------------------------
+void mpd::cmd(const string& cmd) {
+	ofLogNotice("ok") << cmd;
+#if defined(TARGET_ANDROID)
+	auto activity = ofGetOFActivityObject();
+	ofxJavaCallVoidMethod(activity, "cc/openframeworks/mPD/OFActivity", "showSomething", "()V");
+#endif
 }
 
 //--------------------------------------------------------------------

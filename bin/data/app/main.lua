@@ -1,15 +1,20 @@
+jit.off()
+
 require('globals')
+
 local text = require('utils/text')
 local ofx = require('utils/of')
-local s = require('utils/string')
-local pd = require('pd')
-local frame = require('ui/frame')
+local keyEq = require('utils/string').keyEq
+local Canvas = require('ui/pd/canvas')
+local frame = require('ui/pd/frame')
 local docks = require('ui/docks')
-local Canvas = require('ui/canvas')
 local parse = require('parse')
 local events = require('events')
+local pd = require('pd')
 
 local canvas = nil
+
+local floor = math.floor
 
 local function drawCanvas()
 	if not canvas then
@@ -21,8 +26,16 @@ local function drawCanvas()
 end
 
 local function touchEvent(touch)
-	-- if (touch.type == of.TouchEventArgs_down) then
-	if (touch.type == 0) then
+	local docksPressed = docks.pressed
+
+	if (docksPressed and touch.type == 2) then
+		return
+	elseif (docksPressed and touch.type == 1) then
+		docks.pressed = false
+		return
+	elseif (touch.type == 1) then
+		docks.pressed = false
+	elseif (touch.type == 0) then
 		local id, value = docks.touch(touch)
 		if (id) then
 			if not canvas then
@@ -37,6 +50,8 @@ local function touchEvent(touch)
 				pd.queue(canvas.id, id)
 			elseif id == 'clear' then
 				pd.delete(canvas.id)
+			else
+				log('pressed:', id)
 			end
 			return
 		end
@@ -46,6 +61,15 @@ local function touchEvent(touch)
 	end
 end
 
+local loadPatch = function()
+	-- pd.queue('pd open main2.pd', ofx.getPath('ignore.patches/filters')) --
+	-- pd.queue('pd open sigbinops-help.pd', ofx.getPath('ignore.patches')) --
+	-- pd.queue('pd open help.pd', ofx.getPath('ignore.patches')) --
+	-- pd.queue('pd open test.pd', ofx.getPath('ignore.patches')) --
+	-- pd.queue('pd open hsl.pd', ofx.getPath('ignore.patches')) --
+	pd.queue('pd open two-objects.pd', ofx.getPath('ignore.patches')) --
+end
+
 _G.setup = function()
 	of.setLogLevel(of.LOG_VERBOSE)
 	of.background(255)
@@ -53,20 +77,18 @@ _G.setup = function()
 	of.setFrameRate(125)
 	of.enableSmoothing()
 	of.enableAntiAliasing()
+	of.setWindowPosition(0, 0)
 
 	local success = false
 
-	if Target == 'android' then
+	if _G.target == 'android' then
 		success = audio.init(2, 2, 44100)
 	else
 		success = audio.init("Pro Microphone", "Pro Speakers", 48000)
 	end
 
 	if (success) then
-		-- pd.queue('pd open sigbinops-help.pd', ofx.getPath('ignore.patches')) --
-		-- pd.queue('pd open test.pd', ofx.getPath('ignore.patches')) --
-		pd.queue('pd open main.pd', ofx.getPath('ignore.patches/filters')) --
-		-- pd.queue('pd open two-objects.pd', ofx.getPath('ignore.patches')) --
+		loadPatch()
 	end
 end
 
@@ -76,40 +98,43 @@ _G.draw = function()
 	docks.draw()
 	of.setColor(0, 0, 0, 100)
 	text.draw('fps: ' .. of.getFrameRate(), 50, 50)
-	text.draw('gc: ' .. collectgarbage("count"), 50, 120)
+	text.draw('mem: ' .. floor(collectgarbage("count")), 50, 75)
 end
 
 _G.keyPressed = function(key)
-	if (s.keyEq('e', key)) then
+	if (keyEq('e', key)) then
 		pd.queue(canvas.id, 'editmode 0')
-	elseif (s.keyEq('q', key)) then
+	elseif (keyEq('l', key)) then
+		loadPatch()
+	elseif (keyEq('q', key)) then
 		mpd.exit()
-	elseif (s.keyEq('s', key)) then
+	elseif (keyEq('t', key)) then
+		canvas.toggle()
+	elseif (keyEq('s', key)) then
 		pd.queue(canvas.id, 'menusave')
-	elseif (s.keyEq('a', key)) then
+	elseif (keyEq('a', key)) then
 		pd.queue(canvas.id, 'selectall')
-	elseif (s.keyEq('v', key)) then
+	elseif (keyEq('v', key)) then
 		pd.queue(canvas.id, 'dirty 1')
 		pd.queue(canvas.id, 'vslider 0') -- bng,  toggle
 	end
 end
 
--- _G.gotMessage = tryCatch(function(msg)
 _G.gotMessage = function(msg)
 	local parsed = parse(msg)
 
-	if not parsed then
-		return
-	elseif parsed.cmd == 'touch' then
+	if parsed.cmd == 'touch' then
 		touchEvent(parsed)
+	elseif parsed.cmd == 'update-end' and canvas then
+		canvas.cleanup()
+	elseif parsed.cmd == 'update-start' then
+		-- nothing for now
 	elseif parsed.cmd == 'new-canvas' then
 		canvas = Canvas(parsed.canvasId, {x = 0, y = 0})
 	elseif parsed.cmd == 'bind' then
 		events.bind(parsed)
-	elseif msg == 'update-start' then
-		return
-	elseif msg == 'update-end' and canvas then
-		canvas.items.cleanup()
+	elseif parsed.cmd == 'orientation' then
+		log(parsed.cmd, parsed.value)
 	elseif canvas then
 		canvas.message(parsed)
 	end
@@ -123,4 +148,3 @@ _G.exit = function()
 	-- https://github.com/cviejo/mPD/blob/main/src/libs/pd/pure-data/src/g_editor.c#L3399
 end
 
--- touchMoved = touchEvent

@@ -1,15 +1,16 @@
-local F = require('utils.functional')
+local F = require('utils/functional')
 
 local M = {}
 
 local join, curry = F.join, F.curry
+local byte, find, lower = string.byte, string.find, string.lower
 
 M.keyEq = curry(function(char, keyInt)
-	return string.byte(char) == keyInt
+	return byte(char) == keyInt
 end)
 
 M.includes = curry(function(pattern, x)
-	return string.find(string.lower(x), string.lower(pattern))
+	return find(lower(x), lower(pattern))
 end)
 
 M.head = function(x)

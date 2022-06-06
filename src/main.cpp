@@ -9,7 +9,7 @@ int main() {
 	ofxAndroidWindowSettings settings;
 	ofCreateWindow(settings);
 #else
-	ofSetupOpenGL(1024, 768, OF_WINDOW);
+	ofSetupOpenGL(400, 768, OF_WINDOW);
 #endif
 
 	return ofRunApp(new ofApp());

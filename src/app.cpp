@@ -7,24 +7,12 @@ void ofApp::setup() {
 	ofAddListener(ofxAndroidEvents().scaleBegin, this, &ofApp::scaleBegin);
 	ofAddListener(ofxAndroidEvents().scale, this, &ofApp::scale);
 	ofAddListener(ofxAndroidEvents().scaleEnd, this, &ofApp::scaleEnd);
-#else
-	auto xs = vector<string>{"main.lua",      "ui/cords.lua", "ui/button.lua",   "ui/frame2.lua",
-	                         "ui/canvas.lua", "parse.lua",    "ui/draw-item.lua"};
-	for (auto x : xs) {
-		watcher.addPath(ofToDataPath("app/" + x, true));
-	}
-	watcher.start();
+	ofAddListener(ofxAndroidEvents().deviceOrientationChanged, this, &ofApp::orientationChanged);
 #endif
 	mpd::setup();
 }
 
 void ofApp::update() {
-	while (watcher.waitingEvents()) {
-		watcher.stop();
-		watcher.nextEvent();
-		mpd::reload();
-		watcher.start();
-	}
 	mpd::update();
 }
 
@@ -44,20 +32,28 @@ void ofApp::audioRequested(float* buffer, int size, int channelCount) {
 	audio::out(buffer, size, channelCount);
 }
 
+bool scaleEvent(const string& type, float x, float y, float scale) {
+	auto message = type + " " + ofToString(x) + " " + ofToString(y) + " " + ofToString(scale);
+	mpd::push(message);
+	return true;
+}
+
 #if defined(TARGET_ANDROID)
 bool ofApp::scaleBegin(ofxAndroidScaleEventArgs& x) {
-	mpd::scale("scaleBegin", x.getScaleFactor(), x.getFocusX(), x.getFocusY());
-	return true;
+	return scaleEvent("scaleBegin", x.getFocusX(), x.getFocusY(), x.getScaleFactor());
 }
 
 bool ofApp::scale(ofxAndroidScaleEventArgs& x) {
-	mpd::scale("scale", x.getScaleFactor(), x.getFocusX(), x.getFocusY());
-	return true;
+	return scaleEvent("scale", x.getFocusX(), x.getFocusY(), x.getScaleFactor());
 }
 
 bool ofApp::scaleEnd(ofxAndroidScaleEventArgs& x) {
-	mpd::scale("scaleEnd", x.getScaleFactor(), x.getFocusX(), x.getFocusY());
-	return true;
+	return scaleEvent("scaleEvent", x.getFocusX(), x.getFocusY(), x.getScaleFactor());
+}
+
+void ofApp::orientationChanged(ofOrientation& x) {
+	auto message = "orientation " + ofToString((int)x);
+	mpd::push(message);
 }
 
 void ofApp::swipe(ofxAndroidSwipeDir swipeDir, int id) {}
@@ -98,7 +94,7 @@ void ofApp::mouseDragged(int x, int y, int button) {
 }
 
 void ofApp::mouseScrolled(ofMouseEventArgs& args) {
-	mpd::scale("scroll", args.scrollY, mouseX, mouseY);
+	scaleEvent("scroll", mouseX, mouseY, args.scrollY);
 }
 #endif
 

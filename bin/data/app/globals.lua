@@ -1,9 +1,8 @@
 ---@diagnostic disable: lowercase-global
-local logging = require('utils.logging')
-local F = require('utils.functional')
-local inspect = require('libs.inspect')
+local logging = require('utils/logging')
+local inspect = require('libs/inspect')
 
-_G.Target = 'desktop'
+_G.target = 'desktop'
 if _G.mpd then
 	_G.dpi = mpd.getDPI()
 else
@@ -29,22 +28,6 @@ end
 _G.TODO = function(msg)
 	print(red('TODO'), msg)
 end
-
--- adding explictly to the global table works better with the linter
-_G.curry = F.curry
-_G.each = F.forEach
-_G.forEach = F.forEach
-_G.map = F.map
-_G.pipe = F.pipe
-_G.noop = F.noop
-_G.equals = F.equals
-_G.negate = F.negate
-_G.tern = F.tern
-
-_G.join = F.join
-_G.unapply = F.unapply
-_G.tryCatch = F.tryCatch
-_G.clamp = F.clamp
 
 TODO('events/bind for externals')
 TODO('big grid')
