@@ -1,26 +1,25 @@
-local Button = require('ui/button').Button
-local ToggleButton = require('ui/button').ToggleButton
-local Group = require('ui/group')
-local menu = require('ui/menu')
+local Button = require('gui/button').Button
+local ToggleButton = require('gui/button').ToggleButton
+local Group = require('gui/group')
+local menu = require('gui/menu')
+local theme = require('theme')
 
 local size = 47 * dpi
 local corner = 5 * dpi
 
 local width = of.getWidth()
 local menuH = size * 6
-local menuY = (of.getHeight() - menuH) * 0.60
+local menuY = of.getHeight() - menuH * 1.60
 local lowY = of.getHeight() - size
 local rightX = width - size
-
-local dark = of.Color(36, 38, 39)
 
 local more = Button('more_vert', rightX, lowY)
 local fullscreen = ToggleButton('fullscreen', 0, 0)
 
-more.color = dark
-fullscreen.color = dark
+more.color = theme.gui.background
+fullscreen.color = theme.gui.background
 
-local function rightY(pos)
+local rightY = function(pos)
 	return menuY + pos * size
 end
 
@@ -66,14 +65,18 @@ M.draw = function()
 		return
 	end
 
-	of.setColor(dark)
+	of.setColor(theme.gui.background)
 	of.fill()
+
 	of.drawRectRounded(width / 2 - size / 2, lowY, size, size + corner, corner)
 	of.drawRectRounded(rightX, menuY, size + corner, menuH, corner)
 	group.draw()
-	menu.draw()
+
+	-- separator
 	of.setColor(75)
 	of.drawRectangle(rightX + corner, rightY(4), size, dpi)
+
+	menu.draw()
 end
 
 return M

@@ -1,5 +1,6 @@
-local LabeledButton = require('ui/button').LabeledButton
-local Group = require('ui/group')
+local LabeledButton = require('gui/button').LabeledButton
+local Group = require('gui/group')
+local theme = require('theme')
 
 local M = {}
 
@@ -21,10 +22,8 @@ local group = Group(LabeledButton('add', column(0), row(0), size),
                     LabeledButton('save', column(0), row(1), size),
                     LabeledButton('settings', column(1), row(1), size))
 
-local dark = of.Color(36, 38, 39)
-
 local drawFrame = function()
-	of.setColor(dark)
+	of.setColor(theme.gui.background)
 	of.fill()
 	of.drawRectRounded(rightX, lowY, size * 2 + corner, size * 2 + corner, corner)
 end

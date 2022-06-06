@@ -5,9 +5,9 @@ require('globals')
 local text = require('utils/text')
 local ofx = require('utils/of')
 local keyEq = require('utils/string').keyEq
-local Canvas = require('ui/pd/canvas')
-local frame = require('ui/pd/frame')
-local docks = require('ui/docks')
+local Canvas = require('gui/pd/canvas')
+local frame = require('gui/pd/frame')
+local gui = require('gui')
 local parse = require('parse')
 local events = require('events')
 local pd = require('pd')
@@ -26,17 +26,17 @@ local function drawCanvas()
 end
 
 local function touchEvent(touch)
-	local docksPressed = docks.pressed
+	local guiPressed = gui.pressed
 
-	if (docksPressed and touch.type == 2) then
+	if (guiPressed and touch.type == 2) then
 		return
-	elseif (docksPressed and touch.type == 1) then
-		docks.pressed = false
+	elseif (guiPressed and touch.type == 1) then
+		gui.pressed = false
 		return
 	elseif (touch.type == 1) then
-		docks.pressed = false
+		gui.pressed = false
 	elseif (touch.type == 0) then
-		local id, value = docks.touch(touch)
+		local id, value = gui.touch(touch)
 		if (id) then
 			if not canvas then
 				return
@@ -95,7 +95,7 @@ end
 _G.draw = function()
 	pd.flush()
 	drawCanvas()
-	docks.draw()
+	gui.draw()
 	of.setColor(0, 0, 0, 100)
 	text.draw('fps: ' .. of.getFrameRate(), 50, 50)
 	text.draw('mem: ' .. floor(collectgarbage("count")), 50, 75)
@@ -122,6 +122,10 @@ end
 
 _G.gotMessage = function(msg)
 	local parsed = parse(msg)
+
+	if not parsed then
+		return
+	end
 
 	if parsed.cmd == 'touch' then
 		touchEvent(parsed)

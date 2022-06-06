@@ -15,7 +15,6 @@ local withDefaults = merge({
 
 local function loadImage(name, size)
 	local img = of.Image("images/outline_" .. name .. "_white_36dp.png")
-	-- img:load();
 	img:resize(size, size)
 	return img
 end

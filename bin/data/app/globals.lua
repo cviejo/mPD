@@ -29,6 +29,8 @@ _G.TODO = function(msg)
 	print(red('TODO'), msg)
 end
 
+of.setLogLevel(of.LOG_VERBOSE)
+
 TODO('events/bind for externals')
 TODO('big grid')
 TODO("buttons don't change on press (except toggles), render them an image/vbo")
