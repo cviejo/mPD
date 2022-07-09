@@ -1,65 +1,62 @@
-local points = require('utils/points')
-local merge = require('utils/functional').merge
-local Font = require('utils/font')
-local toggleInt = require('utils/toggle-int')
+local F = require('utils.functional')
+local GuiElement = require('gui.element')
+local Font = require('utils.font')
+local theme = require('gui.theme')
 
 local font = Font("DejaVuSansMono", 6 * dpi)
 
-local withDefaults = merge({
-	x = 0,
-	y = 0,
-	size = 47 * dpi,
-	color = of.Color(255),
-	value = 1
-})
-
-local function loadImage(name, size)
-	local img = of.Image("images/outline_" .. name .. "_white_36dp.png")
+local loadImage = function(name, size)
+	local file = "images/outline_" .. name .. "_white_36dp.png"
+	local img = of.Image(file)
 	img:resize(size, size)
 	return img
 end
 
 local function getLabelPosition(label, rect)
-	if label then
-		local bounds = font.getStringBounds(label, 0, 0)
-		return {
-			x = rect.x + (rect.width - bounds.width) / 2,
-			y = rect.y + (rect.height - bounds.height * 0.8)
-		}
-	end
+	local bounds = font.getStringBounds(label, 0, 0)
+	local x = rect.x + (rect.width - bounds.width) / 2
+	local y = rect.y + (rect.height - bounds.height * 0.8)
+	return {x = x, y = y}
 end
 
-local function makeButton(opts)
-	local M = withDefaults(opts)
+local Button = function(options)
+	local M = GuiElement(options)
 
-	local rect = of.Rectangle(M.x, M.y, M.size, M.size)
+	M.on = false
+	M.size = M.size or theme.button.size
+	M.rect.width = M.size or 0
+	M.rect.height = M.size or 0
+
 	local on = nil
 	local off = nil
+	local labelPosition = nil
 	local imageSize = M.size / 2
 	local padding = (M.size - imageSize) / 2
-	local labelPosition = getLabelPosition(M.label, rect)
 
-	if M.toggle then
-		on = loadImage(M.id .. '_on', imageSize)
-		off = loadImage(M.id .. '_off', imageSize)
-	else
-		on = loadImage(M.id, imageSize)
-	end
-
-	M.touch = function(touch)
-		local hit = points.inside(rect, touch)
-		if M.toggle and hit then
-			M.value = toggleInt(M.value)
+	local function init()
+		if M.label then
+			labelPosition = getLabelPosition(M.label, M.rect)
 		end
-		return hit
+		if M.toggle then
+			on = loadImage(M.id .. '_on', imageSize)
+			off = loadImage(M.id .. '_off', imageSize)
+		else
+			on = loadImage(M.id, imageSize)
+		end
 	end
+
+	M.onPressed(function()
+		if M.toggle then
+			M.on = not M.on
+		end
+	end)
 
 	M.draw = function()
-		of.setColor(M.color)
-		if not M.toggle or M.value == 1 then
-			on:draw(M.x + padding, M.y + padding)
+		of.setColor(theme.button.fg)
+		if not M.toggle or M.on then
+			on:draw(M.rect.x + padding, M.rect.y + padding)
 		else
-			off:draw(M.x + padding, M.y + padding)
+			off:draw(M.rect.x + padding, M.rect.y + padding)
 		end
 
 		if M.label then
@@ -67,27 +64,10 @@ local function makeButton(opts)
 		end
 	end
 
+	init()
+
 	return M
 end
 
-local M = {}
+return Button
 
-M.Button = function(id, x, y)
-	return makeButton({id = id, x = x, y = y})
-end
-
-M.ToggleButton = function(id, x, y)
-	return makeButton({id = id, x = x, y = y, toggle = true})
-end
-
-M.LabeledButton = function(id, x, y, size)
-	return makeButton({
-		id = id,
-		x = x,
-		y = y,
-		size = size,
-		label = string.upper(id)
-	})
-end
-
-return M

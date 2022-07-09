@@ -1,4 +1,4 @@
-local forEach = require('utils/functional').forEach
+local forEach = require('utils.functional').forEach
 
 local M = {}
 

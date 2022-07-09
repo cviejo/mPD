@@ -1,42 +1,34 @@
-local LabeledButton = require('gui/button').LabeledButton
-local Group = require('gui/group')
-local theme = require('theme')
+local GuiElement = require('gui.element')
+local Stack = require('gui.stack')
+local Button = require('gui.button')
+-- local theme = require('theme')
 
-local M = {}
+local width, height = of.getWidth(), of.getHeight()
 
-local size = 60 * dpi
-local lowY = of.getHeight() - size * 2
-local rightX = of.getWidth() - size * 2
-local corner = 5 * dpi
+local container = GuiElement({visible = false})
 
-local function column(pos)
-	return rightX + pos * size
+local hide = function()
+	container.visible = false
 end
 
-local function row(pos)
-	return lowY + pos * size
-end
+-- LuaFormatter off
+local rows = {
+	Stack({children = {Button({id = 'add'}), Button({id = 'save'})}}),
+	Stack({children = {Button({id = 'settings'})}})
+}
+-- LuaFormatter on
+local menu = Stack({id = 'menu', orientation = 'vertical', children = rows})
 
-local group = Group(LabeledButton('add', column(0), row(0), size),
-                    LabeledButton('open', column(1), row(0), size),
-                    LabeledButton('save', column(0), row(1), size),
-                    LabeledButton('settings', column(1), row(1), size))
+local pad = GuiElement({id = 'bg', width = width, height = height})
 
-local drawFrame = function()
-	of.setColor(theme.gui.background)
-	of.fill()
-	of.drawRectRounded(rightX, lowY, size * 2 + corner, size * 2 + corner, corner)
-end
+menu.setPosition(width - menu.rect.width, menu.rect.y)
 
-M.active = false
+menu.onPressed(function(x)
+	print('pressed', x.id)
+end)
 
-M.touch = group.touch
+pad.onPressed(hide)
 
-M.draw = function()
-	if M.active then
-		drawFrame()
-		group.draw()
-	end
-end
+container.children = {pad, menu}
 
-return M
+return container
