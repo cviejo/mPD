@@ -14,7 +14,6 @@ _G.audio = audio
 _G.of = of
 _G.glm = glm
 _G.swig_type = swig_type
-
 _G.inspect = inspect
 _G.logging = logging
 _G.log = logging.verbose
@@ -29,7 +28,11 @@ _G.TODO = function(msg)
 	print(red('TODO'), msg)
 end
 
-TODO('events/bind for externals')
-TODO('big grid')
-TODO("buttons don't change on press (except toggles), render them an image/vbo")
-TODO('render text to image/texture?')
+if of then
+	of.setLogLevel(of.LOG_VERBOSE)
+end
+
+-- TODO('events/bind for externals')
+-- TODO('big grid')
+-- TODO("buttons don't change on press (except toggles), render them an image/vbo")
+-- TODO('render text to image/texture?')

@@ -1,41 +1,61 @@
 local M = {}
 
-local curry2 = function(fn)
-	local delayedA = nil
-	local delayedFn = function(b)
-		return fn(delayedA, b)
-	end
-	return function(a, b)
-		if b ~= nil then
+M.noop = function()
+end
+
+-- not pretty, but fast. after receiving the first argument
+-- performance is similar to non-curried form
+M.curry2 = function(fn)
+	local function handler(a, b)
+		if a == nil then
+			return handler
+		elseif b ~= nil then
 			return fn(a, b)
 		else
-			delayedA = a
-			return delayedFn
-		end
-	end
-end
-
-_G.t = function(...)
-	print(...)
-end
-
-local curry3 = function(fn)
-	local delayedA = nil
-	local delayedFn = curry2(function(b, c)
-		return fn(delayedA, b, c)
-	end)
-	return function(a, b, c)
-		if c ~= nil then
-			return fn(a, b, c)
-		else
-			delayedA = a
-			if b then
-				return delayedFn(b)
-			else
-				return delayedFn
+			local function last(_b)
+				if _b ~= nil then
+					return fn(a, _b)
+				else
+					return last
+				end
 			end
+			return last
 		end
 	end
+	return handler
+end
+
+-- not pretty, but fast. after receiving the first two arguments
+-- performance is similar to non-curried form
+M.curry3 = function(fn)
+	local function handler(a, b, c)
+		if a == nil then -- no args
+			return handler
+		elseif b ~= nil and c ~= nil then -- all args
+			return fn(a, b, c)
+		elseif b == nil then -- one arg
+			local function lastTwo(_b, _c)
+				if _b ~= nil and _c ~= nil then
+					return fn(a, _b, _c)
+				elseif _b ~= nil then
+					return handler(a, _b)
+				else
+					return lastTwo
+				end
+			end
+			return lastTwo
+		else -- two args
+			local function last(_c)
+				if _c ~= nil then
+					return fn(a, b, _c)
+				else
+					return last
+				end
+			end
+			return last
+		end
+	end
+	return handler()
 end
 
 -- probably not needed
@@ -61,13 +81,13 @@ M.curry = function(fn)
 	local nparams = debug.getinfo(fn).nparams
 
 	if nparams == 2 then
-		return curry2(fn)
+		return M.curry2(fn)
 	else
-		return curry3(fn)
+		return M.curry3(fn)
 	end
 end
 
-M.equals = curry2(function(a, b)
+M.equals = M.curry2(function(a, b)
 	return a == b
 end)
 
@@ -133,15 +153,21 @@ M.forEach = M.curry(function(fn, xs)
 	end
 end)
 
-M.each = forEach
+M.forEachReverse = M.curry(function(fn, xs)
+	for i = #xs, 1, -1 do
+		fn(xs[i], i)
+	end
+end)
 
-M.reduce = function(fn, init, xs)
+M.each = M.forEach
+
+M.reduce = M.curry3(function(fn, init, xs)
 	local acc = init
 	for i = 1, #xs do
 		acc = fn(acc, xs[i])
 	end
 	return acc
-end
+end)
 
 M.join = M.curry(function(sep, xs) -- todo: reduce
 	local length = #xs
@@ -165,9 +191,6 @@ M.pipe = function(...)
 	return function(x)
 		return M.reduce(reducer, x, fns)
 	end
-end
-
-M.noop = function()
 end
 
 M.tryCatch = M.curry(function(tryer, catcher)
@@ -197,7 +220,7 @@ M.clamp = M.curry(function(min, max, x)
 	end
 end)
 
-M.pick = curry2(function(fields, obj)
+M.pick = M.curry2(function(fields, obj)
 	local result = {}
 	M.forEach(function(field)
 		local value = obj[field]
@@ -217,7 +240,7 @@ M.keys = function(x)
 end
 
 -- not pure, but for convenience let's keep them here
-M.assign = curry2(function(target, source)
+M.assign = M.curry2(function(target, source)
 	for key, value in pairs(source) do
 		target[key] = value
 	end
@@ -228,7 +251,7 @@ M.push = function(x, xs)
 end
 -- not pure, but for convenience let's keep them here
 
-M.merge = curry2(function(a, b)
+M.merge = M.curry2(function(a, b)
 	local result = {}
 	M.assign(result, a)
 	M.assign(result, b)
@@ -240,5 +263,58 @@ M.complement = function(fn)
 		return not fn(...)
 	end
 end
+
+M.times = M.curry2(function(fn, n)
+	local result = {}
+	for i = 1, n do
+		M.push(fn(i), result)
+	end
+	return result
+end)
+
+M.thunkify = function(fn)
+	return function(...)
+		local args = {...}
+		return function()
+			return fn(unpack(args))
+		end
+	end
+end
+
+M.reverse = function(xs)
+	local result = {}
+	M.forEachReverse(function(x)
+		result[#result + 1] = x
+	end, xs)
+	return result
+end
+
+M.find = M.curry2(function(fn, xs)
+	for i = 1, #xs do
+		local item = xs[i]
+		if fn(item) then
+			return item
+		end
+	end
+end)
+
+M.add = M.curry2(function(a, b)
+	return a + b
+end)
+
+M.max = M.curry2(function(a, b)
+	return a > b and a or b
+end)
+
+M.path = M.curry2(function(parts, x)
+	local current = x
+	for i = 1, #parts do
+		current = current[parts[i]]
+		if current == nil then
+			return nil
+		end
+	end
+	return current
+end)
 
 return M

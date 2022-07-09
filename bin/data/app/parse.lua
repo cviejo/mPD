@@ -1,7 +1,7 @@
 TODO('parse arrays in [list *] or {*} format')
 local ffi = require("ffi")
-local S = require('utils/string')
-local F = require('utils/functional')
+local S = require('utils.string')
+local F = require('utils.functional')
 
 ffi.cdef('typedef struct point{ int16_t x, y; } point;')
 

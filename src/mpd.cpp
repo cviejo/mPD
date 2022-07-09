@@ -1,7 +1,7 @@
 #pragma once
 
-#include "mpd.h"
 #include <vector>
+#include "mpd.h"
 #include "ofxLua.h"
 #if defined(TARGET_ANDROID)
 #include "ofxAndroid.h"
@@ -180,7 +180,6 @@ bool mpd::selectionActive() {
 
 //--------------------------------------------------------------------
 void mpd::cmd(const string& cmd) {
-	ofLogNotice("ok") << cmd;
 #if defined(TARGET_ANDROID)
 	auto activity = ofGetOFActivityObject();
 	ofxJavaCallVoidMethod(activity, "cc/openframeworks/mPD/OFActivity", "showSomething", "()V");
@@ -201,7 +200,6 @@ void mpd::pdsend(const string& cmd) {
 t_gobj* mpd::findBox(int x, int y) {
 	int a, b, c, d;
 	auto canvas = pd_getcanvaslist();
-
 	auto selection = canvas->gl_editor->e_onmotion == MA_MOVE;
 
 	return canvas_findhitbox(canvas, x, y, &a, &b, &c, &d);
