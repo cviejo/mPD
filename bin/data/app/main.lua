@@ -2,7 +2,7 @@ jit.off()
 
 require('globals')
 
-local text = require('utils.text')
+local hud = require('utils.hud')
 local parse = require('parse')
 local window = require('gui.main-window')
 local ofx = require('utils.of')
@@ -42,9 +42,7 @@ end
 _G.draw = function()
 	pd.flush()
 	window.draw()
-	of.setColor(0, 0, 0, 100)
-	text.draw('fps: ' .. of.getFrameRate(), 50, 50)
-	text.draw('mem: ' .. math.floor(collectgarbage("count")), 50, 75)
+	hud.draw()
 end
 
 _G.gotMessage = function(msg)
