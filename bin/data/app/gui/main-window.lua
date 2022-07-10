@@ -13,22 +13,18 @@ local paste = Button({id = "paste"})
 local copy = Button({id = "copy"})
 local undo = Button({id = "undo"})
 local settings = Button({id = "more_vert", x = width - theme.button.size})
-local expand = GuiElement()
 
-expand.rect.height = paste.rect.height + theme.corner
-
-local test = Stack({x = 100, y = 200, children = {copy, undo, edit, paste, expand}})
-
+local test = Stack({children = {copy, undo, edit, paste}})
 local window = GuiElement({children = {test, fullscreen, settings, menu}})
 
-local setVisibilty = F.curry2(function(value, element)
-	element.visible = value
-end)
+test.setPosition((width - test.rect.width) / 2, height - test.rect.height)
+test.rect.height = test.rect.height + theme.corner
 
-test.setPosition((width - test.rect.width) / 2, height - test.rect.height + theme.corner)
-
+fullscreen.on = true
 fullscreen.onPressed(function()
-	F.forEach(setVisibilty(fullscreen.on), window.children)
+	F.forEach(function(child)
+		child.visible = fullscreen.on
+	end, window.children)
 	fullscreen.visible = true
 	menu.visible = false
 end)

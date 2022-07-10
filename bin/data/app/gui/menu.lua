@@ -1,7 +1,6 @@
 local GuiElement = require('gui.element')
 local Stack = require('gui.stack')
 local Button = require('gui.button')
--- local theme = require('theme')
 
 local width, height = of.getWidth(), of.getHeight()
 
@@ -19,7 +18,7 @@ local rows = {
 -- LuaFormatter on
 local menu = Stack({id = 'menu', orientation = 'vertical', children = rows})
 
-local pad = GuiElement({id = 'bg', width = width, height = height})
+local bg = GuiElement({id = 'bg', width = width, height = height})
 
 menu.setPosition(width - menu.rect.width, menu.rect.y)
 
@@ -27,8 +26,8 @@ menu.onPressed(function(x)
 	print('pressed', x.id)
 end)
 
-pad.onPressed(hide)
+bg.onPressed(hide)
 
-container.children = {pad, menu}
+container.children = {bg, menu}
 
 return container
