@@ -22,7 +22,7 @@ end
 local Button = function(options)
 	local M = GuiElement(options)
 
-	M.on = false
+	M.on = M.on or false
 	M.size = M.size or theme.button.size
 	M.rect.width = M.size or 0
 	M.rect.height = M.size or 0
