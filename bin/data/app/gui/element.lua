@@ -27,7 +27,7 @@ local touchTest = curry2(function(touch, child)
 	return child.visible and child.touch(touch)
 end)
 
-local GuiElement = function(options)
+local function GuiElement(options)
 	local M = {}
 
 	M.id = 'id not set'

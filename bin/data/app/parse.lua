@@ -17,12 +17,8 @@ local isKey = function(x)
 end
 
 local splitWords = function(s, nl)
-	local sep = '%S+'
-	if nl then
-		sep = '[%S\n]+'
-	end
-
-	return s:gmatch(sep)
+	local separator = nl and '[%S\n]+' or '%S+'
+	return s:gmatch(separator)
 end
 
 local parseColor = function(x)
@@ -143,13 +139,7 @@ local function parseCreate(canvasId, word)
 		params = parseParams(tail(current), word)
 	end
 	local id = getId(params.tags)
-	return {
-		canvasId = canvasId,
-		cmd = cmd,
-		id = id,
-		points = points,
-		params = params
-	}
+	return {canvasId = canvasId, cmd = cmd, id = id, points = points, params = params}
 end
 
 local parseNewText = function(canvasId, word)

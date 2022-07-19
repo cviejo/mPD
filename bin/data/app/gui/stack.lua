@@ -36,7 +36,7 @@ local arrangeChildren = function(orientation, rect, children)
 	end
 end
 
-local Stack = function(options)
+local function Stack(options)
 	local M = GuiElement(options)
 
 	M.update = function()

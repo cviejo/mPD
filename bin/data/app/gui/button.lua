@@ -12,14 +12,14 @@ local loadImage = function(name, size)
 	return img
 end
 
-local function getLabelPosition(label, rect)
+local getLabelPosition = function(label, rect)
 	local bounds = font.getStringBounds(label, 0, 0)
 	local x = rect.x + (rect.width - bounds.width) / 2
 	local y = rect.y + (rect.height - bounds.height * 0.8)
 	return {x = x, y = y}
 end
 
-local Button = function(options)
+local function Button(options)
 	local M = GuiElement(options)
 
 	M.on = M.on or false
@@ -33,7 +33,7 @@ local Button = function(options)
 	local imageSize = M.size / 2
 	local padding = (M.size - imageSize) / 2
 
-	local function init()
+	local init = function()
 		if M.label then
 			labelPosition = getLabelPosition(M.label, M.rect)
 		end
