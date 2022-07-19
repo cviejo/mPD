@@ -58,14 +58,6 @@ M.curry3 = function(fn)
 	return handler()
 end
 
--- probably not needed
-M.tern = function(cond, a, b)
-	if cond then
-		return a
-	end
-	return b
-end
-
 -- not is a lua keyword
 M.negate = function(x)
 	return not x
