@@ -15,15 +15,11 @@ local function Dialog(options)
 	end
 
 	content.onPressed(hide)
-
 	background.onPressed(hide)
 
 	M.visible = false
-
 	M.children = {background, content}
-
 	M.rect = content.rect
-
 	M.setPosition = content.setPosition
 
 	return M
