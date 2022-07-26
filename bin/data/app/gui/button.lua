@@ -19,9 +19,10 @@ local getLabelPosition = function(label, rect)
 	return {x = x, y = y}
 end
 
-local function Button(options)
+local function Button(id, options)
 	local M = GuiElement(options)
 
+	M.id = id
 	M.on = M.on or false
 	M.size = M.size or theme.button.size
 	M.rect.width = M.size or 0
