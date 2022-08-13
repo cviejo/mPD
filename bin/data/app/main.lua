@@ -21,7 +21,7 @@ _G.setup = function()
 	of.setLogLevel(of.LOG_VERBOSE)
 	of.background(255)
 	of.setVerticalSync(false) -- needed for fps > 60 on desktop
-	of.setFrameRate(125)
+	of.setFrameRate(20)
 	of.enableSmoothing()
 	of.enableAntiAliasing()
 	of.setWindowPosition(0, 0)
@@ -52,10 +52,9 @@ _G.gotMessage = function(msg)
 		return
 	elseif parsed.cmd == 'touch' then
 		window.touch(parsed)
+	else
+		-- canvas.message(parsed)
 	end
 end
 
-_G.exit = function()
-	window.clear()
-end
-
+_G.exit = window.clear

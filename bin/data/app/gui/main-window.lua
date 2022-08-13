@@ -5,7 +5,13 @@ local Stack = require('gui.stack')
 local theme = require('gui.theme')
 local Dialog = require('gui.dialog')
 
-local width, height = of.getWidth(), of.getHeight()
+local width, height, corner = of.getWidth(), of.getHeight(), theme.corner
+
+local square = GuiElement({width = corner, height = corner})
+
+local row = function(...)
+	return Stack({children = {...}})
+end
 
 -- bottom dock
 local edit = Button('edit', {toggle = true})
@@ -19,7 +25,7 @@ local more = Button('more_vert', {x = width - theme.button.size})
 local add = Button('add')
 local save = Button('save')
 local settings = Button('settings')
-local menu = Dialog({children = {Stack({children = {add, save}}), Stack({children = {settings}})}})
+local menu = Dialog({children = {square, row(add, save, square), row(settings)}})
 
 -- root
 local fullscreen = Button('fullscreen', {toggle = true, on = true})
@@ -29,9 +35,9 @@ local window = GuiElement({children = {canvas, test, fullscreen, more, menu}})
 local testX = (width - test.rect.width) / 2
 local testY = height - test.rect.height
 
-menu.setPosition(width - menu.rect.width, 0)
+menu.setPosition(width - menu.rect.width + corner, -(corner))
 test.setPosition(testX, testY)
-test.rect.height = test.rect.height + theme.corner
+test.rect.height = test.rect.height + corner
 
 fullscreen.onPressed(function()
 	F.forEach(function(child)

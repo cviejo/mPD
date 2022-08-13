@@ -6,9 +6,9 @@ local width, height = of.getWidth(), of.getHeight()
 local function Dialog(options)
 	local M = GuiElement(options)
 
-	local content = Stack({id = 'menu', orientation = 'vertical', children = M.children})
+	local content = Stack({orientation = 'vertical', children = M.children})
 
-	local background = GuiElement({id = 'bg', width = width, height = height})
+	local background = GuiElement({width = width, height = height})
 
 	local hide = function()
 		M.visible = false
