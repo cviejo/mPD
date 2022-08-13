@@ -42,7 +42,7 @@ end
 _G.draw = function()
 	pd.flush()
 	window.draw()
-	hud.draw()
+	-- hud.draw()
 end
 
 _G.gotMessage = function(msg)

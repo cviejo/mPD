@@ -7,7 +7,7 @@ local Dialog = require('gui.dialog')
 
 local width, height, corner = of.getWidth(), of.getHeight(), theme.corner
 
-local square = GuiElement({width = corner, height = corner})
+local margin = GuiElement({width = corner, height = corner})
 
 local row = function(...)
 	return Stack({children = {...}})
@@ -18,26 +18,28 @@ local edit = Button('edit', {toggle = true})
 local paste = Button('paste')
 local copy = Button('copy')
 local undo = Button('undo')
-local test = Stack({children = {copy, undo, edit, paste}})
+local redo = Button('redo')
+local dock = Stack({children = {undo, copy, paste, edit, redo}})
 
 -- menu
 local more = Button('more_vert', {x = width - theme.button.size})
 local add = Button('add')
 local save = Button('save')
 local settings = Button('settings')
-local menu = Dialog({children = {square, row(add, save, square), row(settings)}})
+local open = Button('open')
+local menu = Dialog({children = {margin, row(add, open, margin), row(save, settings)}})
 
 -- root
 local fullscreen = Button('fullscreen', {toggle = true, on = true})
 local canvas = GuiElement({width = width, height = height})
-local window = GuiElement({children = {canvas, test, fullscreen, more, menu}})
+local window = GuiElement({children = {canvas, dock, fullscreen, more, menu}})
 
-local testX = (width - test.rect.width) / 2
-local testY = height - test.rect.height
+local testX = (width - dock.rect.width) / 2
+local testY = height - dock.rect.height
 
 menu.setPosition(width - menu.rect.width + corner, -(corner))
-test.setPosition(testX, testY)
-test.rect.height = test.rect.height + corner
+dock.setPosition(testX, testY)
+dock.rect.height = dock.rect.height + corner
 
 fullscreen.onPressed(function()
 	F.forEach(function(child)
