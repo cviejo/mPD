@@ -145,6 +145,23 @@ M.forEach = M.curry(function(fn, xs)
 	end
 end)
 
+M.filter = M.curry(function(fn, xs)
+	local result = {}
+	for i = 1, #xs do
+		local x = xs[i]
+		if fn(x) then
+			result[#result + 1] = x
+		end
+	end
+	return result
+end)
+
+M.reject = M.curry(function(fn, xs)
+	return M.filter(function(x)
+		return not fn(x)
+	end, xs)
+end)
+
 M.forEachReverse = M.curry(function(fn, xs)
 	for i = #xs, 1, -1 do
 		fn(xs[i], i)
