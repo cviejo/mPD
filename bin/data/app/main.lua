@@ -2,20 +2,11 @@ jit.off()
 
 require('globals')
 
-local hud = require('utils.hud')
 local parse = require('parse')
 local window = require('gui.main-window')
 local ofx = require('utils.of')
+local time = require('utils.time')
 local pd = require('pd')
-
-local loadPatch = function()
-	-- pd.queue('pd open main2.pd', ofx.getPath('ignore.patches/filters')) --
-	-- pd.queue('pd open sigbinops-help.pd', ofx.getPath('ignore.patches')) --
-	-- pd.queue('pd open help.pd', ofx.getPath('ignore.patches')) --
-	-- pd.queue('pd open test.pd', ofx.getPath('ignore.patches')) --
-	-- pd.queue('pd open hsl.pd', ofx.getPath('ignore.patches')) --
-	pd.queue('pd open two-objects.pd', ofx.getPath('ignore.patches')) --
-end
 
 _G.setup = function()
 	of.setLogLevel(of.LOG_VERBOSE)
@@ -26,34 +17,33 @@ _G.setup = function()
 	of.enableAntiAliasing()
 	of.setWindowPosition(0, 0)
 
-	local success = false
+	setTimeout(function()
+		local success = false
 
-	if _G.target == 'android' then
-		success = audio.init(2, 2, 44100)
-	else
-		success = audio.init("Pro Microphone", "Pro Speakers", 48000)
-	end
+		if _G.target == 'android' then
+			success = audio.init(2, 2, 44100)
+		else
+			success = audio.init("Pro Microphone", "Pro Speakers", 48000)
+		end
 
-	if (success) then
-		loadPatch()
-	end
+		if (success) then
+			pd.queue('pd open two-objects.pd', ofx.getPath('ignore.patches'))
+		end
+	end, 300)
 end
 
 _G.draw = function()
+	time.update()
 	pd.flush()
 	window.draw()
-	-- hud.draw()
+	-- require('utils.hud').draw()
 end
 
 _G.gotMessage = function(msg)
 	local parsed = parse(msg)
 
-	if not parsed then
-		return
-	elseif parsed.cmd == 'touch' then
-		window.touch(parsed)
-	else
-		-- canvas.message(parsed)
+	if parsed then
+		window.message(parsed)
 	end
 end
 

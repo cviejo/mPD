@@ -5,7 +5,7 @@ local Stack = require('gui.stack')
 local theme = require('gui.theme')
 local Dialog = require('gui.dialog')
 
-local width, height, corner = of.getWidth(), of.getHeight(), theme.corner
+local corner = theme.corner
 
 local margin = GuiElement({width = corner, height = corner})
 
@@ -22,24 +22,40 @@ local redo = Button('redo')
 local dock = Stack({children = {undo, copy, paste, edit, redo}})
 
 -- menu
-local more = Button('more_vert', {x = width - theme.button.size})
-local add = Button('add')
-local save = Button('save')
-local settings = Button('settings')
-local open = Button('open')
+local menuItemSize = {size = theme.button.size * 1.2}
+local more = Button('more_vert')
+local add = Button('add', menuItemSize)
+local save = Button('save', menuItemSize)
+local settings = Button('settings', menuItemSize)
+local open = Button('open', menuItemSize)
 local menu = Dialog({children = {margin, row(add, open, margin), row(save, settings)}})
 
 -- root
 local fullscreen = Button('fullscreen', {toggle = true, on = true})
-local canvas = GuiElement({width = width, height = height})
+local canvas = GuiElement( --[[ {width = width, height = height} ]] )
 local window = GuiElement({children = {canvas, dock, fullscreen, more, menu}})
 
-local testX = (width - dock.rect.width) / 2
-local testY = height - dock.rect.height
+local function arrange()
+	local width, height = of.getWidth(), of.getHeight()
+	local testX = (width - dock.rect.width) / 2
+	local testY = height - dock.rect.height
 
-menu.setPosition(width - menu.rect.width + corner, -(corner))
-dock.setPosition(testX, testY)
-dock.rect.height = dock.rect.height + corner
+	menu.setPosition(width - menu.rect.width + corner, -(corner))
+	dock.setPosition(testX, testY)
+	dock.rect.height = dock.rect.height + corner
+	more.rect.x = width - theme.button.size
+end
+
+window.message = function(msg)
+	if msg.cmd == 'touch' then
+		window.touch(msg)
+	elseif msg.cmd == 'orientation' then
+		arrange()
+		setTimeout(arrange, 300) -- fixes for artifacts when rearranging
+	else
+		-- canvas
+	end
+end
 
 fullscreen.onPressed(function()
 	F.forEach(function(child)
@@ -53,11 +69,13 @@ more.onPressed(function()
 	menu.visible = true
 end)
 
-local log = F.thunkify(print)
+arrange()
 
 F.forEach(function(x)
-	x.onPressed(log(x.id, ' pressed'))
-end, {add, save, settings, copy, undo, edit, paste})
+	x.onPressed(function()
+		log(x.id, ' pressed')
+	end)
+end, {add, save, settings, copy, undo, redo, edit, paste})
 
 return window
 
