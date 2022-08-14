@@ -1,6 +1,7 @@
 ---@diagnostic disable: lowercase-global
 local logging = require('utils.logging')
 local inspect = require('libs.inspect')
+local time = require('utils.time')
 
 _G.target = 'desktop'
 _G.dpi = not _G.mpd and 1 or mpd.getDPI()
@@ -12,6 +13,7 @@ _G.glm = glm
 _G.inspect = inspect
 _G.logging = logging
 _G.log = logging.verbose
+_G.setTimeout = time.setTimeout
 _G.TODO = function(msg)
 	print(logging.red('TODO'), msg)
 end
