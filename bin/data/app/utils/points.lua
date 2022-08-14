@@ -1,4 +1,4 @@
-local F = require('utils/functional')
+local F = require('utils.functional')
 
 local curry = F.curry
 

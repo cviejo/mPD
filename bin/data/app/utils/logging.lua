@@ -1,5 +1,5 @@
-local inspect = require('libs/inspect')
-local F = require('utils/functional')
+local inspect = require('libs.inspect')
+local F = require('utils.functional')
 
 local map, unless, join = F.map, F.unless, F.join
 

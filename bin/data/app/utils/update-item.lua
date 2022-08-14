@@ -1,5 +1,5 @@
-local curry = require('utils/functional').curry
-local pointsToPath = require('utils/of').pointsToPath
+local curry = require('utils.functional').curry
+local pointsToPath = require('utils.of').pointsToPath
 
 return curry(function(update, item)
 	if not item then

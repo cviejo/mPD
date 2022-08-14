@@ -1,6 +1,6 @@
 ---@diagnostic disable: lowercase-global
-local logging = require('utils/logging')
-local inspect = require('libs/inspect')
+local logging = require('utils.logging')
+local inspect = require('libs.inspect')
 
 _G.target = 'desktop'
 _G.dpi = not _G.mpd and 1 or mpd.getDPI()
