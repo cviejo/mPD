@@ -3,7 +3,8 @@
 -- canvas.message(parsed)
 -- if (not finish()) then log(msg.message, '\n') end
 -- or just finish()
---
+local logging = require('utils.logging')
+
 local M = {}
 
 local mark = function()
@@ -19,7 +20,7 @@ M.start = function(label, threshold)
 		if threshold then
 			if (diff > threshold) then
 				print('')
-				log(red(label), diff)
+				logging.log(logging.red(label), diff)
 				return false
 			else
 				return true

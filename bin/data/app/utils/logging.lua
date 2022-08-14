@@ -42,6 +42,9 @@ end
 
 return {
 	colour = colour,
+	red = colour(31),
+	green = colour(32),
+	blue = colour(34),
 	verbose = log(of.LOG_VERBOSE),
 	notice = log(of.LOG_NOTICE),
 	warn = log(of.LOG_WARNING),
