@@ -51,7 +51,7 @@ window.message = function(msg)
 		window.touch(msg)
 	elseif msg.cmd == 'orientation' then
 		arrange()
-		setTimeout(arrange, 300) -- fixes for artifacts when rearranging
+		setTimeout(arrange, 300) -- timeout fixes some artifacts when rearranging
 	else
 		-- canvas
 	end
@@ -73,6 +73,7 @@ arrange()
 
 F.forEach(function(x)
 	x.onPressed(function()
+		menu.visible = false -- maybe do this only on menu.children.onPressed
 		log(x.id, ' pressed')
 	end)
 end, {add, save, settings, copy, undo, redo, edit, paste})

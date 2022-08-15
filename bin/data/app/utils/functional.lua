@@ -58,7 +58,7 @@ M.curry3 = function(fn)
 	return handler()
 end
 
--- not is a lua keyword
+-- `not` is a lua keyword
 M.negate = function(x)
 	return not x
 end
