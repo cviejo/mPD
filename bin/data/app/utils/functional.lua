@@ -194,11 +194,11 @@ end)
 -- in this case means declaring the reducer only once
 M.pipe = function(...)
 	local fns = {...}
-	local reducer = function(acc, fn)
+	local run = M.reduce(function(acc, fn)
 		return fn(acc)
-	end
+	end)
 	return function(x)
-		return M.reduce(reducer, x, fns)
+		return run(x, fns)
 	end
 end
 
