@@ -1,7 +1,8 @@
 local inspect = require('libs.inspect')
 local F = require('utils.functional')
+local S = require('utils.string')
 
-local map, unless, join = F.map, F.unless, F.join
+local map, unless, join = F.map, F.unless, S.join
 
 local isPrintable = function(x)
 	local t = type(x)
@@ -45,6 +46,7 @@ return {
 	red = colour(31),
 	green = colour(32),
 	blue = colour(34),
+	log = log(of.LOG_VERBOSE),
 	verbose = log(of.LOG_VERBOSE),
 	notice = log(of.LOG_NOTICE),
 	warn = log(of.LOG_WARNING),

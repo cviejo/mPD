@@ -2,7 +2,7 @@ local F = require('utils.functional')
 
 local M = {}
 
-local join, curry = F.join, F.curry
+local curry = F.curry
 local byte, find, lower = string.byte, string.find, string.lower
 
 M.keyEq = curry(function(char, keyInt)
@@ -29,6 +29,18 @@ M.last = function(x)
 	return x:sub(-1)
 end
 
-M.joinLines = join("\n")
+M.join = curry(function(sep, xs) -- todo: reduce
+	local length = #xs
+	if length == 0 then
+		return ''
+	end
+	local acc = '' .. xs[1]
+	for i = 2, #xs do
+		acc = acc .. sep .. xs[i]
+	end
+	return acc
+end)
+
+M.joinLines = M.join("\n")
 
 return M

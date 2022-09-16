@@ -1,12 +1,11 @@
 local F = require('utils.functional')
-
-local pipe, join, unapply = F.pipe, F.join, F.unapply
+local S = require('utils.string')
 
 local M = {}
 
 local queue = ''
 
-local joinWords = join(' ')
+local joinWords = S.join(' ')
 
 local canvasCommand = function(cmd)
 	return function(canvasId)
@@ -26,7 +25,7 @@ M.flush = function()
 	queue = ''
 end
 
-M.send = pipe(unapply(joinWords), mpd.pdsend)
+M.send = F.pipe(F.unapply(joinWords), mpd.pdsend)
 
 M.save = canvasCommand('menusave')
 

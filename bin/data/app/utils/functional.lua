@@ -178,18 +178,6 @@ M.reduce = M.curry3(function(fn, init, xs)
 	return acc
 end)
 
-M.join = M.curry(function(sep, xs) -- todo: reduce
-	local length = #xs
-	if length == 0 then
-		return ''
-	end
-	local acc = '' .. xs[1]
-	for i = 2, #xs do
-		acc = acc .. sep .. xs[i]
-	end
-	return acc
-end)
-
 -- avoid inlining / creating functions dynamically in potentially hot paths
 -- in this case means declaring the reducer only once
 M.pipe = function(...)
