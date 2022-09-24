@@ -24,6 +24,10 @@ void ofApp::keyPressed(ofKeyEventArgs& args) {
 	mpd::key(args);
 }
 
+void ofApp::gotMessage(ofMessage msg) {
+	mpd::push(msg.message);
+}
+
 void ofApp::audioReceived(float* buffer, int size, int channelCount) {
 	audio::in(buffer, size, channelCount);
 }
