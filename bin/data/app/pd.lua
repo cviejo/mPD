@@ -1,11 +1,9 @@
 local F = require('utils.functional')
-local S = require('utils.string')
+local joinWords = require('utils.join-words')
 
 local M = {}
 
-local queue = ''
-
-local joinWords = S.join(' ')
+local buffer = ''
 
 local canvasCommand = function(cmd)
 	return function(canvasId)
@@ -14,15 +12,15 @@ local canvasCommand = function(cmd)
 end
 
 M.queue = function(...)
-	queue = queue .. ';' .. joinWords({...})
+	buffer = buffer .. ';' .. joinWords({...})
 end
 
 M.flush = function()
-	if (queue == '') then
+	if (buffer == '') then
 		return
 	end
-	mpd.pdsend(queue)
-	queue = ''
+	mpd.pdsend(buffer)
+	buffer = ''
 end
 
 M.send = F.pipe(F.unapply(joinWords), mpd.pdsend)

@@ -2,10 +2,10 @@ jit.off()
 
 require('globals')
 
-local parse = require('parse')
 local window = require('gui.main-window')
 local ofx = require('utils.of')
 local time = require('utils.time')
+local parse = require('parse')
 local pd = require('pd')
 
 _G.setup = function()
@@ -15,9 +15,11 @@ _G.setup = function()
 	of.setFrameRate(20)
 	of.enableSmoothing()
 	of.enableAntiAliasing()
-	of.setWindowPosition(0, 0)
+	of.setWindowPosition(1200, 300) -- just for desktop
 
 	setTimeout(function()
+		of.sendMessage("test")
+
 		local success = false
 
 		if _G.target == 'android' then
@@ -27,7 +29,7 @@ _G.setup = function()
 		end
 
 		if (success) then
-			pd.queue('pd open two-objects.pd', ofx.getPath('ignore.patches'))
+			pd.queue('pd open test2.pd', ofx.getPath('ignore.patches'))
 		end
 	end, 300)
 end
@@ -42,7 +44,12 @@ end
 _G.gotMessage = function(msg)
 	local parsed = parse(msg)
 
-	if parsed then
+	if not parsed then
+		return
+	elseif parsed.cmd == 'update-start' or parsed.cmd == 'update-end' then
+		-- not implemented
+		return
+	else
 		window.message(parsed)
 	end
 end

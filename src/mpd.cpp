@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include "mpd.h"
+#include <vector>
 #include "ofxLua.h"
 #if defined(TARGET_ANDROID)
 #include "ofxAndroid.h"

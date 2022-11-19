@@ -52,7 +52,7 @@ bool ofApp::scale(ofxAndroidScaleEventArgs& x) {
 }
 
 bool ofApp::scaleEnd(ofxAndroidScaleEventArgs& x) {
-	return scaleEvent("scaleEvent", x.getFocusX(), x.getFocusY(), x.getScaleFactor());
+	return scaleEvent("scaleEnd", x.getFocusX(), x.getFocusY(), x.getScaleFactor());
 }
 
 void ofApp::orientationChanged(ofOrientation& x) {
