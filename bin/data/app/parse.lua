@@ -192,5 +192,7 @@ return function(input)
 		return {cmd = first, value = second}
 	elseif input == 'update-start' or input == 'update-end' then
 		return {cmd = input}
+	elseif first == 'gui' then
+		return {cmd = first, type = second, id = word(), value = word()}
 	end
 end

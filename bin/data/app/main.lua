@@ -18,8 +18,6 @@ _G.setup = function()
 	of.setWindowPosition(1200, 300) -- just for desktop
 
 	setTimeout(function()
-		of.sendMessage("test")
-
 		local success = false
 
 		if _G.target == 'android' then

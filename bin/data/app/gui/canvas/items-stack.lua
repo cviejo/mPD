@@ -10,6 +10,10 @@ return function()
 	local tagged = {}
 	local dirty = false
 
+	M.count = function()
+		return #ordered
+	end
+
 	M.get = function()
 		return ordered
 	end
