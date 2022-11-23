@@ -24,6 +24,10 @@ void ofApp::keyPressed(ofKeyEventArgs& args) {
 	mpd::key(args);
 }
 
+void ofApp::gotMessage(ofMessage msg) {
+	mpd::push(msg.message);
+}
+
 void ofApp::audioReceived(float* buffer, int size, int channelCount) {
 	audio::in(buffer, size, channelCount);
 }
@@ -48,7 +52,7 @@ bool ofApp::scale(ofxAndroidScaleEventArgs& x) {
 }
 
 bool ofApp::scaleEnd(ofxAndroidScaleEventArgs& x) {
-	return scaleEvent("scaleEvent", x.getFocusX(), x.getFocusY(), x.getScaleFactor());
+	return scaleEvent("scaleEnd", x.getFocusX(), x.getFocusY(), x.getScaleFactor());
 }
 
 void ofApp::orientationChanged(ofOrientation& x) {

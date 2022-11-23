@@ -20,7 +20,7 @@ public:
 	void audioReceived(float* buffer, int size, int channelCount);
 	void audioRequested(float* buffer, int size, int channelCount);
 
-	void gotMessage(ofMessage msg) {}
+	void gotMessage(ofMessage msg);
 	void errorReceived(std::string& msg) {}
 
 	void keyPressed(ofKeyEventArgs& args);

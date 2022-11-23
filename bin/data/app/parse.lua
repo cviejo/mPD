@@ -1,4 +1,4 @@
-TODO('parse arrays in [list *] or {*} format')
+-- TODO('parse arrays in [list *] or {*} format')
 local ffi = require("ffi")
 local S = require('utils.string')
 local F = require('utils.functional')
@@ -11,9 +11,7 @@ local head, init, tail, last = S.head, S.init, S.tail, S.last
 local scaleEvent = {scale = 1, scaleBegin = 1, scaleEnd = 1, scroll = 1}
 
 local isKey = function(x)
-	if x then
-		return head(x) == '-'
-	end
+	return x ~= nil and head(x) == '-'
 end
 
 local splitWords = function(s, nl)
@@ -32,6 +30,7 @@ end
 
 local advanceToCurly = function(word)
 	while last(word()) ~= '}' do
+		-- nothing, we just want to move on the cursor
 	end
 end
 
@@ -193,5 +192,7 @@ return function(input)
 		return {cmd = first, value = second}
 	elseif input == 'update-start' or input == 'update-end' then
 		return {cmd = input}
+	elseif first == 'gui' then
+		return {cmd = first, type = second, id = word(), value = word()}
 	end
 end
