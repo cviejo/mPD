@@ -175,8 +175,8 @@ return function(input)
 		return {cmd = 'editmode', canvasId = second, value = tonumber(word())}
 	elseif first == 'pdtk_text_set' then
 		local tag = word()
-		local value = parseText(word)
-		return {cmd = 'set-text', canvasId = second, tag = tag, value = value}
+		local params = {text = parseText(word)}
+		return {cmd = 'set-text', canvasId = second, tag = tag, params = params}
 	elseif (first == 'pdtk_canvas_new') then
 		local width = tonumber(word())
 		local height = tonumber(word())
