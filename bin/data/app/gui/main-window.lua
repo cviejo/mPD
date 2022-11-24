@@ -1,11 +1,11 @@
 local F = require('utils.functional')
--- local S = require('utils.string')
 local GuiElement = require('gui.element')
 local Button = require('gui.button')
 local Stack = require('gui.stack')
 local theme = require('gui.theme')
 local Dialog = require('gui.dialog')
 local renderer = require('gui.renderer')
+local pd = require('pd')
 
 local corner = theme.corner
 
@@ -15,7 +15,7 @@ local row = function(...)
 	return Stack({children = {...}})
 end
 
--- bottom dock
+-- dock
 local edit = Button('edit', {toggle = true})
 local paste = Button('paste')
 local clear = Button('clear')
@@ -38,7 +38,7 @@ local menu = Dialog({children = {margin, row(add, open, margin), row(save, setti
 local fullscreen = Button('fullscreen', {toggle = true, on = true})
 local window = GuiElement({children = {renderer, dock, fullscreen, more, layers, menu}})
 
-local function arrange()
+local arrange = function()
 	local width, height = of.getWidth(), of.getHeight()
 	local testX = (width - dock.rect.width) / 2
 	local testY = height - dock.rect.height
@@ -51,17 +51,19 @@ local function arrange()
 	layers.rect.x = (width - layers.rect.width) / 2
 end
 
-window.message = function(msg)
-	if msg.cmd == 'touch' then
-		window.touch(msg)
-	elseif msg.cmd == 'orientation' then
-		arrange()
-		setTimeout(arrange, 300) -- timeout fixes some artifacts when rearranging
-	else
-		renderer.message(msg)
-		-- renderer
+local onCanvasAction = F.thunkify(function(btn)
+	if renderer.patch then
+		local patchId = renderer.patch.id
+
+		if btn.id == 'edit' then
+			pd.queue(patchId, 'editmode', (btn.on and '1' or '0'))
+		elseif (btn.id == 'redo' or btn.id == 'undo' or btn.id == 'copy' or btn.id == 'paste') then
+			pd.queue(patchId, btn.id)
+		elseif btn.id == 'clear' then
+			pd.delete(patchId)
+		end
 	end
-end
+end)
 
 fullscreen.onPressed(function()
 	F.forEach(function(child)
@@ -76,16 +78,30 @@ more.onPressed(function()
 	menu.visible = true
 end)
 
-arrange()
+window.message = function(msg)
+	if msg.cmd == 'touch' then
+		window.touch(msg)
+	elseif msg.cmd == 'orientation' then
+		arrange()
+		setTimeout(arrange, 300) -- timeout fixes some artifacts when rearranging
+	else
+		renderer.message(msg)
+	end
+end
 
 F.forEach(function(x)
-	x.onPressed(function()
-		menu.visible = false -- maybe do this only on menu.children.onPressed
-		local message = "gui pressed " .. x.id .. ' ' .. (x.on and '1' or '0')
-		print("message: " .. message)
-		of.sendMessage(message)
-	end)
-end, {add, save, settings, copy, undo, redo, clear, edit, paste})
+	x.onPressed(onCanvasAction(x))
+end, dock.children)
+
+arrange()
 
 return window
+
+-- F.forEach(function(x)
+-- 	x.onPressed(function()
+-- 		menu.visible = false -- maybe do this only on menu.children.onPressed
+-- 		local message = "gui pressed " .. x.id .. ' ' .. print("message: " .. message)
+-- 		of.sendMessage(message)
+-- 	end)
+-- end, {add, save, settings, copy, undo, redo, clear, edit, paste})
 

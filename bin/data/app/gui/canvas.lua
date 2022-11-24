@@ -1,17 +1,17 @@
-local pd = require('pd')
 local F = require('utils.functional')
 local GuiElement = require('gui.element')
 local Stack = require('gui.canvas.items-stack')
 local Viewport = require('gui.canvas.viewport')
-local drawItem = require('gui.canvas.draw-item')
 local cords = require('gui.canvas.cords')
-local hasTag = require('utils.has-tag')
-local ofx = require('utils.of')
-local updateItem = require('gui.canvas.update-item')
-local logging = require('utils.logging')
+local drawItem = require('gui.canvas.draw-item')
 local grid = require('gui.canvas.grid')
-local points = require('utils.points')
+local updateItem = require('gui.canvas.update-item')
+local hasTag = require('utils.has-tag')
+local logging = require('utils.logging')
 local nearestOuletPos = require('utils.nearest-outlet-pos')
+local ofx = require('utils.of')
+local points = require('utils.points')
+local pd = require('pd')
 
 local map = F.map
 
@@ -20,7 +20,7 @@ local scaleEvent = {scale = 1, scaleBegin = 1, scaleEnd = 1, scroll = 1}
 return function(id)
 	pd.queue(id, 'map 1;', id, 'updatemenu;', id, 'editmode', 0)
 
-	local M = GuiElement()
+	local M = GuiElement({id = id})
 
 	local items = Stack()
 	local viewport = Viewport(1)
@@ -68,16 +68,6 @@ return function(id)
 		end
 		viewport.setScale(msg)
 		updateGrid()
-	end
-
-	local function handleGuiAction(msg)
-		if msg.id == 'edit' then
-			pd.queue(id, 'editmode', msg.value)
-		elseif (msg.id == 'redo' or msg.id == 'undo' or msg.id == 'copy' or msg.id == 'paste') then
-			pd.queue(id, msg.id)
-		elseif msg.id == 'clear' then
-			pd.delete(id)
-		end
 	end
 
 	M.onPressed = touchHandler(function(_, scaled, floored)
@@ -132,14 +122,11 @@ return function(id)
 		elseif cmd == 'move' then
 			move(msg.tag, msg.points[1])
 		elseif cmd == 'delete' then
-			print 'got delete'
 			delete(msg)
 		elseif scaleEvent[cmd] then
 			setScale(msg)
 		elseif cmd == 'editmode' then
 			editmode = msg.value
-		elseif cmd == 'gui' then
-			handleGuiAction(msg)
 		elseif not msg.id then
 			logging.log(logging.red("no id"), msg)
 		elseif hasTag('cord', msg) then
