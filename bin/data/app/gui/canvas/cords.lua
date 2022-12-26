@@ -6,6 +6,8 @@ local signal = nil
 local control = nil
 local selected = nil
 
+-- it's a bit odd to handle selected lines separately, but couldn't
+-- get mesh:addColor to work as needed
 local function setSelected(item)
 	selected = {
 		cmd = 'line',
