@@ -1,3 +1,4 @@
+local S = require('utils.string')
 local drawItem = require('gui.canvas.draw-item')
 local cordMesh = require('gui.canvas.line-mesh')
 
@@ -9,9 +10,8 @@ local function setSelected(item)
 	selected = {
 		cmd = 'line',
 		tag = item.tag,
-		tags = {},
-		params = {width = 2, fill = '0000ff'},
-		points = control.getCord(item) or signal.getCord(item)
+		params = {width = 2, fill = '0000ff', tags = {}},
+		points = control.getPoints(item) or signal.getPoints(item)
 	}
 end
 
@@ -22,6 +22,16 @@ local function clear()
 end
 
 local function update(item)
+	if (S.head(item.tag) ~= 'l') then
+		return false
+	elseif not item.params and item.params.fill == '0000ff' then
+		setSelected(item)
+		return true
+	elseif item.params and item.params.fill == '000000' then
+		selected = nil
+		return true
+	end
+
 	return signal.update(item) or control.update(item)
 end
 
