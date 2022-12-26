@@ -7,10 +7,6 @@ local Dialog = require('gui.dialog')
 local renderer = require('gui.renderer')
 local pd = require('pd')
 
-local corner = theme.corner
-
-local margin = GuiElement({width = corner, height = corner})
-
 local row = function(...)
 	return Stack({children = {...}})
 end
@@ -32,23 +28,20 @@ local add = Button('add', menuItemSize)
 local save = Button('save', menuItemSize)
 local settings = Button('settings', menuItemSize)
 local open = Button('open', menuItemSize)
-local menu = Dialog({children = {margin, row(add, open, margin), row(save, settings)}})
+local menu = Dialog({children = {row(add, open), row(save, settings)}})
 
 -- root
 local fullscreen = Button('fullscreen', {toggle = true, on = true})
 local window = GuiElement({children = {renderer, dock, fullscreen, more, layers, menu}})
 
 local arrange = function()
-	local width, height = of.getWidth(), of.getHeight()
-	local testX = (width - dock.rect.width) / 2
-	local testY = height - dock.rect.height
+	local center = of.getWindowRect():getCenter()
 
-	menu.setPosition(width - menu.rect.width + corner, -(corner))
-	dock.setPosition(testX, testY)
-	dock.rect.height = dock.rect.height + corner
+	menu.setPosition(center.x - menu.rect.width / 2, center.y - menu.rect.height / 2)
+	dock.setPosition(center.x - dock.rect.width / 2, of.getHeight() - dock.rect.height)
 
-	more.rect.x = width - theme.button.size
-	layers.rect.x = (width - layers.rect.width) / 2
+	more.rect.x = of.getWidth() - theme.button.size
+	layers.rect.x = (of.getWidth() - layers.rect.width) / 2
 end
 
 local onCanvasAction = F.thunkify(function(btn)
