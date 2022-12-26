@@ -26,7 +26,7 @@ end
 local function update(item)
 	if (S.head(item.tag) ~= 'l') then
 		return false
-	elseif not item.params and item.params.fill == '0000ff' then
+	elseif item.params and item.params.fill == '0000ff' then
 		setSelected(item)
 		return true
 	elseif item.params and item.params.fill == '000000' then
