@@ -2,7 +2,7 @@ local F = require('utils.functional')
 local GuiElement = require('gui.element')
 local Stack = require('gui.canvas.items-stack')
 local Viewport = require('gui.canvas.viewport')
-local cords = require('gui.canvas.cords')
+local Cords = require('gui.canvas.cords')
 local drawItem = require('gui.canvas.draw-item')
 local grid = require('gui.canvas.grid')
 local updateItem = require('gui.canvas.update-item')
@@ -23,6 +23,7 @@ return function(id)
 	local M = GuiElement({id = id})
 
 	local items = Stack()
+	local cords = Cords()
 	local viewport = Viewport(1)
 	local editmode = 0
 	local lastTouch = nil

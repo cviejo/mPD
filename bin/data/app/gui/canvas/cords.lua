@@ -2,70 +2,73 @@ local S = require('utils.string')
 local drawItem = require('gui.canvas.draw-item')
 local cordMesh = require('gui.canvas.line-mesh')
 
-local signal = nil
-local control = nil
-local selected = nil
+return function()
+	local M = {}
 
--- it's a bit odd to handle selected lines separately, but couldn't
--- get mesh:addColor to work as needed
-local function setSelected(item)
-	selected = {
-		cmd = 'line',
-		tag = item.tag,
-		params = {width = 2, fill = '0000ff', tags = {}},
-		points = control.getPoints(item) or signal.getPoints(item)
-	}
-end
+	local signal = nil
+	local control = nil
+	local selected = nil
 
-local function clear()
-	-- TODO
-	selected = nil
-	signal = cordMesh(0x808093)
-	control = cordMesh(0x323232)
-end
+	-- it's a bit odd to handle selected lines separately, but couldn't
+	-- get mesh:addColor to work as needed
+	local function setSelected(item)
+		selected = {
+			cmd = 'line',
+			tag = item.tag,
+			params = {width = 2, fill = '0000ff', tags = {}},
+			points = control.getPoints(item) or signal.getPoints(item)
+		}
+	end
 
-local function update(item)
-	if (S.head(item.tag) ~= 'l') then
-		return false
-	elseif item.params and item.params.fill == '0000ff' then
-		setSelected(item)
-		return true
-	elseif item.params and item.params.fill == '000000' then
+	M.clear = function()
 		selected = nil
-		return true
+		signal = cordMesh(0x808093)
+		control = cordMesh(0x323232)
 	end
 
-	return signal.update(item) or control.update(item)
-end
+	M.update = function(item)
+		if (S.head(item.tag) ~= 'l') then
+			return false
+		elseif item.params and item.params.fill == '0000ff' then
+			setSelected(item)
+			return true
+		elseif item.params and item.params.fill == '000000' then
+			selected = nil
+			return true
+		end
 
-local function delete(item)
-	selected = nil
-	return signal.delete(item) or control.delete(item)
-end
-
-local function draw(viewport)
-	of.setLineWidth(viewport.scale)
-	control.draw()
-	of.setLineWidth(2 * viewport.scale)
-	signal.draw()
-
-	if (selected) then
-		drawItem(viewport, selected)
+		return signal.update(item) or control.update(item)
 	end
-end
 
-local function add(item)
-	if item.cmd == 'select-line' then
-		setSelected(item)
-	elseif item.cmd == 'unselect-line' then
+	M.delete = function(item)
 		selected = nil
-	elseif item.params.width == 1 then
-		control.add(item)
-	else
-		signal.add(item)
+		return signal.delete(item) or control.delete(item)
 	end
+
+	M.draw = function(viewport)
+		of.setLineWidth(viewport.scale)
+		control.draw()
+		of.setLineWidth(2 * viewport.scale)
+		signal.draw()
+
+		if (selected) then
+			drawItem(viewport, selected)
+		end
+	end
+
+	M.add = function(item)
+		if item.cmd == 'select-line' then
+			setSelected(item)
+		elseif item.cmd == 'unselect-line' then
+			selected = nil
+		elseif item.params.width == 1 then
+			control.add(item)
+		else
+			signal.add(item)
+		end
+	end
+
+	M.clear()
+
+	return M
 end
-
-clear()
-
-return {draw = draw, add = add, update = update, delete = delete, clear = clear}
