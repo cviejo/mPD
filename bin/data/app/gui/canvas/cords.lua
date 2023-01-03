@@ -19,6 +19,7 @@ end
 
 local function clear()
 	-- TODO
+	selected = nil
 	signal = cordMesh(0x808093)
 	control = cordMesh(0x323232)
 end
@@ -38,6 +39,7 @@ local function update(item)
 end
 
 local function delete(item)
+	selected = nil
 	return signal.delete(item) or control.delete(item)
 end
 
