@@ -314,4 +314,8 @@ M.path = M.curry2(function(parts, x)
 	return current
 end)
 
+M.pathEq = M.curry3(function(parts, value, x)
+	return M.path(parts, x) == value
+end)
+
 return M

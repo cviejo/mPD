@@ -1,6 +1,15 @@
+local F = require('utils.functional')
 local S = require('utils.string')
 local drawItem = require('gui.canvas.draw-item')
 local cordMesh = require('gui.canvas.line-mesh')
+
+local notLine = function(item)
+	return S.head(item.tag) ~= 'l'
+end
+
+local blackFill = F.pathEq({'params', 'fill'}, '000000')
+
+local blueFill = F.pathEq({'params', 'fill'}, '0000ff')
 
 return function()
 	local M = {}
@@ -27,12 +36,12 @@ return function()
 	end
 
 	M.update = function(item)
-		if (S.head(item.tag) ~= 'l') then
+		if (notLine(item)) then
 			return false
-		elseif item.params and item.params.fill == '0000ff' then
+		elseif blueFill(item) then
 			setSelected(item)
 			return true
-		elseif item.params and item.params.fill == '000000' then
+		elseif blackFill(item) then
 			selected = nil
 			return true
 		end
