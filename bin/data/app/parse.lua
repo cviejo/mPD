@@ -1,9 +1,7 @@
 -- TODO('parse arrays in [list *] or {*} format')
-local ffi = require("ffi")
 local S = require('utils.string')
 local F = require('utils.functional')
-
-ffi.cdef('typedef struct point{ int16_t x, y; } point;')
+local point = require('utils.point')
 
 local push = F.push
 local head, init, tail, last = S.head, S.init, S.tail, S.last
@@ -54,8 +52,7 @@ local parsePoints = function(word)
 			current = part
 			break
 		end
-		push(ffi.new('point', x, tonumber(word())), points)
-
+		push(point(x, tonumber(word())), points)
 	end
 	return points, current
 end

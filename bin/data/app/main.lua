@@ -1,5 +1,3 @@
-jit.off()
-
 require('globals')
 
 local window = require('gui.main-window')

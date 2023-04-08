@@ -1,3 +1,7 @@
+if _G.jit then
+	_G.jit.off()
+end
+
 ---@diagnostic disable: lowercase-global
 local logging = require('utils.logging')
 local inspect = require('libs.inspect')
@@ -14,6 +18,7 @@ _G.inspect = inspect
 _G.logging = logging
 _G.log = logging.verbose
 _G.setTimeout = time.setTimeout
+_G.unpack = _G.unpack or table.unpack
 _G.TODO = function(msg)
 	print(logging.red('TODO'), msg)
 end
