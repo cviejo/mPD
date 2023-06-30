@@ -1,4 +1,3 @@
-local F = require('utils.functional')
 local GuiElement = require('gui.element')
 local Font = require('utils.font')
 local theme = require('gui.theme')

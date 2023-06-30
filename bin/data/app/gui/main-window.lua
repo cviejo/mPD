@@ -86,15 +86,19 @@ F.forEach(function(x)
 	x.onPressed(onCanvasAction(x))
 end, dock.children)
 
+F.forEach(function(x)
+	x.onPressed(function()
+		if x.id == 'save' then
+			local patchId = renderer.patch.id
+			pd.queue(patchId, 'menusave')
+			menu.visible = false
+		else
+			print('not implemented: ' .. x.id)
+		end
+	end)
+end, {add, save, settings, copy, undo, redo, clear, edit, paste})
+
 arrange()
 
 return window
-
--- F.forEach(function(x)
--- 	x.onPressed(function()
--- 		menu.visible = false -- maybe do this only on menu.children.onPressed
--- 		local message = "gui pressed " .. x.id .. ' ' .. print("message: " .. message)
--- 		of.sendMessage(message)
--- 	end)
--- end, {add, save, settings, copy, undo, redo, clear, edit, paste})
 
