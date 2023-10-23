@@ -25,8 +25,7 @@ M.curry2 = function(fn)
 	return handler
 end
 
--- not pretty, but fast. after receiving the first two arguments
--- performance is similar to non-curried form
+-- see curry2 comment
 M.curry3 = function(fn)
 	local function handler(a, b, c)
 		if a == nil then -- no args
@@ -58,17 +57,6 @@ M.curry3 = function(fn)
 	return handler()
 end
 
--- `not` is a lua keyword
-M.negate = function(x)
-	return not x
-end
-
-M.unapply = function(fn)
-	return function(...)
-		return fn({...})
-	end
-end
-
 M.curry = function(fn)
 	local nparams = debug.getinfo(fn).nparams
 
@@ -76,6 +64,16 @@ M.curry = function(fn)
 		return M.curry2(fn)
 	else
 		return M.curry3(fn)
+	end
+end
+
+M.negate = function(x)
+	return not x
+end
+
+M.unapply = function(fn)
+	return function(...)
+		return fn({ ... })
 	end
 end
 
@@ -181,7 +179,7 @@ end)
 -- avoid inlining / creating functions dynamically in potentially hot paths
 -- in this case means declaring the reducer only once
 M.pipe = function(...)
-	local fns = {...}
+	local fns = { ... }
 	local run = M.reduce(function(acc, fn)
 		return fn(acc)
 	end)
@@ -271,7 +269,7 @@ end)
 
 M.thunkify = function(fn)
 	return function(...)
-		local args = {...}
+		local args = { ... }
 		return function()
 			return fn(unpack(args))
 		end
@@ -316,6 +314,17 @@ end)
 
 M.pathEq = M.curry3(function(parts, value, x)
 	return M.path(parts, x) == value
+end)
+
+M.concat = M.curry2(function(a, b)
+	local result = {}
+	for i = 1, #a do
+		result[#result + 1] = a[i]
+	end
+	for i = 1, #b do
+		result[#result + 1] = b[i]
+	end
+	return result
 end)
 
 return M

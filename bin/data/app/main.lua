@@ -6,14 +6,18 @@ local time = require('utils.time')
 local parse = require('parse')
 local pd = require('pd')
 
+local w, h = nil, nil
+
 _G.setup = function()
+	w, h = of.getWidth(), of.getHeight()
 	of.setLogLevel(of.LOG_VERBOSE)
 	of.background(255)
 	of.setVerticalSync(false) -- needed for fps > 60 on desktop
 	of.setFrameRate(20)
 	of.enableSmoothing()
 	of.enableAntiAliasing()
-	of.setWindowPosition(1200, 300) -- just for desktop
+	-- of.setWindowPosition(1200, 300) -- just for desktop
+	of.setWindowPosition(-200, -150) -- just for desktop
 
 	setTimeout(function()
 		local success = false

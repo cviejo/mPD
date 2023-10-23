@@ -6,19 +6,16 @@ local theme = require('gui.theme')
 local Dialog = require('gui.dialog')
 local renderer = require('gui.renderer')
 local pd = require('pd')
+local onPressHandler = require('gui.on-press')
+
+local onPress = F.thunkify(onPressHandler)
 
 local row = function(...)
 	return Stack({children = {...}})
 end
 
--- dock
-local edit = Button('edit', {toggle = true})
-local paste = Button('paste')
-local clear = Button('clear')
-local copy = Button('copy')
-local undo = Button('undo')
-local redo = Button('redo')
-local dock = Stack({children = {undo, copy, paste, clear, edit, redo}})
+local dock = row(Button('undo'), Button('copy'), Button('paste'), Button('clear'),
+                 Button('edit', {toggle = true}), Button('redo'))
 
 -- menu
 local menuItemSize = {size = theme.button.size * 1.2}
@@ -44,20 +41,6 @@ local arrange = function()
 	layers.rect.x = (of.getWidth() - layers.rect.width) / 2
 end
 
-local onCanvasAction = F.thunkify(function(btn)
-	if renderer.patch then
-		local patchId = renderer.patch.id
-
-		if btn.id == 'edit' then
-			pd.queue(patchId, 'editmode', (btn.on and '1' or '0'))
-		elseif (btn.id == 'redo' or btn.id == 'undo' or btn.id == 'copy' or btn.id == 'paste') then
-			pd.queue(patchId, btn.id)
-		elseif btn.id == 'clear' then
-			pd.delete(patchId)
-		end
-	end
-end)
-
 fullscreen.onPressed(function()
 	F.forEach(function(child)
 		child.visible = fullscreen.on
@@ -77,26 +60,16 @@ window.message = function(msg)
 	elseif msg.cmd == 'orientation' then
 		arrange()
 		setTimeout(arrange, 300) -- timeout fixes some artifacts when rearranging
+		-- elseif msg.cmd == 'hid' then
+
 	else
 		renderer.message(msg)
 	end
 end
 
 F.forEach(function(x)
-	x.onPressed(onCanvasAction(x))
-end, dock.children)
-
-F.forEach(function(x)
-	x.onPressed(function()
-		if x.id == 'save' then
-			local patchId = renderer.patch.id
-			pd.queue(patchId, 'menusave')
-			menu.visible = false
-		else
-			print('not implemented: ' .. x.id)
-		end
-	end)
-end, {add, save, settings, copy, undo, redo, clear, edit, paste})
+	x.onPressed(onPress(x))
+end, F.concat(dock.children, {add, save, settings}))
 
 arrange()
 
