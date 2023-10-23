@@ -141,10 +141,7 @@ return function(id)
 		of.pushMatrix()
 		of.scale(viewport.scale, viewport.scale)
 		of.translate(viewport.position() * -1)
-
-		-- of.translate(position.x / scale, position.y / scale)
-		-- of.background(back)
-		of.background(255) -- theme this?
+		of.background(255)
 
 		if editmode == 1 and viewport.scale >= 1 then
 			of.setColor(100)

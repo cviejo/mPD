@@ -1,3 +1,8 @@
+-- Using: logging
+--
+-- local logging = require('utils.logging')
+-- logging.log(logging.red('no path'), item)
+--
 local inspect = require('libs.inspect')
 local F = require('utils.functional')
 local S = require('utils.string')

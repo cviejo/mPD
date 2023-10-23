@@ -2,13 +2,12 @@ local F = require('utils.functional')
 local Font = require('utils.font')
 local hasTag = require('utils.has-tag')
 local toRect = require('utils.points').toRect
-local logging = require('utils.logging')
 
 local pipe, curry, safe, intersects = F.pipe, F.curry, F.safe, F.intersects
 local complement = F.complement
 
 local scale = 1
-local front = 0
+local front = '0'
 local font = Font("DejaVuSansMono", 9)
 
 local setHex = safe(pipe(of.hexToInt, of.setHexColor))
@@ -115,7 +114,6 @@ local function drawPolyLine(item)
 	end
 
 	if not item.path then
-		-- logging.log(logging.red('no path'), item.message)
 		return
 	elseif fill then
 		item.path:setHexColor(of.hexToInt(fill))
@@ -132,21 +130,19 @@ end
 
 local pointOutside = function(rect, point)
 	local right, bottom = rect.x + rect.width, rect.y + rect.height
+	return point.x > right or point.y > bottom or point.x < rect.x or point.y < rect.y
+end
+
+local shapeOutside = function(rect, point)
+	local right, bottom = rect.x + rect.width, rect.y + rect.height
 	return point.x > right or point.y > bottom
 end
 
-local pointInside = complement(pointOutside)
+local shapeInside = complement(shapeOutside)
 
 local outside = function(rect, item)
 	local p1, p2 = item.points[1], item.points[2]
-	local top, left = rect.y, rect.x
-	local right, bottom = left + rect.width, top + rect.height
-	-- LuaFormatter off
-	return (p1.y < top and p2.y < top) or
-		    (p1.y > bottom and p2.y > bottom) or
-	       (p1.x > right and p2.x > right) or
-	       (p1.x < left and p2.x < left)
-	-- LuaFormatter on
+	return pointOutside(rect, p1) and pointOutside(rect, p2)
 end
 
 return curry(function(viewport, item)
@@ -162,13 +158,13 @@ return curry(function(viewport, item)
 		drawRectangle(item)
 	elseif cmd == 'line' and not outside(rect, item) then
 		drawLine(item)
-	elseif (cmd == 'polyline' or cmd == 'polygon') and pointInside(rect, item.points[1]) then
+	elseif (cmd == 'polyline' or cmd == 'polygon') and shapeInside(rect, item.points[1]) then
 		drawPolyLine(item)
 	elseif cmd == 'oval' and not outside(rect, item) then
 		drawOval(item)
-	elseif cmd == 'array' and not pointOutside(rect, item.points[1]) then
+	elseif cmd == 'array' and not shapeOutside(rect, item.points[1]) then
 		drawArray(item)
-	elseif cmd == 'text' and not pointOutside(rect, item.points[1]) then
+	elseif cmd == 'text' and not shapeOutside(rect, item.points[1]) then
 		drawText(item)
 	end
 end)
@@ -210,4 +206,3 @@ end)
 -- 	end
 -- 	of.drawRectangle(x, y, w, h)
 -- end
-
