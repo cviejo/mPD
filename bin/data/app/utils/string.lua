@@ -41,6 +41,6 @@ M.join = curry(function(sep, xs) -- todo: reduce
 	return acc
 end)
 
-M.joinLines = M.join("\n")
+M.joinLines = M.join('\n')
 
 return M

@@ -1,4 +1,4 @@
-local includes = require("utils.functional").includes
+local includes = require('utils.functional').includes
 
 return function(tag, x)
 	local tags = x.params.tags

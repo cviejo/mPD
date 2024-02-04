@@ -25,7 +25,7 @@ _G.setup = function()
 		if _G.target == 'android' then
 			success = audio.init(2, 2, 44100)
 		else
-			success = audio.init("Pro Microphone", "Pro Speakers", 48000)
+			success = audio.init('Pro Microphone', 'Pro Speakers', 48000)
 		end
 
 		if (success) then

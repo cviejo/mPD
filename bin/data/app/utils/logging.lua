@@ -27,10 +27,10 @@ local of = _G.of or {
 local function colour(code)
 	return function(x)
 		local value = x
-		if type(x) ~= "string" then
+		if type(x) ~= 'string' then
 			value = inspect(x)
 		end
-		return "\027[" .. code .. "m" .. value .. "\027[0m"
+		return '\027[' .. code .. 'm' .. value .. '\027[0m'
 	end
 end
 

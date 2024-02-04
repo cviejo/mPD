@@ -2,10 +2,10 @@ local GuiElement = require('gui.element')
 local Font = require('utils.font')
 local theme = require('gui.theme')
 
-local font = Font("DejaVuSansMono", 6 * dpi)
+local font = Font('DejaVuSansMono', 6 * dpi)
 
 local loadImage = function(name, size)
-	local file = "images/" .. name .. ".png"
+	local file = 'images/' .. name .. '.png'
 	local img = of.Image(file)
 	img:resize(size, size)
 	return img

@@ -3,7 +3,7 @@ local point = function(x, y)
 end
 
 if jit then
-	local ffi = require("ffi")
+	local ffi = require('ffi')
 	ffi.cdef('typedef struct point{ int16_t x, y; } point;')
 	point = function(x, y)
 		return ffi.new('point', x, y)

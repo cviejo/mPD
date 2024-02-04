@@ -61,7 +61,6 @@ window.message = function(msg)
 		arrange()
 		setTimeout(arrange, 300) -- timeout fixes some artifacts when rearranging
 		-- elseif msg.cmd == 'hid' then
-
 	else
 		renderer.message(msg)
 	end
@@ -74,4 +73,3 @@ end, F.concat(dock.children, {add, save, settings}))
 arrange()
 
 return window
-

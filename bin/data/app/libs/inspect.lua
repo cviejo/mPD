@@ -48,44 +48,44 @@ end
 -- Apostrophizes the string if it has quotes, but not aphostrophes
 -- Otherwise, it returns a regular quoted string
 local function smartQuote(str)
-	if str:match('"') and not str:match("'") then return "'" .. str .. "'" end
+	if str:match('"') and not str:match('\'') then
+		return '\'' .. str .. '\''
+	end
 	return '"' .. str:gsub('"', '\\"') .. '"'
 end
 
 -- \a => '\\a', \0 => nil
 local shortControlCharEscapes = {
-	["\a"] = "\\a",
-	["\b"] = "\\b",
-	["\f"] = "\\f",
-	["\n"] = "\\n",
-	["\r"] = "\\r",
-	["\t"] = "\\t",
-	["\v"] = "\\v",
-	["\127"] = "\\127"
+	['\a'] = '\\a',
+	['\b'] = '\\b',
+	['\f'] = '\\f',
+	['\n'] = '\\n',
+	['\r'] = '\\r',
+	['\t'] = '\\t',
+	['\v'] = '\\v',
+	['\127'] = '\\127'
 }
-local longControlCharEscapes = {["\127"] = "\127"} -- \a => nil, \0 => \000, 31 => \031
+local longControlCharEscapes = {['\127'] = '\127'} -- \a => nil, \0 => \000, 31 => \031
 for i = 0, 31 do
 	local ch = string.char(i)
 	if not shortControlCharEscapes[ch] then
-		shortControlCharEscapes[ch] = "\\" .. i
-		longControlCharEscapes[ch] = string.format("\\%03d", i)
+		shortControlCharEscapes[ch] = '\\' .. i
+		longControlCharEscapes[ch] = string.format('\\%03d', i)
 	end
 end
 -- longControlCharEscapes["\127"]="\\127"
 
 local function escape(str)
-	return (str:gsub("\\", "\\\\"):gsub("(%c)%f[0-9]", longControlCharEscapes)
-					       :gsub("%c", shortControlCharEscapes))
+	return (str:gsub('\\', '\\\\'):gsub('(%c)%f[0-9]', longControlCharEscapes):gsub('%c',
+	                                                                                shortControlCharEscapes))
 end
 
 local function isIdentifier(str)
-	return type(str) == 'string' and str:match("^[_%a][_%a%d]*$")
+	return type(str) == 'string' and str:match('^[_%a][_%a%d]*$')
 end
 
 local function isSequenceKey(k, sequenceLength)
-	return
-					type(k) == 'number' and 1 <= k and k <= sequenceLength and math.floor(k) ==
-									k
+	return type(k) == 'number' and 1 <= k and k <= sequenceLength and math.floor(k) == k
 end
 
 local defaultTypeOrders = {
@@ -102,7 +102,9 @@ local function sortKeys(a, b)
 	local ta, tb = type(a), type(b)
 
 	-- strings and numbers are sorted numerically/alphabetically
-	if ta == tb and (ta == 'string' or ta == 'number') then return a < b end
+	if ta == tb and (ta == 'string' or ta == 'number') then
+		return a < b
+	end
 
 	local dta, dtb = defaultTypeOrders[ta], defaultTypeOrders[tb]
 	-- Two default types are compared according to the defaultTypeOrders table
@@ -164,20 +166,28 @@ end
 
 local copySequence = function(s)
 	local copy, len = {}, #s
-	for i = 1, len do copy[i] = s[i] end
+	for i = 1, len do
+		copy[i] = s[i]
+	end
 	return copy, len
 end
 
 local function makePath(path, ...)
 	local keys = {...}
 	local newPath, len = copySequence(path)
-	for i = 1, #keys do newPath[len + i] = keys[i] end
+	for i = 1, #keys do
+		newPath[len + i] = keys[i]
+	end
 	return newPath
 end
 
 local function processRecursive(process, item, path, visited)
-	if item == nil then return nil end
-	if visited[item] then return visited[item] end
+	if item == nil then
+		return nil
+	end
+	if visited[item] then
+		return visited[item]
+	end
 
 	local processed = process(item, path)
 	if type(processed) == 'table' then
@@ -186,18 +196,18 @@ local function processRecursive(process, item, path, visited)
 		local processedKey
 
 		for k, v in rawpairs(processed) do
-			processedKey = processRecursive(process, k, makePath(path, k, inspect.KEY),
-			                                visited)
+			processedKey = processRecursive(process, k, makePath(path, k, inspect.KEY), visited)
 			if processedKey ~= nil then
-				processedCopy[processedKey] = processRecursive(process, v, makePath(path,
-				                                                                    processedKey),
-				                                               visited)
+				processedCopy[processedKey] =
+								processRecursive(process, v, makePath(path, processedKey), visited)
 			end
 		end
 
-		local mt = processRecursive(process, getmetatable(processed),
-		                            makePath(path, inspect.METATABLE), visited)
-		if type(mt) ~= 'table' then mt = nil end -- ignore not nil/table __metatable field
+		local mt = processRecursive(process, getmetatable(processed), makePath(path, inspect.METATABLE),
+		                            visited)
+		if type(mt) ~= 'table' then
+			mt = nil
+		end -- ignore not nil/table __metatable field
 		setmetatable(processedCopy, mt)
 		processed = processedCopy
 	end
@@ -245,10 +255,12 @@ function Inspector:getId(v)
 end
 
 function Inspector:putKey(k)
-	if isIdentifier(k) then return self:puts(k) end
-	self:puts("[")
+	if isIdentifier(k) then
+		return self:puts(k)
+	end
+	self:puts('[')
 	self:putValue(k)
-	self:puts("]")
+	self:puts(']')
 end
 
 function Inspector:putTable(t)
@@ -259,17 +271,20 @@ function Inspector:putTable(t)
 	elseif self.level >= self.depth then
 		self:puts('{...}')
 	else
-		if self.tableAppearances[t] > 1 then self:puts('<', self:getId(t), '>') end
+		if self.tableAppearances[t] > 1 then
+			self:puts('<', self:getId(t), '>')
+		end
 
-		local nonSequentialKeys, nonSequentialKeysLength, sequenceLength =
-						getNonSequentialKeys(t)
+		local nonSequentialKeys, nonSequentialKeysLength, sequenceLength = getNonSequentialKeys(t)
 		local mt = getmetatable(t)
 
 		self:puts('{')
 		self:down(function()
 			local count = 0
 			for i = 1, sequenceLength do
-				if count > 0 then self:puts(',') end
+				if count > 0 then
+					self:puts(',')
+				end
 				self:puts(' ')
 				self:putValue(t[i])
 				count = count + 1
@@ -277,7 +292,9 @@ function Inspector:putTable(t)
 
 			for i = 1, nonSequentialKeysLength do
 				local k = nonSequentialKeys[i]
-				if count > 0 then self:puts(',') end
+				if count > 0 then
+					self:puts(',')
+				end
 				self:tabify()
 				self:putKey(k)
 				self:puts(' = ')
@@ -286,7 +303,9 @@ function Inspector:putTable(t)
 			end
 
 			if type(mt) == 'table' then
-				if count > 0 then self:puts(',') end
+				if count > 0 then
+					self:puts(',')
+				end
 				self:tabify()
 				self:puts('<metatable> = ')
 				self:putValue(mt)
@@ -308,8 +327,7 @@ function Inspector:putValue(v)
 
 	if tv == 'string' then
 		self:puts(smartQuote(escape(v)))
-	elseif tv == 'number' or tv == 'boolean' or tv == 'nil' or tv == 'cdata' or tv ==
-					'ctype' then
+	elseif tv == 'number' or tv == 'boolean' or tv == 'nil' or tv == 'cdata' or tv == 'ctype' then
 		self:puts(tostring(v))
 	elseif tv == 'table' then
 		self:putTable(v)
@@ -328,7 +346,9 @@ function inspect.inspect(root, options)
 	local indent = options.indent or '  '
 	local process = options.process
 
-	if process then root = processRecursive(process, root, {}, {}) end
+	if process then
+		root = processRecursive(process, root, {}, {})
+	end
 
 	local inspector = setmetatable({
 		depth = depth,

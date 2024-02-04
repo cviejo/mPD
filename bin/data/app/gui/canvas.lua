@@ -129,7 +129,7 @@ return function(id)
 		elseif cmd == 'editmode' then
 			editmode = msg.value
 		elseif not msg.id then
-			logging.log(logging.red("no id"), msg)
+			logging.log(logging.red('no id'), msg)
 		elseif hasTag('cord', msg) then
 			cords.add(msg)
 		else

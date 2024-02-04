@@ -5,7 +5,7 @@ local printScale = 2
 return function(name, size)
 	local font = of.TrueTypeFont()
 
-	font:load("fonts/" .. name .. ".ttf", size * printScale - 1)
+	font:load('fonts/' .. name .. '.ttf', size * printScale - 1)
 
 	local M = {}
 
