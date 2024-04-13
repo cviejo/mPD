@@ -18,7 +18,7 @@ M.update = function()
 end
 
 M.setTimeout = function(callback, timeout)
-	F.push({callback = callback, timeout = timeout, start = M.elapsed()}, timeouts)
+	F.push({ callback = callback, timeout = timeout, start = M.elapsed() }, timeouts)
 end
 
 M.clearTimeout = function(timeout)

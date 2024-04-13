@@ -15,7 +15,7 @@ local getLabelPosition = function(label, rect)
 	local bounds = font.getStringBounds(label, 0, 0)
 	local x = rect.x + (rect.width - bounds.width) / 2
 	local y = rect.y + (rect.height - bounds.height * 0.8)
-	return {x = x, y = y}
+	return { x = x, y = y }
 end
 
 local function Button(id, options)

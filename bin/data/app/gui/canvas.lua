@@ -15,12 +15,12 @@ local pd = require('pd')
 
 local map = F.map
 
-local scaleEvent = {scale = 1, scaleBegin = 1, scaleEnd = 1, scroll = 1}
+local scaleEvent = { scale = 1, scaleBegin = 1, scaleEnd = 1, scroll = 1 }
 
 return function(id)
 	pd.queue(id, 'map 1;', id, 'updatemenu;', id, 'editmode', 0)
 
-	local M = GuiElement({id = id})
+	local M = GuiElement({ id = id })
 
 	local items = Stack()
 	local cords = Cords()
@@ -33,7 +33,7 @@ return function(id)
 			return
 		end
 		local scaled = viewport.screenToCanvas(touch)
-		local floored = {x = math.floor(scaled.x), y = math.floor(scaled.y)}
+		local floored = { x = math.floor(scaled.x), y = math.floor(scaled.y) }
 		fn(touch, scaled, floored)
 	end)
 
@@ -112,10 +112,10 @@ return function(id)
 
 		if cmd == 'array' then
 			msg.mesh = ofx.pointsToMesh(msg.points)
-			msg.points = {msg.points[1]}
+			msg.points = { msg.points[1] }
 		elseif cmd == 'polyline' or cmd == 'polygon' then
 			msg.path = ofx.pointsToPath(msg.points)
-			msg.points = {msg.points[1]}
+			msg.points = { msg.points[1] }
 		end
 
 		if cmd == 'coords' or cmd == 'set-text' or cmd == 'itemconfigure' then

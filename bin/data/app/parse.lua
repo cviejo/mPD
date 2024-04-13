@@ -6,7 +6,7 @@ local point = require('utils.point')
 local push = F.push
 local head, init, tail, last = S.head, S.init, S.tail, S.last
 
-local scaleEvent = {scale = 1, scaleBegin = 1, scaleEnd = 1, scroll = 1}
+local scaleEvent = { scale = 1, scaleBegin = 1, scaleEnd = 1, scroll = 1 }
 
 local isKey = function(x)
 	return x ~= nil and head(x) == '-'
@@ -87,7 +87,7 @@ local parseList = function(word)
 		push(init(part), list)
 		return list
 	end
-	return {first}
+	return { first }
 end
 
 local parseValue = function(key, word)
@@ -135,18 +135,18 @@ local function parseCreate(canvasId, word)
 		params = parseParams(tail(current), word)
 	end
 	local id = getId(params.tags)
-	return {canvasId = canvasId, cmd = cmd, id = id, points = points, params = params}
+	return { canvasId = canvasId, cmd = cmd, id = id, points = points, params = params }
 end
 
 local parseNewText = function(canvasId, word)
-	local tags = {tail(word()), word(), tail(word())}
-	local points = {{x = tonumber(word()), y = tonumber(word())}}
+	local tags = { tail(word()), word(), tail(word()) }
+	local points = { { x = tonumber(word()), y = tonumber(word()) } }
 	return {
 		cmd = 'text',
 		id = getId(tags),
 		canvasId = canvasId,
 		points = points,
-		params = {tags = tags, text = parseText(word)}
+		params = { tags = tags, text = parseText(word) }
 	}
 end
 
@@ -160,36 +160,36 @@ return function(input)
 	if second == 'create' then
 		return parseCreate(first, word)
 	elseif (second == 'coords' or second == 'move' or second == 'delete') then
-		return {cmd = second, tag = word(), points = parsePoints(word)}
+		return { cmd = second, tag = word(), points = parsePoints(word) }
 	elseif (second == 'itemconfigure') then
 		-- missing select-line and unselect-line
 		local tag = word()
 		local params = parseParams(tail(word()), word)
-		return {cmd = second, tag = tag, params = params}
+		return { cmd = second, tag = tag, params = params }
 	elseif (first == 'pdtk_text_new') then
 		return parseNewText(second, word)
 	elseif (first == 'pdtk_canvas_editmode') then
-		return {cmd = 'editmode', canvasId = second, value = tonumber(word())}
+		return { cmd = 'editmode', canvasId = second, value = tonumber(word()) }
 	elseif first == 'pdtk_text_set' then
 		local tag = word()
-		local params = {text = parseText(word)}
-		return {cmd = 'set-text', canvasId = second, tag = tag, params = params}
+		local params = { text = parseText(word) }
+		return { cmd = 'set-text', canvasId = second, tag = tag, params = params }
 	elseif (first == 'pdtk_canvas_new') then
 		local width = tonumber(word())
 		local height = tonumber(word())
-		return {cmd = 'new-canvas', canvasId = second, width = width, height = height}
+		return { cmd = 'new-canvas', canvasId = second, width = width, height = height }
 	elseif (first == 'touch') then
 		local x = tonumber(word())
 		local y = tonumber(word())
-		return {cmd = first, type = tonumber(second), x = x, y = y}
+		return { cmd = first, type = tonumber(second), x = x, y = y }
 	elseif (scaleEvent[first]) then
 		local x = second
-		return {cmd = first, x = x, y = tonumber(word()), value = tonumber(word())}
+		return { cmd = first, x = x, y = tonumber(word()), value = tonumber(word()) }
 	elseif (first == 'orientation') then
-		return {cmd = first, value = second}
+		return { cmd = first, value = second }
 	elseif input == 'update-start' or input == 'update-end' then
-		return {cmd = input}
+		return { cmd = input }
 	elseif first == 'gui' then
-		return {cmd = first, type = second, id = word(), value = word()}
+		return { cmd = first, type = second, id = word(), value = word() }
 	end
 end

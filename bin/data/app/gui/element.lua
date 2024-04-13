@@ -39,7 +39,7 @@ local function GuiElement(options)
 	M.clear = F.noop
 
 	F.assign(M, options or {})
-	F.assign(M.rect, F.pick({'x', 'y', 'width', 'height'}, M))
+	F.assign(M.rect, F.pick({ 'x', 'y', 'width', 'height' }, M))
 
 	addEvent('pressed', M)
 	addEvent('released', M)

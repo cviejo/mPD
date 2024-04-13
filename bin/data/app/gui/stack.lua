@@ -6,14 +6,14 @@ local reduce, map, path, max, add, assign = F.reduce, F.map, F.path, F.max, F.ad
 
 local findMax = reduce(max, 0)
 local accum = reduce(add, 0)
-local getHeights = map(path({'rect', 'height'}))
-local getWidths = map(path({'rect', 'width'}))
+local getHeights = map(path({ 'rect', 'height' }))
+local getWidths = map(path({ 'rect', 'width' }))
 
 local setPosition = function(x, y, child)
 	if child.setPosition then
 		child.setPosition(x, y)
 	else
-		assign(child.rect, {x = x, y = y})
+		assign(child.rect, { x = x, y = y })
 	end
 end
 

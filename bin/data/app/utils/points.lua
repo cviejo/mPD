@@ -13,11 +13,11 @@ M.toRect = curry(function(p1, p2)
 end)
 
 M.add = curry(function(p1, p2)
-	return {x = p1.x + p2.x, y = p1.y + p2.y}
+	return { x = p1.x + p2.x, y = p1.y + p2.y }
 end)
 
 M.subtract = curry(function(p1, p2)
-	return {x = p1.x - p2.x, y = p1.y - p2.y}
+	return { x = p1.x - p2.x, y = p1.y - p2.y }
 end)
 
 -- M.inside = curry(function(rect, point)

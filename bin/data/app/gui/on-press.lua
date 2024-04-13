@@ -10,6 +10,7 @@ return function(btn)
 
 	if btn.id == 'save' then
 		local patchId = renderer.patch.id
+		print("patchId: " .. patchId)
 		pd.queue(patchId, 'menusave')
 	elseif btn.id == 'edit' then
 		pd.queue(patchId, 'editmode', (btn.on and '1' or '0'))

@@ -5,31 +5,30 @@ local Stack = require('gui.stack')
 local theme = require('gui.theme')
 local Dialog = require('gui.dialog')
 local renderer = require('gui.renderer')
-local pd = require('pd')
 local onPressHandler = require('gui.on-press')
 
 local onPress = F.thunkify(onPressHandler)
 
 local row = function(...)
-	return Stack({children = {...}})
+	return Stack({ children = { ... } })
 end
 
 local dock = row(Button('undo'), Button('copy'), Button('paste'), Button('clear'),
-                 Button('edit', {toggle = true}), Button('redo'))
+	Button('edit', { toggle = true }), Button('redo'))
 
 -- menu
-local menuItemSize = {size = theme.button.size * 1.2}
+local menuItemSize = { size = theme.button.size * 1.2 }
 local more = Button('more_vert')
 local layers = Button('layers')
 local add = Button('add', menuItemSize)
 local save = Button('save', menuItemSize)
 local settings = Button('settings', menuItemSize)
 local open = Button('open', menuItemSize)
-local menu = Dialog({children = {row(add, open), row(save, settings)}})
+local menu = Dialog({ children = { row(add, open), row(save, settings) } })
 
 -- root
-local fullscreen = Button('fullscreen', {toggle = true, on = true})
-local window = GuiElement({children = {renderer, dock, fullscreen, more, layers, menu}})
+local fullscreen = Button('fullscreen', { toggle = true, on = true })
+local window = GuiElement({ children = { renderer, dock, fullscreen, more, layers, menu } })
 
 local arrange = function()
 	local center = of.getWindowRect():getCenter()
@@ -68,7 +67,7 @@ end
 
 F.forEach(function(x)
 	x.onPressed(onPress(x))
-end, F.concat(dock.children, {add, save, settings}))
+end, F.concat(dock.children, { add, save, settings }))
 
 arrange()
 

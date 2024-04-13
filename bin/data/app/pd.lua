@@ -12,7 +12,7 @@ local canvasCommand = function(cmd)
 end
 
 M.queue = function(...)
-	buffer = buffer .. ';' .. joinWords({...})
+	buffer = buffer .. ';' .. joinWords({ ... })
 end
 
 M.flush = function()

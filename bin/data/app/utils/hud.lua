@@ -9,4 +9,4 @@ local draw = function( --[[ str, x, y ]] )
 	font:drawString('mem: ' .. math.floor(collectgarbage('count')), 50, 75)
 end
 
-return {draw = draw}
+return { draw = draw }

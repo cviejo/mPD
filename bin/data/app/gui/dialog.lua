@@ -9,7 +9,7 @@ end
 local function Dialog(options)
 	local M = GuiElement(options)
 
-	local content = Stack({orientation = 'vertical', children = M.children})
+	local content = Stack({ orientation = 'vertical', children = M.children })
 
 	local background = GuiElement({})
 
@@ -22,7 +22,7 @@ local function Dialog(options)
 	updateBackground(background)
 
 	M.visible = false
-	M.children = {background, content}
+	M.children = { background, content }
 	M.rect = content.rect
 	M.setPosition = function(x, y)
 		content.setPosition(x, y)

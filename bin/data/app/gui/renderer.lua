@@ -3,7 +3,7 @@ local Canvas = require('gui.canvas')
 
 local width, height = of.getWidth(), of.getHeight()
 
-local M = GuiElement({id = 'renderer', width = width, height = height})
+local M = GuiElement({ id = 'renderer', width = width, height = height })
 
 local callOnPatch = function(functionName)
 	return function(arg)

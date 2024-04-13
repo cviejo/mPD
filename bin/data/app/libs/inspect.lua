@@ -65,7 +65,7 @@ local shortControlCharEscapes = {
 	['\v'] = '\\v',
 	['\127'] = '\\127'
 }
-local longControlCharEscapes = {['\127'] = '\127'} -- \a => nil, \0 => \000, 31 => \031
+local longControlCharEscapes = { ['\127'] = '\127' } -- \a => nil, \0 => \000, 31 => \031
 for i = 0, 31 do
 	local ch = string.char(i)
 	if not shortControlCharEscapes[ch] then
@@ -173,7 +173,7 @@ local copySequence = function(s)
 end
 
 local function makePath(path, ...)
-	local keys = {...}
+	local keys = { ... }
 	local newPath, len = copySequence(path)
 	for i = 1, #keys do
 		newPath[len + i] = keys[i]
@@ -217,10 +217,10 @@ end
 -------------------------------------------------------------------
 
 local Inspector = {}
-local Inspector_mt = {__index = Inspector}
+local Inspector_mt = { __index = Inspector }
 
 function Inspector:puts(...)
-	local args = {...}
+	local args = { ... }
 	local buffer = self.buffer
 	local len = #buffer
 	for i = 1, #args do

@@ -7,9 +7,9 @@ local notLine = function(item)
 	return S.head(item.tag) ~= 'l'
 end
 
-local blackFill = F.pathEq({ 'params', 'fill' }, '000000')
+local blackFill = F.pathEq({'params', 'fill'}, '000000')
 
-local blueFill = F.pathEq({ 'params', 'fill' }, '0000ff')
+local blueFill = F.pathEq({'params', 'fill'}, '0000ff')
 
 return function()
 	local M = {}
@@ -24,7 +24,7 @@ return function()
 		selected = {
 			cmd = 'line',
 			tag = item.tag,
-			params = { width = 2, fill = '0000ff', tags = {} },
+			params = {width = 2, fill = '0000ff', tags = {}},
 			points = control.getPoints(item) or signal.getPoints(item)
 		}
 	end
