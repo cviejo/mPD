@@ -28,10 +28,12 @@ _G.setup = function()
 			success = audio.init('Pro Microphone', 'Pro Speakers', 48000)
 		end
 
-		if (success) then
-			pd.queue('pd open test2.pd', ofx.getPath('ignore.patches'))
-		end
-	end, 300)
+		setTimeout(function()
+			if (success) then
+				pd.queue('pd open test2.pd', ofx.getPath('ignore.patches'))
+			end
+		end, 300)
+	end, 200)
 end
 
 _G.draw = function()
