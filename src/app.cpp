@@ -28,6 +28,10 @@ void ofApp::gotMessage(ofMessage msg) {
 	mpd::push(msg.message);
 }
 
+void ofApp::hostMessage(std::string& msg) {
+	mpd::push(msg);
+}
+
 void ofApp::audioReceived(float* buffer, int size, int channelCount) {
 	audio::in(buffer, size, channelCount);
 }

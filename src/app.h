@@ -22,6 +22,7 @@ public:
 
 	void gotMessage(ofMessage msg);
 	void errorReceived(std::string& msg) {}
+	void hostMessage(std::string& msg);
 
 	void keyPressed(ofKeyEventArgs& args);
 #if defined(TARGET_ANDROID)

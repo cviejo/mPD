@@ -1,5 +1,8 @@
 #include "app.h"
 #include "ofMain.h"
+#ifdef TARGET_ANDROID
+#include <jni.h>
+#endif
 
 int main() {
 	ofSetLogLevel(OF_LOG_NOTICE);
@@ -21,4 +24,12 @@ void ofAndroidActivityInit() {
 }
 
 void ofAndroidApplicationInit() {}
+
+void Java_org_mpd_OFActivity_javaMessage(JNIEnv* env, jobject obj, jstring event, jstring data) {
+	jboolean iscopy;
+
+	const char* message = env->GetStringUTFChars(data, &iscopy);
+
+	((ofApp*)ofGetAppPtr())->hostMessage(message);
+}
 #endif
