@@ -25,11 +25,16 @@ void ofAndroidActivityInit() {
 
 void ofAndroidApplicationInit() {}
 
-void Java_org_mpd_OFActivity_javaMessage(JNIEnv* env, jobject obj, jstring event, jstring data) {
-	jboolean iscopy;
+extern "C" {
 
-	const char* message = env->GetStringUTFChars(data, &iscopy);
+	void Java_cc_openframeworks_mPD_OFActivity_hostMessage(JNIEnv* env, jobject obj, jstring data) {
+		jboolean iscopy;
 
-	((ofApp*)ofGetAppPtr())->hostMessage(message);
+		const char* message = env->GetStringUTFChars(data, &iscopy);
+
+		auto str = string(message);
+
+		((ofApp*)ofGetAppPtr())->hostMessage(str);
+	}
 }
 #endif
