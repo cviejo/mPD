@@ -33,6 +33,10 @@ _G.setup = function()
 				pd.queue('pd open test2.pd', ofx.getPath('ignore.patches'))
 			end
 		end, 300)
+
+		setTimeout(function()
+			mpd.cmd('http://192.168.178.68:8080');
+		end, 300)
 	end, 200)
 end
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "mpd.h"
 #include <vector>
+#include "mpd.h"
 #include "ofxLua.h"
 #if defined(TARGET_ANDROID)
 #include "ofxAndroid.h"
@@ -182,7 +182,10 @@ bool mpd::selectionActive() {
 void mpd::cmd(const string& cmd) {
 #if defined(TARGET_ANDROID)
 	auto activity = ofGetOFActivityObject();
-	ofxJavaCallVoidMethod(activity, "cc/openframeworks/mPD/OFActivity", "showSomething", "()V");
+	auto jcmd = ofGetJNIEnv()->NewStringUTF(cmd.c_str());
+
+	ofxJavaCallVoidMethod(activity, "cc/openframeworks/mPD/OFActivity", "showSomething",
+	                      "(Ljava/lang/String;)V", jcmd);
 #endif
 }
 
