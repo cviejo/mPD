@@ -4,9 +4,12 @@
    "description": "mPD dev utils",
    "scripts": {
       "build": "make",
+      "test": "busted bin/data -p '.*%.test%.lua$'",
+      "testWatch": "nodemon -q -x 'yarn --silent test' --ext lua --watch bin/data",
       "run": "make run",
       "dev": "nodemon -x 'make run' --ext lua",
       "deploy": "of=../../../../of_v0.11.2_android_release/apps/pd/mPD; rsync -r src $of; rsync -r bin/data $of/bin",
       "swig": "cmd='swig -c++ -lua -fcompact -fvirtual'; $cmd -I../../../libs/openFrameworks src/mpd.i; $cmd src/utils/audio.i"
-   }
+   },
+   "license": "MIT"
 }
