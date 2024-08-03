@@ -6,38 +6,42 @@ local time = require('utils.time')
 local parse = require('parse')
 local pd = require('pd')
 
-local w, h = nil, nil
+local initAudio = function()
+	local success = false
+
+	if _G.target == 'android' then
+		success = audio.init(2, 2, 44100)
+	else
+		success = audio.init('Pro Microphone', 'Pro Speakers', 48000)
+	end
+
+	if not success then
+		print('audio init failed')
+		return
+	end
+
+	setTimeout(function()
+		pd.queue('pd open test2.pd', ofx.getPath('ignore.patches'))
+	end, 300)
+end
 
 _G.setup = function()
-	w, h = of.getWidth(), of.getHeight()
+	-- desktop only
+	of.setVerticalSync(false) -- needed for fps > 60
+	of.setWindowPosition(-200, -150)
+	-- setTimeout(function()
+	-- 	of.setWindowShape(900, 400);
+	-- 	of.sendMessage('orientation 1')
+	-- end, 3000)
+	-- desktop only
+
 	of.setLogLevel(of.LOG_VERBOSE)
 	of.background(255)
-	of.setVerticalSync(false) -- needed for fps > 60 on desktop
 	of.setFrameRate(20)
 	of.enableSmoothing()
 	of.enableAntiAliasing()
-	-- of.setWindowPosition(1200, 300) -- just for desktop
-	of.setWindowPosition(-200, -150) -- just for desktop
 
-	setTimeout(function()
-		local success = false
-
-		if _G.target == 'android' then
-			success = audio.init(2, 2, 44100)
-		else
-			success = audio.init('Pro Microphone', 'Pro Speakers', 48000)
-		end
-
-		setTimeout(function()
-			if (success) then
-				pd.queue('pd open test2.pd', ofx.getPath('ignore.patches'))
-			end
-		end, 300)
-
-		setTimeout(function()
-			mpd.cmd('http://192.168.178.68:8080');
-		end, 300)
-	end, 200)
+	setTimeout(initAudio, 200)
 end
 
 _G.draw = function()
