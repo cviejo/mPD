@@ -135,7 +135,7 @@ local function parseCreate(canvasId, word)
 		params = parseParams(tail(current), word)
 	end
 	local id = getId(params.tags)
-	return { canvasId = canvasId, cmd = cmd, id = id, points = points, params = params }
+	return { cmd = cmd, canvasId = canvasId, id = id, points = points, params = params }
 end
 
 local parseNewText = function(canvasId, word)
@@ -159,37 +159,59 @@ return function(input)
 
 	if second == 'create' then
 		return parseCreate(first, word)
-	elseif (second == 'coords' or second == 'move' or second == 'delete') then
+	end
+
+	if (second == 'coords' or second == 'move' or second == 'delete') then
 		return { cmd = second, tag = word(), points = parsePoints(word) }
-	elseif (second == 'itemconfigure') then
+	end
+
+	if (second == 'itemconfigure') then
 		-- missing select-line and unselect-line
 		local tag = word()
 		local params = parseParams(tail(word()), word)
-		return { cmd = second, tag = tag, params = params }
-	elseif (first == 'pdtk_text_new') then
+		return { cmd = 'itemconfigure', tag = tag, params = params }
+	end
+
+	if (first == 'pdtk_text_new') then
 		return parseNewText(second, word)
-	elseif (first == 'pdtk_canvas_editmode') then
+	end
+
+	if (first == 'pdtk_canvas_editmode') then
 		return { cmd = 'editmode', canvasId = second, value = tonumber(word()) }
-	elseif first == 'pdtk_text_set' then
+	end
+
+	if first == 'pdtk_text_set' then
 		local tag = word()
 		local params = { text = parseText(word) }
 		return { cmd = 'set-text', canvasId = second, tag = tag, params = params }
-	elseif (first == 'pdtk_canvas_new') then
+	end
+
+	if (first == 'pdtk_canvas_new') then
 		local width = tonumber(word())
 		local height = tonumber(word())
 		return { cmd = 'new-canvas', canvasId = second, width = width, height = height }
-	elseif (first == 'touch') then
+	end
+
+	if (first == 'touch') then
 		local x = tonumber(word())
 		local y = tonumber(word())
 		return { cmd = first, type = tonumber(second), x = x, y = y }
-	elseif (scaleEvent[first]) then
-		local x = second
+	end
+
+	if (scaleEvent[first]) then
+		local x = second -- why not tonumber?
 		return { cmd = first, x = x, y = tonumber(word()), value = tonumber(word()) }
-	elseif (first == 'orientation') then
-		return { cmd = first, value = second }
-	elseif input == 'update-start' or input == 'update-end' then
+	end
+
+	if (first == 'orientation') then
+		return { cmd = 'orientation', value = second }
+	end
+
+	if input == 'update-start' or input == 'update-end' then
 		return { cmd = input }
-	elseif first == 'gui' then
-		return { cmd = first, type = second, id = word(), value = word() }
+	end
+
+	if first == 'gui' then
+		return { cmd = 'gui', type = second, id = word(), value = word() }
 	end
 end
