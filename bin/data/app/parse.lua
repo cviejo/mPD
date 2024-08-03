@@ -207,11 +207,13 @@ return function(input)
 		return { cmd = 'orientation', value = second }
 	end
 
-	if input == 'update-start' or input == 'update-end' then
-		return { cmd = input }
-	end
-
 	if first == 'gui' then
 		return { cmd = 'gui', type = second, id = word(), value = word() }
 	end
+
+	-- see mpd::update()
+	-- pre and post message/update batch, not sure they're needed anymore.
+	-- if input == 'update-start' or input == 'update-end' then
+	-- 	return { cmd = input }
+	-- end
 end

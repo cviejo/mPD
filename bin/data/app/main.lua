@@ -53,12 +53,7 @@ end
 _G.gotMessage = function(msg)
 	local parsed = parse(msg)
 
-	if not parsed then
-		return
-	elseif parsed.cmd == 'update-start' or parsed.cmd == 'update-end' then
-		-- not implemented
-		return
-	else
+	if parsed then
 		window.message(parsed)
 	end
 end
