@@ -31,11 +31,20 @@ public:
 	void touchUp(ofTouchEventArgs& args);
 	void touchDoubleTap(ofTouchEventArgs& args);
 	void touchCancelled(ofTouchEventArgs& args);
-	bool scaleBegin(ofxAndroidScaleEventArgs& aArgs);
-	bool scale(ofxAndroidScaleEventArgs& aArgs);
-	bool scaleEnd(ofxAndroidScaleEventArgs& aArgs);
+	bool scaleBegin(ofxAndroidScaleEventArgs& args);
+	bool scale(ofxAndroidScaleEventArgs& args);
+	bool scaleEnd(ofxAndroidScaleEventArgs& args);
 	void swipe(ofxAndroidSwipeDir swipeDir, int id);
 	void orientationChanged(ofOrientation& x);
+
+	// void pause();
+	// void stop();
+	// void resume();
+	// void reloadTextures();
+	//
+	// bool backPressed();
+	// void okPressed();
+	// void cancelPressed();
 #else
 	void mousePressed(int x, int y, int button);
 	void mouseReleased(int x, int y, int button);
