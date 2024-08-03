@@ -6,6 +6,7 @@ local theme = require('gui.theme')
 local Dialog = require('gui.dialog')
 local renderer = require('gui.renderer')
 local onPressHandler = require('gui.on-press')
+local grid = require('gui.canvas.grid')
 
 local onPress = F.thunkify(onPressHandler)
 
@@ -25,6 +26,7 @@ local save = Button('save', menuItemSize)
 local settings = Button('settings', menuItemSize)
 local open = Button('open', menuItemSize)
 local menu = Dialog({ children = { row(add, open), row(save, settings) } })
+
 
 -- root
 local fullscreen = Button('fullscreen', { toggle = true, on = true })
@@ -57,6 +59,7 @@ window.message = function(msg)
 	if msg.cmd == 'touch' then
 		window.touch(msg)
 	elseif msg.cmd == 'orientation' then
+		grid.init()
 		arrange()
 		setTimeout(arrange, 300) -- timeout fixes some artifacts when rearranging
 		-- elseif msg.cmd == 'hid' then
