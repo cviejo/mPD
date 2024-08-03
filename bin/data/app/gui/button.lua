@@ -38,8 +38,8 @@ local function Button(id, options)
 			labelPosition = getLabelPosition(M.label, M.rect)
 		end
 		if M.toggle then
-			on = loadImage(M.id .. '_on', imageSize)
-			off = loadImage(M.id .. '_off', imageSize)
+			on = loadImage(M.id .. '-on', imageSize)
+			off = loadImage(M.id .. '-off', imageSize)
 		else
 			on = loadImage(M.id, imageSize)
 		end

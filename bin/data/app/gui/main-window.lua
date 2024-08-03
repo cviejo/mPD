@@ -15,18 +15,17 @@ local row = function(...)
 end
 
 local dock = row(Button('undo'), Button('copy'), Button('paste'), Button('clear'),
-	Button('edit', { toggle = true }), Button('redo'))
+                 Button('edit', { toggle = true }), Button('redo'))
 
 -- menu
 local menuItemSize = { size = theme.button.size * 1.2 }
-local more = Button('more_vert')
+local more = Button('more-vert')
 local layers = Button('layers')
 local add = Button('add', menuItemSize)
 local save = Button('save', menuItemSize)
 local settings = Button('settings', menuItemSize)
 local open = Button('open', menuItemSize)
 local menu = Dialog({ children = { row(add, open), row(save, settings) } })
-
 
 -- root
 local fullscreen = Button('fullscreen', { toggle = true, on = true })
