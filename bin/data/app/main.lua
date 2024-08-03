@@ -33,7 +33,6 @@ _G.setup = function()
 	-- 	of.setWindowShape(900, 400);
 	-- 	of.sendMessage('orientation 1')
 	-- end, 3000)
-	-- desktop only
 
 	of.setLogLevel(of.LOG_VERBOSE)
 	of.background(255)
