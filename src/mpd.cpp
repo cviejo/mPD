@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include "mpd.h"
+#include <vector>
 #include "ofxLua.h"
 #if defined(TARGET_ANDROID)
 #include "ofxAndroid.h"
@@ -184,8 +184,15 @@ void mpd::cmd(const string& cmd) {
 	auto activity = ofGetOFActivityObject();
 	auto jcmd = ofGetJNIEnv()->NewStringUTF(cmd.c_str());
 
-	ofxJavaCallVoidMethod(activity, "cc/openframeworks/mPD/OFActivity", "showSomething",
-	                      "(Ljava/lang/String;)V", jcmd);
+	// clang-format off
+	ofxJavaCallVoidMethod(
+		activity,
+		"cc/openframeworks/mPD/OFActivity",
+		"showSomething",
+		"(Ljava/lang/String;)V",
+		jcmd
+	);
+	// clang-format on
 #endif
 }
 
