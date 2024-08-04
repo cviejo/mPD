@@ -211,6 +211,10 @@ return function(input)
 		return { cmd = 'gui', type = second, id = word(), value = word() }
 	end
 
+	if (first == 'pd-class') then
+		return { cmd = 'pd-class', name = second }
+	end
+
 	-- see mpd::update()
 	-- pre and post message/update batch, not sure they're needed anymore.
 	-- if input == 'update-start' or input == 'update-end' then

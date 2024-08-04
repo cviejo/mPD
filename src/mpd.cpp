@@ -28,7 +28,6 @@ ofMutex mtx;
 
 auto lua = ofxLua();
 auto msgs = vector<string>();
-auto classes = vector<string>();
 auto partial = string("");
 auto scaling = false;
 auto touchable = true;  // limits touch rate to draw rate
@@ -55,11 +54,7 @@ bool includes(const string& needle, char* hay) {
 
 //--------------------------------------------------------------------
 void gui_hook(char* msg) {
-	if (includes("pd-class", msg)) {
-		auto parts = ofSplitString(msg, " ");
-		classes.push_back(parts[1]);
-		return;
-	} else if (includes("pdtk_canvas_getscroll", msg) || includes("raise cord", msg)) {
+	if (includes("pdtk_canvas_getscroll", msg) || includes("raise cord", msg)) {
 		return;
 	}
 	string str = msg;
