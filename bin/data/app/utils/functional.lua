@@ -335,4 +335,11 @@ M.values = function(x)
 	return result
 end
 
+M.sort = M.curry2(function(fn, xs)
+	local result = {}
+	M.assign(result, xs)
+	table.sort(result, fn)
+	return result
+end)
+
 return M
