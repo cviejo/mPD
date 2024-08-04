@@ -58,9 +58,7 @@ M.curry3 = function(fn)
 end
 
 M.curry = function(fn)
-	local nparams = debug.getinfo(fn).nparams
-
-	if nparams == 2 then
+	if debug.getinfo(fn).nparams == 2 then
 		return M.curry2(fn)
 	else
 		return M.curry3(fn)
