@@ -312,6 +312,10 @@ M.thunkify = function(fn)
 	end
 end
 
+M.toUpper = function(x)
+	return x:upper()
+end
+
 M.unapply = function(fn)
 	return function(...)
 		return fn({ ... })

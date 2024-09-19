@@ -17,14 +17,18 @@ end
 local dock = row(Button('undo'), Button('copy'), Button('paste'), Button('clear'),
                  Button('edit', { toggle = true }), Button('redo'))
 
+local LabelButton = function(id, options)
+	return Button(id, F.merge({ label = F.toUpper(id) }, options or {}))
+end
+
 -- menu
-local menuItemSize = { size = theme.button.size * 1.2 }
+local menuItemSize = { size = theme.button.size * 1.4 }
 local more = Button('more-vert')
 local layers = Button('layers')
-local add = Button('add', menuItemSize)
-local save = Button('save', menuItemSize)
-local settings = Button('settings', menuItemSize)
-local open = Button('open', menuItemSize)
+local add = LabelButton('add', menuItemSize)
+local save = LabelButton('save', menuItemSize)
+local settings = LabelButton('settings', menuItemSize)
+local open = LabelButton('open', menuItemSize)
 local menu = Dialog({ children = { row(add, open), row(save, settings) } })
 
 -- root

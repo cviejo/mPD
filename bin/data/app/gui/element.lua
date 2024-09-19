@@ -1,6 +1,6 @@
 local F = require('utils.functional')
+local S = require('utils.string')
 local getTouchTypes = require('utils.get-touch-types')
-local capitalize = require('utils.capitalize')
 
 local find, reverse, curry2 = F.find, F.reverse, F.curry2
 
@@ -13,10 +13,10 @@ end
 local addEvent = function(event, M)
 	local listeners = {}
 
-	M['on' .. capitalize(event)] = function(x)
+	M['on' .. S.capitalize(event)] = function(x)
 		listeners[#listeners + 1] = x
 	end
-	M['notify' .. capitalize(event)] = function(x)
+	M['notify' .. S.capitalize(event)] = function(x)
 		for i = 1, #listeners do
 			listeners[i](x)
 		end

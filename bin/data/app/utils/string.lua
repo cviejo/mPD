@@ -43,4 +43,8 @@ end)
 
 M.joinLines = M.join('\n')
 
+M.capitalize = function(x)
+	return x:sub(1, 1):upper() .. x:sub(2)
+end
+
 return M

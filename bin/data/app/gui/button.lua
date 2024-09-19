@@ -2,7 +2,7 @@ local GuiElement = require('gui.element')
 local Font = require('utils.font')
 local theme = require('gui.theme')
 
-local font = Font('DejaVuSansMono', 6 * dpi)
+local font = Font('DejaVuSansMono', 9.5 * dpi)
 
 local loadImage = function(name, size)
 	local file = 'images/' .. name .. '.png'
@@ -33,9 +33,16 @@ local function Button(id, options)
 	local imageSize = M.size / 2
 	local padding = (M.size - imageSize) / 2
 
-	local init = function()
+	local updateLabelPosition = function()
 		if M.label then
 			labelPosition = getLabelPosition(M.label, M.rect)
+		end
+	end
+
+	local init = function()
+		if M.label then
+			updateLabelPosition()
+			M.rect.height = M.size + font.getStringBounds(M.label, 0, 0).height * 1.2
 		end
 		if M.toggle then
 			on = loadImage(M.id .. '-on', imageSize)

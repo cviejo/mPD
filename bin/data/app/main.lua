@@ -5,6 +5,7 @@ local ofx = require('utils.of')
 local time = require('utils.time')
 local parse = require('parse')
 local pd = require('pd')
+local classNames = require('pd-class-names')
 
 local initAudio = function()
 	local success = false
@@ -27,6 +28,7 @@ end
 
 _G.setup = function()
 	-- desktop only
+
 	of.setVerticalSync(false) -- needed for fps > 60
 	of.setWindowPosition(-200, -150)
 	-- setTimeout(function()
@@ -53,7 +55,13 @@ end
 _G.gotMessage = function(msg)
 	local parsed = parse(msg)
 
-	if parsed then
+	if not parsed then
+		return
+	end
+
+	if (parsed.cmd == 'pd-class') then
+		classNames.add(parsed.name)
+	else
 		window.message(parsed)
 	end
 end
