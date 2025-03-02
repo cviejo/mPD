@@ -24,6 +24,8 @@ extern "C" {
 	void sys_unlock(void);
 }
 
+// bool includes(const string& needle, const string& hay);
+
 ofMutex mtx;
 
 auto lua = ofxLua();
@@ -48,7 +50,7 @@ void message(const string& x) {
 }
 
 //--------------------------------------------------------------------
-bool includes(const string& needle, char* hay) {
+bool includes(const string& needle, const string& hay) {
 	return ofIsStringInString(hay, needle);
 }
 

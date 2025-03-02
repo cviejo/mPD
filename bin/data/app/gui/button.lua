@@ -29,7 +29,7 @@ local function Button(id, options)
 
 	local on = nil
 	local off = nil
-	local labelPosition = nil
+	local labelPosition = { x = 0, y = 0 }
 	local imageSize = M.size / 2
 	local padding = (M.size - imageSize) / 2
 
@@ -77,4 +77,3 @@ local function Button(id, options)
 end
 
 return Button
-
